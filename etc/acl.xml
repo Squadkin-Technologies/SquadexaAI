@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+	<acl>
+		<resources>
+			<resource id="Magento_Backend::admin">
+				<resource id="Squadkin_AIAutoProductBuilder::GeneratedCsv" title="AI Product Builder" sortOrder="10">
+					<resource id="Squadkin_AIAutoProductBuilder::GeneratedCsv_save" title="Save AI Product Builder" sortOrder="10"/>
+					<resource id="Squadkin_AIAutoProductBuilder::GeneratedCsv_delete" title="Delete AI Product Builder" sortOrder="20"/>
+					<resource id="Squadkin_AIAutoProductBuilder::GeneratedCsv_update" title="Update AI Product Builder" sortOrder="30"/>
+					<resource id="Squadkin_AIAutoProductBuilder::GeneratedCsv_view" title="View AI Product Builder" sortOrder="40"/>
+					<resource id="Squadkin_AIAutoProductBuilder::GeneratedCsv_upload" title="Upload Files to AI Product Builder" sortOrder="50"/>
+					<resource id="Squadkin_AIAutoProductBuilder::GeneratedCsv_download" title="Download Files from AI Product Builder" sortOrder="60"/>
+				</resource>
+				<resource id="Squadkin_AIAutoProductBuilder::AiProduct" title="AI Generated Products" sortOrder="20">
+					<resource id="Squadkin_AIAutoProductBuilder::AiProduct_save" title="Save AI Generated Products" sortOrder="10"/>
+					<resource id="Squadkin_AIAutoProductBuilder::AiProduct_delete" title="Delete AI Generated Products" sortOrder="20"/>
+					<resource id="Squadkin_AIAutoProductBuilder::AiProduct_update" title="Update AI Generated Products" sortOrder="30"/>
+					<resource id="Squadkin_AIAutoProductBuilder::AiProduct_view" title="View AI Generated Products" sortOrder="40"/>
+					<resource id="Squadkin_AIAutoProductBuilder::AiProduct_create" title="Create Magento Products from AI Data" sortOrder="50"/>
+				</resource>
+				<resource id="Magento_Backend::stores">
+					<resource id="Magento_Backend::stores_settings">
+						<resource id="Magento_Config::config">
+							<resource id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_config" title="AI Product Builder Configuration"/>
+						</resource>
+					</resource>
+				</resource>
+			</resource>
+		</resources>
+	</acl>
+</config>

@@ -1,0 +1,32 @@
+<div class="admin__field-control custom-attributes-container">
+    <div class="admin__field-note">
+        <span data-bind="i18n: 'Select attributes from the dropdown and set their values. The form will adapt based on the attribute type (text, dropdown, multiselect, etc.).'"></span>
+    </div>
+    
+    <div class="custom-attributes-info" data-bind="visible: getAttributeCount() > 0">
+        <div class="admin__field-note">
+            <span data-bind="i18n: 'Total Custom Attributes'"></span>: 
+            <strong data-bind="text: getAttributeCount()"></strong>
+        </div>
+    </div>
+    
+    <div class="custom-attributes-actions">
+        <button type="button" 
+                class="action-secondary" 
+                data-bind="click: addAttributeRow">
+            <span data-bind="i18n: 'Add New Attribute'"></span>
+        </button>
+        
+        <button type="button" 
+                class="action-secondary" 
+                data-bind="click: clearAllRows, visible: getAttributeCount() > 0">
+            <span data-bind="i18n: 'Clear All'"></span>
+        </button>
+    </div>
+    
+    <div class="custom-attributes-help" data-bind="visible: getAttributeCount() === 0">
+        <div class="admin__field-note">
+            <span data-bind="i18n: 'No custom attributes added yet. Click \"Add Custom Attribute\" to get started.'"></span>
+        </div>
+    </div>
+</div> 

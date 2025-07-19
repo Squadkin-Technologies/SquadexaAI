@@ -1,0 +1,160 @@
+.custom-attributes-container {
+    margin-bottom: 20px;
+}
+
+.custom-attributes-container .admin__field-note {
+    margin-bottom: 15px;
+    color: #666;
+    font-size: 13px;
+}
+
+.custom-attributes-info {
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.custom-attributes-actions {
+    margin-bottom: 20px;
+}
+
+.custom-attributes-actions button {
+    margin-right: 10px;
+    margin-bottom: 5px;
+}
+
+.custom-attributes-help {
+    background: #e8f4f8;
+    border: 1px solid #c2e0eb;
+    border-radius: 4px;
+    padding: 15px;
+    text-align: center;
+}
+
+.custom-attributes-help .admin__field-note {
+    margin-bottom: 0;
+    color: #0066cc;
+    font-style: italic;
+}
+
+/* Dynamic rows styling */
+.admin__dynamic-rows .custom-attributes-container {
+    margin-bottom: 0;
+}
+
+.admin__dynamic-rows .admin__control-table {
+    margin-top: 10px;
+}
+
+.admin__dynamic-rows .admin__control-table .admin__control-table-cell {
+    vertical-align: top;
+    padding: 8px;
+}
+
+.admin__dynamic-rows .admin__control-table .admin__control-table-cell:first-child {
+    width: 200px;
+}
+
+.admin__dynamic-rows .admin__control-table .admin__control-table-cell:nth-child(2) {
+    width: auto;
+}
+
+.admin__dynamic-rows .admin__control-table .admin__control-table-cell:last-child {
+    width: 50px;
+    text-align: center;
+}
+
+/* Attribute select styling */
+.custom-attributes-container .admin__field-control select {
+    min-width: 180px;
+}
+
+/* Value field styling */
+.custom-attributes-container .admin__field-control input,
+.custom-attributes-container .admin__field-control textarea,
+.custom-attributes-container .admin__field-control select {
+    width: 100%;
+    min-width: 200px;
+}
+
+.custom-attributes-container .admin__field-control textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+
+/* Tooltips */
+.custom-attributes-container .admin__field-tooltip {
+    position: relative;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.custom-attributes-container .admin__field-tooltip .admin__field-tooltip-content {
+    max-width: 300px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .admin__dynamic-rows .admin__control-table .admin__control-table-cell:first-child {
+        width: 150px;
+    }
+    
+    .custom-attributes-container .admin__field-control select {
+        min-width: 140px;
+    }
+    
+    .custom-attributes-container .admin__field-control input,
+    .custom-attributes-container .admin__field-control textarea,
+    .custom-attributes-container .admin__field-control select {
+        min-width: 150px;
+    }
+}
+
+/* Loading state */
+.custom-attributes-container .loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.custom-attributes-container .loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #ccc;
+    border-top: 2px solid #007bdb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Error states */
+.custom-attributes-container .admin__field-error {
+    border-color: #e22626;
+}
+
+.custom-attributes-container .admin__field-error-message {
+    color: #e22626;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* Success states */
+.custom-attributes-container .admin__field-success {
+    border-color: #79a22e;
+}
+
+.custom-attributes-container .admin__field-success-message {
+    color: #79a22e;
+    font-size: 12px;
+    margin-top: 5px;
+} 

@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+	<table name="squadkin_aiautoproductbuilder_generatedcsv" resource="default" engine="innodb" comment="squadkin_aiautoproductbuilder_generatedcsv Table">
+		<column xsi:type="int" name="generatedcsv_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity Id"/>
+		<column name="input_file_name" nullable="true" xsi:type="text" comment="input_file_name"/>
+		<column name="input_file_path" nullable="true" xsi:type="text" comment="input_file_path"/>
+		<column name="response_file_name" nullable="true" xsi:type="text" comment="response_file_name"/>
+		<column name="response_file_path" nullable="true" xsi:type="text" comment="response_file_path"/>
+		<column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+		<constraint xsi:type="primary" referenceId="PRIMARY">
+			<column name="generatedcsv_id"/>
+		</constraint>
+	</table>
+	<table name="squadkin_aiautoproductbuilder_aiproduct" resource="default" engine="innodb" comment="AI Generated Products Table">
+		<column xsi:type="int" name="aiproduct_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity Id"/>
+		<column xsi:type="int" name="generatedcsv_id" padding="10" unsigned="true" nullable="true" comment="Generated CSV ID"/>
+		<column name="sku" nullable="false" xsi:type="varchar" length="64" comment="Product SKU"/>
+		<column name="name" nullable="false" xsi:type="text" comment="Product Name"/>
+		<column name="description" nullable="true" xsi:type="text" comment="Product Description"/>
+		<column name="short_description" nullable="true" xsi:type="text" comment="Product Short Description"/>
+		<column name="price" nullable="true" xsi:type="decimal" precision="12" scale="4" comment="Product Price"/>
+		<column name="special_price" nullable="true" xsi:type="decimal" precision="12" scale="4" comment="Product Special Price"/>
+		<column name="weight" nullable="true" xsi:type="decimal" precision="12" scale="4" comment="Product Weight"/>
+		<column name="qty" nullable="true" xsi:type="int" comment="Product Quantity"/>
+		<column name="category" nullable="true" xsi:type="varchar" length="255" comment="Product Category"/>
+		<column name="status" nullable="true" xsi:type="varchar" length="50" default="Enabled" comment="Product Status"/>
+		<column name="visibility" nullable="true" xsi:type="varchar" length="100" default="Catalog, Search" comment="Product Visibility"/>
+		<column name="type" nullable="true" xsi:type="varchar" length="50" default="simple" comment="Product Type"/>
+		<column name="attribute_set" nullable="true" xsi:type="varchar" length="100" default="Default" comment="Attribute Set"/>
+		<column name="tax_class" nullable="true" xsi:type="varchar" length="100" comment="Tax Class"/>
+		<column name="meta_title" nullable="true" xsi:type="text" comment="Meta Title"/>
+		<column name="meta_description" nullable="true" xsi:type="text" comment="Meta Description"/>
+		<column name="meta_keywords" nullable="true" xsi:type="text" comment="Meta Keywords"/>
+		<column name="url_key" nullable="true" xsi:type="varchar" length="255" comment="URL Key"/>
+		<column name="magento_product_id" nullable="true" xsi:type="int" unsigned="true" comment="Magento Product ID"/>
+		<column name="is_created_in_magento" nullable="false" xsi:type="boolean" default="false" comment="Is Created in Magento"/>
+		<column name="additional_data" nullable="true" xsi:type="longtext" comment="Additional Custom Attributes JSON"/>
+		<column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+		<column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+		<constraint xsi:type="primary" referenceId="PRIMARY">
+			<column name="aiproduct_id"/>
+		</constraint>
+		<constraint xsi:type="foreign" referenceId="SQUADKIN_AIPRODUCT_GENERATEDCSV_ID" table="squadkin_aiautoproductbuilder_aiproduct" column="generatedcsv_id" referenceTable="squadkin_aiautoproductbuilder_generatedcsv" referenceColumn="generatedcsv_id" onDelete="SET NULL"/>
+		<constraint xsi:type="unique" referenceId="SQUADKIN_AIPRODUCT_SKU_UNIQUE">
+			<column name="sku"/>
+		</constraint>
+		<index referenceId="SQUADKIN_AIPRODUCT_GENERATEDCSV_ID" indexType="btree">
+			<column name="generatedcsv_id"/>
+		</index>
+		<index referenceId="SQUADKIN_AIPRODUCT_MAGENTO_PRODUCT_ID" indexType="btree">
+			<column name="magento_product_id"/>
+		</index>
+	</table>
+</schema>

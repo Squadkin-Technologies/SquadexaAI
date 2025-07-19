@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+	<menu>
+		<add id="Squadkin::top_level" title="Squadkin" module="Squadkin_AIAutoProductBuilder" sortOrder="9999" resource="Magento_Backend::content"/>
+		<add id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_generatedcsv" title="AI Product Builder" module="Squadkin_AIAutoProductBuilder" sortOrder="10" resource="Magento_Backend::content" parent="Squadkin::top_level" action="squadkin_aiautoproductbuilder/generatedcsv/index"/>
+		<add id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_aiproduct" title="AI Generated Products" module="Squadkin_AIAutoProductBuilder" sortOrder="20" resource="Squadkin_AIAutoProductBuilder::AiProduct_view" parent="Squadkin::top_level" action="squadkin_aiautoproductbuilder/aiproduct/index"/>
+		<add id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_config" title="Configuration" module="Squadkin_AIAutoProductBuilder" sortOrder="9999" resource="Magento_Backend::content" parent="Squadkin::top_level" action="adminhtml/system_config/edit/section/aiproductbuilder"/>
+	</menu>
+</config>

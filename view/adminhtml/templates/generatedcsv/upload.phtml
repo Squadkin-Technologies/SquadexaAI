@@ -1,0 +1,156 @@
+<?php
+/**
+ * Copyright ©  All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Squadkin\AIAutoProductBuilder\Block\Adminhtml\GeneratedCsv\Upload $block */
+?>
+<div class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('Upload File for AI Processing')) ?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item upload-section">
+            <form id="upload-form" 
+                  action="<?= $block->escapeUrl($block->getUploadUrl()) ?>" 
+                  method="post" 
+                  enctype="multipart/form-data">
+                
+                <input name="form_key" type="hidden" value="<?= $block->escapeHtmlAttr($block->getFormKey()) ?>" />
+                
+                <div class="admin__field admin__field-file">
+                    <label class="admin__field-label" for="input_file">
+                        <span><?= $block->escapeHtml(__('Select File')) ?></span>
+                    </label>
+                    <div class="admin__field-control">
+                        <input type="file" 
+                               name="input_file" 
+                               id="input_file" 
+                               class="admin__control-file" 
+                               accept="<?= $block->escapeHtmlAttr($block->getAcceptedFileTypes()) ?>"
+                               required="required" />
+                        <div class="admin__field-note">
+                            <span><?= $block->escapeHtml(__('Accepted file types: CSV, XLSX. Maximum file size: %1 MB.', $block->getMaxFileSize())) ?></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin__field admin__field-submit">
+                    <div class="admin__field-control">
+                        <button type="submit" 
+                                class="action-primary" 
+                                id="upload-button">
+                            <span><?= $block->escapeHtml(__('Generate CSV From AI')) ?></span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.upload-section {
+    background: #f8f8f8;
+    padding: 20px;
+    border: 1px solid #e3e3e3;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.upload-section .admin__field {
+    margin-bottom: 15px;
+}
+
+.upload-section .admin__field-label {
+    font-weight: 600;
+    color: #333;
+}
+
+.upload-section .admin__control-file {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #adadad;
+    border-radius: 3px;
+    background: #fff;
+}
+
+.upload-section .admin__field-note {
+    margin-top: 5px;
+    color: #666;
+    font-size: 12px;
+}
+
+.upload-section .action-primary {
+    background: #eb5202;
+    border: 1px solid #eb5202;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.upload-section .action-primary:hover {
+    background: #d44a02;
+    border-color: #d44a02;
+}
+
+.upload-section .action-primary:disabled {
+    background: #ccc;
+    border-color: #ccc;
+    cursor: not-allowed;
+}
+</style>
+
+<script>
+require(['jquery', 'mage/translate'], function($, $t) {
+    $(document).ready(function() {
+        var uploadForm = $('#upload-form');
+        var uploadButton = $('#upload-button');
+        var fileInput = $('#input_file');
+        
+        // File validation
+        fileInput.on('change', function() {
+            var file = this.files[0];
+            if (file) {
+                var maxSize = <?= $block->getMaxFileSize() ?> * 1024 * 1024; // Convert MB to bytes
+                var allowedTypes = ['csv', 'xlsx'];
+                var fileExtension = file.name.split('.').pop().toLowerCase();
+                
+                if (file.size > maxSize) {
+                    alert($t('File size exceeds maximum limit of %1 MB.').replace('%1', <?= $block->getMaxFileSize() ?>));
+                    this.value = '';
+                    return false;
+                }
+                
+                if (allowedTypes.indexOf(fileExtension) === -1) {
+                    alert($t('Invalid file type. Only CSV and XLSX files are allowed.'));
+                    this.value = '';
+                    return false;
+                }
+            }
+        });
+        
+        // Form submission
+        uploadForm.on('submit', function(e) {
+            if (!fileInput.val()) {
+                alert($t('Please select a file to upload.'));
+                e.preventDefault();
+                return false;
+            }
+            
+            // Disable button and show loading state
+            uploadButton.prop('disabled', true);
+            uploadButton.html('<span>' + $t('Processing...') + '</span>');
+            
+            // Show processing message
+            $('<div class="message message-notice">' + 
+              '<div>' + $t('Processing file with AI API. This may take a few moments...') + '</div>' + 
+              '</div>').insertAfter('.page-main-actions');
+        });
+    });
+});
+</script> 
