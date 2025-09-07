@@ -6,8 +6,5 @@ var config = {
             'Squadkin_AIAutoProductBuilder/js/form/components/attribute-value': 'Squadkin_AIAutoProductBuilder/js/form/components/attribute-value',
             'Squadkin_AIAutoProductBuilder/js/form/components/custom-attributes': 'Squadkin_AIAutoProductBuilder/js/form/components/custom-attributes'
         }
-    },
-    deps: [
-        'Squadkin_AIAutoProductBuilder/css/custom-attributes'
-    ]
+    }
 }; 

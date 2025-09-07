@@ -3,21 +3,23 @@
 	<acl>
 		<resources>
 			<resource id="Magento_Backend::admin">
-				<resource id="Squadkin_AIAutoProductBuilder::GeneratedCsv" title="AI Product Builder" sortOrder="10">
-					<resource id="Squadkin_AIAutoProductBuilder::GeneratedCsv_save" title="Save AI Product Builder" sortOrder="10"/>
-					<resource id="Squadkin_AIAutoProductBuilder::GeneratedCsv_delete" title="Delete AI Product Builder" sortOrder="20"/>
-					<resource id="Squadkin_AIAutoProductBuilder::GeneratedCsv_update" title="Update AI Product Builder" sortOrder="30"/>
-					<resource id="Squadkin_AIAutoProductBuilder::GeneratedCsv_view" title="View AI Product Builder" sortOrder="40"/>
-					<resource id="Squadkin_AIAutoProductBuilder::GeneratedCsv_upload" title="Upload Files to AI Product Builder" sortOrder="50"/>
-					<resource id="Squadkin_AIAutoProductBuilder::GeneratedCsv_download" title="Download Files from AI Product Builder" sortOrder="60"/>
-				</resource>
-				<resource id="Squadkin_AIAutoProductBuilder::AiProduct" title="AI Generated Products" sortOrder="20">
-					<resource id="Squadkin_AIAutoProductBuilder::AiProduct_save" title="Save AI Generated Products" sortOrder="10"/>
-					<resource id="Squadkin_AIAutoProductBuilder::AiProduct_delete" title="Delete AI Generated Products" sortOrder="20"/>
-					<resource id="Squadkin_AIAutoProductBuilder::AiProduct_update" title="Update AI Generated Products" sortOrder="30"/>
-					<resource id="Squadkin_AIAutoProductBuilder::AiProduct_view" title="View AI Generated Products" sortOrder="40"/>
-					<resource id="Squadkin_AIAutoProductBuilder::AiProduct_create" title="Create Magento Products from AI Data" sortOrder="50"/>
-				</resource>
+			    <resource id="Squadkin_AIAutoProductBuilder::aiautoproductbuilder_main_menu" title="AI Auto Product Builder" sortOrder="10">
+                    <resource id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_generatedcsv" title="AI Product Builder" sortOrder="10">
+						<resource id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_generatedcsv_save" title="Save AI Product Builder" sortOrder="10"/>
+						<resource id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_generatedcsv_delete" title="Delete AI Product Builder" sortOrder="20"/>
+						<resource id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_generatedcsv_update" title="Update AI Product Builder" sortOrder="30"/>
+						<resource id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_generatedcsv_view" title="View AI Product Builder" sortOrder="40"/>
+						<resource id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_generatedcsv_upload" title="Upload Files to AI Product Builder" sortOrder="50"/>
+						<resource id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_generatedcsv_download" title="Download Files from AI Product Builder" sortOrder="60"/>
+					</resource>
+                    <resource id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_aiproduct" title="AI Generated Products" sortOrder="20">
+						<resource id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_aiproduct_save" title="Save AI Generated Products" sortOrder="10"/>
+						<resource id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_aiproduct_delete" title="Delete AI Generated Products" sortOrder="20"/>
+						<resource id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_aiproduct_update" title="Update AI Generated Products" sortOrder="30"/>
+						<resource id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_aiproduct_view" title="View AI Generated Products" sortOrder="40"/>
+						<resource id="Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_aiproduct_create" title="Create Magento Products from AI Data" sortOrder="50"/>
+					</resource>
+                </resource>
 				<resource id="Magento_Backend::stores">
 					<resource id="Magento_Backend::stores_settings">
 						<resource id="Magento_Config::config">

@@ -21,17 +21,17 @@
                 
                 <div class="admin__field admin__field-file">
                     <label class="admin__field-label" for="input_file">
-                        <span><?= $block->escapeHtml(__('Select CSV File')) ?></span>
+                        <span><?= $block->escapeHtml(__('Select File')) ?></span>
                     </label>
                     <div class="admin__field-control">
                         <input type="file" 
                                name="input_file" 
                                id="input_file" 
                                class="admin__control-file" 
-                               accept=".csv"
+                               accept="<?= $block->escapeHtmlAttr($block->getAcceptedFileTypes()) ?>"
                                required="required" />
                         <div class="admin__field-note">
-                            <span><?= $block->escapeHtml(__('Accepted file types: CSV. Maximum file size: %1 MB.', $block->getMaxFileSize())) ?></span>
+                            <span><?= $block->escapeHtml(__('Accepted file types: CSV, XLSX. Maximum file size: %1 MB.', $block->getMaxFileSize())) ?></span>
                         </div>
                     </div>
                 </div>
@@ -162,6 +162,8 @@
                         </button>
                     </div>
                 </div>
+                
+
             </form>
         </div>
     </div>
@@ -255,14 +257,126 @@
     font-size: 12px;
     font-weight: 600;
 }
+
+.upload-section .action-secondary {
+    background: #007cba;
+    border: 1px solid #007cba;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.upload-section .action-secondary:hover {
+    background: #006ba6;
+    border-color: #006ba6;
+}
+
+.upload-section .action-tertiary {
+    background: #28a745;
+    border: 1px solid #28a745;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.upload-section .action-tertiary:hover {
+    background: #218838;
+    border-color: #218838;
+}
+
+.validation-status {
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.validation-status.success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.validation-status.error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.validation-details {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 15px;
+    font-size: 13px;
+}
+
+.validation-details h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #495057;
+}
+
+.validation-details ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.validation-details li {
+    margin-bottom: 5px;
+    color: #6c757d;
+}
+
+.validation-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.validation-summary-item {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 10px;
+    text-align: center;
+}
+
+.validation-summary-item .number {
+    font-size: 24px;
+    font-weight: bold;
+    color: #007cba;
+}
+
+.validation-summary-item .label {
+    font-size: 12px;
+    color: #6c757d;
+    text-transform: uppercase;
+}
 </style>
 
 <script>
 require(['jquery', 'mage/translate'], function($, $t) {
     $(document).ready(function() {
         var uploadForm = $('#upload-form');
+        var validateButton = $('#validate-button');
         var generateButton = $('#generate-button');
+        var importButton = $('#import-button');
         var fileInput = $('#input_file');
+        var validationResults = $('#validation-results');
+        var validationStatus = $('#validation-status');
+        var validationDetails = $('#validation-details');
+        var errorReportSection = $('#error-report-section');
+        var downloadErrorReport = $('#download-error-report');
+        
+        var tempFileName = null;
+        var validationData = null;
         
         // File validation
         fileInput.on('change', function() {
@@ -275,14 +389,18 @@ require(['jquery', 'mage/translate'], function($, $t) {
                 if (file.size > maxSize) {
                     alert($t('File size exceeds maximum limit of %1 MB.').replace('%1', <?= $block->getMaxFileSize() ?>));
                     this.value = '';
+                    resetValidation();
                     return false;
                 }
                 
                 if (allowedTypes.indexOf(fileExtension) === -1) {
                     alert($t('Invalid file type. Only CSV files are allowed.'));
                     this.value = '';
+                    resetValidation();
                     return false;
                 }
+                
+                resetValidation();
             }
         });
         
@@ -303,34 +421,215 @@ require(['jquery', 'mage/translate'], function($, $t) {
         // Check AI options on change
         $('.ai-option-checkbox').on('change', function() {
             validateAiOptions();
+            resetValidation();
         });
         
-        // Form submission validation
-        uploadForm.on('submit', function(e) {
-            // Check if file is selected
+        // Reset validation state
+        function resetValidation() {
+            validationResults.hide();
+            generateButton.hide();
+            importButton.hide();
+            errorReportSection.hide();
+            tempFileName = null;
+            validationData = null;
+        }
+        
+        // CSV Validation
+        validateButton.on('click', function() {
             if (!fileInput.val()) {
-                e.preventDefault();
-                alert($t('Please select a CSV file to upload.'));
-                return false;
+                alert($t('Please select a file to upload.'));
+                return;
             }
             
             // Validate AI options
             if (!validateAiOptions()) {
-                e.preventDefault();
                 alert($t('Please select at least 3 AI generation options.'));
-                return false;
+                return;
             }
             
             // Show loading state
+            validateButton.prop('disabled', true);
+            validateButton.html('<span>' + $t('Validating...') + '</span>');
+            
+            // Create FormData
+            var formData = new FormData();
+            formData.append('input_file', fileInput[0].files[0]);
+            formData.append('form_key', $('input[name="form_key"]').val());
+            
+            // Add AI options
+            $('.ai-option-checkbox:checked').each(function() {
+                formData.append('ai_options[]', $(this).val());
+            });
+            
+            // Send validation request
+            $.ajax({
+                url: '<?= $block->escapeUrl($block->getUrl('squadkin_aiautoproductbuilder/generatedcsv/validate')) ?>',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    handleValidationResponse(response);
+                },
+                error: function(xhr, status, error) {
+                    handleValidationError(error);
+                },
+                complete: function() {
+                    // Reset button state
+                    validateButton.prop('disabled', false);
+                    validateButton.html('<span>' + $t('Validate CSV') + '</span>');
+                }
+            });
+        });
+        
+        // Handle validation response
+        function handleValidationResponse(response) {
+            validationResults.show();
+            validationData = response;
+            tempFileName = response.temp_file;
+            
+            if (response.success) {
+                // Success - show generate button
+                validationStatus.removeClass('error').addClass('success');
+                validationStatus.html('<i class="fa fa-check-circle"></i> ' + $t('CSV file validation successful!'));
+                
+                var result = response.validation_result;
+                var aiOptions = response.ai_options;
+                
+                var detailsHtml = '<div class="validation-summary">';
+                detailsHtml += '<div class="validation-summary-item"><div class="number">' + result.processed_rows + '</div><div class="label">' + $t('Total Rows') + '</div></div>';
+                detailsHtml += '<div class="validation-summary-item"><div class="number">' + result.valid_rows + '</div><div class="label">' + $t('Valid Rows') + '</div></div>';
+                detailsHtml += '<div class="validation-summary-item"><div class="number">' + result.headers.length + '</div><div class="label">' + $t('Columns') + '</div></div>';
+                detailsHtml += '</div>';
+                
+                detailsHtml += '<h4>' + $t('AI Generation Options:') + '</h4>';
+                detailsHtml += '<ul>';
+                $.each(aiOptions.labels, function(key, label) {
+                    detailsHtml += '<li>' + label + '</li>';
+                });
+                detailsHtml += '</ul>';
+                
+                if (result.headers && result.headers.length > 0) {
+                    detailsHtml += '<h4>' + $t('CSV Columns:') + '</h4>';
+                    detailsHtml += '<ul>';
+                    $.each(result.headers, function(index, header) {
+                        detailsHtml += '<li>' + header + '</li>';
+                    });
+                    detailsHtml += '</ul>';
+                }
+                
+                validationDetails.html(detailsHtml);
+                generateButton.show();
+                errorReportSection.hide();
+                
+            } else {
+                // Error - show error details and download link
+                validationStatus.removeClass('success').addClass('error');
+                validationStatus.html('<i class="fa fa-exclamation-triangle"></i> ' + $t('CSV file validation failed!'));
+                
+                var detailsHtml = '<h4>' + $t('Validation Errors:') + '</h4>';
+                if (response.validation_result && response.validation_result.validation_messages) {
+                    detailsHtml += '<ul>';
+                    $.each(response.validation_result.validation_messages, function(index, message) {
+                        detailsHtml += '<li>' + message + '</li>';
+                    });
+                    detailsHtml += '</ul>';
+                } else {
+                    detailsHtml += '<p>' + (response.error || $t('Unknown validation error.')) + '</p>';
+                }
+                
+                validationDetails.html(detailsHtml);
+                generateButton.hide();
+                importButton.hide();
+                
+                // Show error report download if available
+                if (response.error_report) {
+                    downloadErrorReport.attr('href', '<?= $block->escapeUrl($block->getUrl('squadkin_aiautoproductbuilder/generatedcsv/downloaderror')) ?>?file=' + response.error_report);
+                    errorReportSection.show();
+                }
+            }
+        }
+        
+        // Handle validation error
+        function handleValidationError(error) {
+            validationResults.show();
+            validationStatus.removeClass('success').addClass('error');
+            validationStatus.html('<i class="fa fa-exclamation-triangle"></i> ' + $t('Validation failed due to a system error.'));
+            validationDetails.html('<p>' + error + '</p>');
+            generateButton.hide();
+            importButton.hide();
+            errorReportSection.hide();
+        }
+        
+        // Form submission for AI generation
+        uploadForm.on('submit', function(e) {
+            e.preventDefault();
+            
+            if (!tempFileName || !validationData || !validationData.success) {
+                alert($t('Please validate the CSV file first.'));
+                return;
+            }
+            
+            // Disable button and show loading state
             generateButton.prop('disabled', true);
-            generateButton.html('<span>' + $t('Processing...') + '</span>');
+            generateButton.html('<span>' + $t('Generating...') + '</span>');
             
             // Show processing message
             $('<div class="message message-notice">' + 
               '<div>' + $t('Processing file with AI API. This may take a few moments...') + '</div>' + 
               '</div>').insertAfter('.page-main-actions');
             
-            return true; // Allow form to submit normally
+            // Proceed with original upload flow but with temp file
+            submitFormWithTempFile();
+        });
+        
+        // Submit form with temporary file
+        function submitFormWithTempFile() {
+            var formData = new FormData();
+            formData.append('temp_file', tempFileName);
+            formData.append('form_key', $('input[name="form_key"]').val());
+            
+            // Add AI options
+            $('.ai-option-checkbox:checked').each(function() {
+                formData.append('ai_options[]', $(this).val());
+            });
+            
+            $.ajax({
+                url: '<?= $block->escapeUrl($block->getUploadUrl()) ?>',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    // Reload page to show results
+                    window.location.reload();
+                },
+                error: function(xhr, status, error) {
+                    alert($t('Error processing file: %1').replace('%1', error));
+                    generateButton.prop('disabled', false);
+                    generateButton.html('<span>' + $t('Generate AI Products') + '</span>');
+                }
+            });
+        }
+        
+        // Import products button
+        importButton.on('click', function() {
+            if (!tempFileName || !validationData || !validationData.success) {
+                alert($t('Please validate and generate AI products first.'));
+                return;
+            }
+            
+            if (confirm($t('Are you sure you want to import the AI-generated products into Magento? This will create actual products in your catalog.'))) {
+                importButton.prop('disabled', true);
+                importButton.html('<span>' + $t('Importing...') + '</span>');
+                
+                // TODO: Implement import to Magento functionality
+                alert($t('Import functionality will be implemented in the next phase.'));
+                
+                importButton.prop('disabled', false);
+                importButton.html('<span>' + $t('Import Products to Magento') + '</span>');
+            }
         });
     });
 });

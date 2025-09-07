@@ -1,0 +1,350 @@
+<?php
+/**
+ * Copyright ©  All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Squadkin\AIAutoProductBuilder\Block\Adminhtml\GeneratedCsv\ImportModal $block */
+$generatedCsv = $block->getGeneratedCsv();
+?>
+
+<div class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('Import AI Products to Magento')) ?></span>
+    </div>
+    
+    <?php if ($generatedCsv): ?>
+        <div class="admin__page-section-content">
+            <?php if ($generatedCsv->getImportStatus() === 'processing'): ?>
+                <!-- Processing Status View -->
+                <div class="admin__field-note import-processing-status">
+                    <p><strong><?= $block->escapeHtml(__('Import Status: Processing')) ?></strong></p>
+                    <p><?= $block->escapeHtml(__('Import is currently in progress for: %1', $generatedCsv->getResponseFileName())) ?></p>
+                    <?php if ($generatedCsv->getImportErrorMessage()): ?>
+                        <div class="message message-notice">
+                            <p><?= $block->escapeHtml(__('Previous attempt message: %1', $generatedCsv->getImportErrorMessage())) ?></p>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <div class="admin__field-control">
+                        <button type="button" onclick="location.reload()" class="action-default scalable">
+                            <?= $block->escapeHtml(__('Refresh Status')) ?>
+                        </button>
+                            <button type="button" onclick="window.location.href='<?= $block->escapeUrl($block->getUrl('squadkin_aiautoproductbuilder/generatedcsv/index')) ?>'" class="action-secondary scalable">
+                            <?= $block->escapeHtml(__('Back to Grid')) ?>
+                        </button>
+                    </div>
+                </div>
+            <?php else: ?>
+                <!-- Normal Import Form -->
+                <div class="admin__field-note">
+                    <p><?= $block->escapeHtml(__('You are about to import AI-generated products from: %1', $generatedCsv->getResponseFileName())) ?></p>
+                    <?php if ($generatedCsv->getImportErrorMessage()): ?>
+                        <div class="message message-error">
+                            <p><?= $block->escapeHtml(__('Previous import error: %1', $generatedCsv->getImportErrorMessage())) ?></p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                
+            <form id="import-form" class="import-form" enctype="multipart/form-data" method="post">
+                <input name="form_key" type="hidden" value="<?= $block->escapeHtmlAttr($block->getFormKey()) ?>" />
+                <input name="csv_id" type="hidden" value="<?= $block->escapeHtmlAttr($generatedCsv->getGeneratedcsvId()) ?>" />
+                
+                <fieldset class="admin__fieldset">
+                    <legend class="admin__legend">
+                        <span><?= $block->escapeHtml(__('Import Settings')) ?></span>
+                    </legend>
+                    
+                    <div class="admin__field admin__field-required">
+                        <label class="admin__field-label" for="validation_strategy">
+                            <span><?= $block->escapeHtml(__('Validation Strategy')) ?></span>
+                        </label>
+                        <div class="admin__field-control">
+                            <select name="validation_strategy" id="validation_strategy" class="admin__control-select" required="required">
+                                <?php foreach ($block->getValidationStrategies() as $value => $label): ?>
+                                    <option value="<?= $block->escapeHtmlAttr($value) ?>" <?= $value === 'validation-stop-on-errors' ? 'selected="selected"' : '' ?>>
+                                        <?= $block->escapeHtml($label) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="admin__field-note">
+                                <span><?= $block->escapeHtml(__('Choose how to handle validation errors during import.')) ?></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="admin__field">
+                        <label class="admin__field-label" for="allowed_error_count">
+                            <span><?= $block->escapeHtml(__('Allowed Errors Count')) ?></span>
+                        </label>
+                        <div class="admin__field-control">
+                            <input type="number" 
+                                   name="allowed_error_count" 
+                                   id="allowed_error_count" 
+                                   class="admin__control-text"
+                                   value="10"
+                                   min="0"
+                                   max="100" />
+                            <div class="admin__field-note">
+                                <span><?= $block->escapeHtml(__('Maximum number of errors allowed during import (0 = unlimited).')) ?></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="admin__field admin__field-required">
+                        <label class="admin__field-label" for="behavior">
+                            <span><?= $block->escapeHtml(__('Import Behavior')) ?></span>
+                        </label>
+                        <div class="admin__field-control">
+                            <select name="behavior" id="behavior" class="admin__control-select" required="required">
+                                <?php foreach ($block->getImportBehaviors() as $value => $label): ?>
+                                    <option value="<?= $block->escapeHtmlAttr($value) ?>" <?= $value === 'append' ? 'selected="selected"' : '' ?>>
+                                        <?= $block->escapeHtml($label) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="admin__field-note">
+                                <span><?= $block->escapeHtml(__('Select the import behavior for handling existing products.')) ?></span>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                
+                <fieldset class="admin__fieldset">
+                    <legend class="admin__legend">
+                        <span><?= $block->escapeHtml(__('Or Upload Custom CSV (optional)')) ?></span>
+                    </legend>
+                    <div class="admin__field">
+                        <label class="admin__field-label" for="custom_csv_file">
+                            <span><?= $block->escapeHtml(__('Custom CSV File')) ?></span>
+                        </label>
+                        <div class="admin__field-control">
+                            <input type="file" name="custom_csv_file" id="custom_csv_file" accept=".csv" class="admin__control-file" />
+                            <div class="admin__field-note">
+                                <span><?= $block->escapeHtml(__('Upload a custom CSV file to import instead of the default linked file.')) ?></span>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div id="import-validation-errors" style="display:none;" class="message message-error">
+                    <div id="import-validation-errors-content"></div>
+                    <div id="import-error-report-link" style="margin-top:10px;"></div>
+                </div>
+
+                <div class="admin__field admin__field-submit">
+                    <div class="admin__field-control">
+                        <button type="submit" class="action-primary scalable">
+                            <?= $block->escapeHtml(__('Import')) ?>
+                        </button>
+                        <button type="button" 
+                                class="action-secondary" 
+                                id="import-cancel-button">
+                            <span><?= $block->escapeHtml(__('Cancel')) ?></span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Import Progress Section -->
+                <div id="import-progress" class="admin__field-note" style="display: none;">
+                    <div class="import-progress-bar">
+                        <div class="progress-text">
+                            <span id="progress-message"><?= $block->escapeHtml(__('Initializing import...')) ?></span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Import Results Section -->
+                <div id="import-results" class="admin__field-note" style="display: none;">
+                    <div id="import-results-content"></div>
+                </div>
+            </form>
+            <?php endif; ?>
+        </div>
+    <?php else: ?>
+        <div class="admin__page-section-content">
+            <div class="message message-error">
+                <div><?= $block->escapeHtml(__('No CSV data found to import.')) ?></div>
+            </div>
+            <div class="admin__field admin__field-submit">
+                <div class="admin__field-control">
+                    <button type="button" 
+                            class="action-primary" 
+                            onclick="window.location.href='<?= $block->escapeUrl($block->getBackUrl()) ?>'">
+                        <span><?= $block->escapeHtml(__('Back to List')) ?></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>
+
+<style>
+.import-form {
+    background: #f8f8f8;
+    padding: 20px;
+    border: 1px solid #e3e3e3;
+    border-radius: 4px;
+}
+
+.admin__fieldset {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.admin__legend {
+    font-weight: 600;
+    color: #333;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 15px;
+}
+
+.import-progress-bar {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.progress-text {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.progress-bar {
+    height: 20px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #007cba;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.import-results-success {
+    color: #155724;
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    padding: 15px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.import-results-error {
+    color: #721c24;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 15px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.action-primary, .action-secondary {
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.action-primary {
+    background: #eb5202;
+    border: 1px solid #eb5202;
+    color: #fff;
+}
+
+.action-primary:hover {
+    background: #d44a02;
+    border-color: #d44a02;
+}
+
+.action-primary:disabled {
+    background: #ccc;
+    border-color: #ccc;
+    cursor: not-allowed;
+}
+
+.action-secondary {
+    background: #fff;
+    border: 1px solid #007cba;
+    color: #007cba;
+}
+
+.action-secondary:hover {
+    background: #f0f8ff;
+}
+</style>
+
+<script type="text/javascript">
+require(['jquery', 'mage/translate'], function($, $t) {
+    var importForm = $('#import-form');
+    var errorBox = $('#import-validation-errors');
+    var errorContent = $('#import-validation-errors-content');
+    var errorReportLink = $('#import-error-report-link');
+
+    importForm.on('submit', function(event) {
+        event.preventDefault();
+        errorBox.hide();
+        errorContent.html('');
+        errorReportLink.html('');
+
+        if (!confirm($t('Are you sure you want to import these products? This will create actual products in your Magento catalog.'))) {
+            return false;
+        }
+
+        var formData = new FormData(this); // This includes the form_key and file
+
+        $.ajax({
+            url: '<?= $block->escapeUrl($block->getImportExecuteUrl()) ?>',
+            type: 'POST',
+            data: formData,
+            processData: false, // Required for FormData
+            contentType: false, // Required for FormData
+            dataType: 'json',
+            showLoader: true,
+            success: function(response) {
+                if (response.success) {
+                    location.reload(); // Or show a success message and refresh grid
+                } else {
+                    // Show validation errors
+                    if (response.validation_errors && response.validation_errors.length) {
+                        errorContent.html('<ul>' + response.validation_errors.map(function(msg) {
+                            return '<li>' + msg + '</li>';
+                        }).join('') + '</ul>');
+                        errorBox.show();
+                    }
+                    // Show error report link if available
+                    if (response.error_report_url) {
+                        errorReportLink.html(
+                            '<a href="' + response.error_report_url + '" target="_blank">' +
+                            $t('Download Error Report') + '</a>'
+                        );
+                    }
+                    // Show main error message
+                    if (response.error) {
+                        errorContent.prepend('<div><strong>' + response.error + '</strong></div>');
+                        errorBox.show();
+                    }
+                }
+            },
+            error: function(xhr) {
+                errorContent.html('<div><strong>' + $t('An unexpected error occurred. Please try again.') + '</strong></div>');
+                errorBox.show();
+            }
+        });
+    });
+});
+</script> 

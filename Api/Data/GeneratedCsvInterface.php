@@ -15,6 +15,11 @@ interface GeneratedCsvInterface
     const GENERATEDCSV_ID = 'generatedcsv_id';
     const INPUT_FILE_NAME = 'input_file_name';
     const RESPONSE_FILE_NAME = 'response_file_name';
+    const IMPORT_STATUS = 'import_status';
+    const IMPORTED_PRODUCTS_COUNT = 'imported_products_count';
+    const TOTAL_PRODUCTS_COUNT = 'total_products_count';
+    const IMPORT_ERROR_MESSAGE = 'import_error_message';
+    const IMPORTED_AT = 'imported_at';
 
     /**
      * Get generatedcsv_id
@@ -80,5 +85,70 @@ interface GeneratedCsvInterface
      * @return \Squadkin\AIAutoProductBuilder\GeneratedCsv\Api\Data\GeneratedCsvInterface
      */
     public function setResponseFilePath($responseFilePath);
+
+    /**
+     * Get import_status
+     * @return string|null
+     */
+    public function getImportStatus();
+
+    /**
+     * Set import_status
+     * @param string $importStatus
+     * @return \Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface
+     */
+    public function setImportStatus($importStatus);
+
+    /**
+     * Get imported_products_count
+     * @return int|null
+     */
+    public function getImportedProductsCount();
+
+    /**
+     * Set imported_products_count
+     * @param int $importedProductsCount
+     * @return \Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface
+     */
+    public function setImportedProductsCount($importedProductsCount);
+
+    /**
+     * Get total_products_count
+     * @return int|null
+     */
+    public function getTotalProductsCount();
+
+    /**
+     * Set total_products_count
+     * @param int $totalProductsCount
+     * @return \Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface
+     */
+    public function setTotalProductsCount($totalProductsCount);
+
+    /**
+     * Get import_error_message
+     * @return string|null
+     */
+    public function getImportErrorMessage();
+
+    /**
+     * Set import_error_message
+     * @param string $importErrorMessage
+     * @return \Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface
+     */
+    public function setImportErrorMessage($importErrorMessage);
+
+    /**
+     * Get imported_at
+     * @return string|null
+     */
+    public function getImportedAt();
+
+    /**
+     * Set imported_at
+     * @param string $importedAt
+     * @return \Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface
+     */
+    public function setImportedAt($importedAt);
 }
 

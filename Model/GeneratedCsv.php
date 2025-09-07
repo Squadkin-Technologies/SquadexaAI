@@ -100,5 +100,85 @@ class GeneratedCsv extends AbstractModel implements GeneratedCsvInterface
     {
         return $this->setData(self::RESPONSE_FILE_PATH, $responseFilePath);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getImportStatus()
+    {
+        return $this->getData(self::IMPORT_STATUS);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setImportStatus($importStatus)
+    {
+        return $this->setData(self::IMPORT_STATUS, $importStatus);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getImportedProductsCount()
+    {
+        return $this->getData(self::IMPORTED_PRODUCTS_COUNT);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setImportedProductsCount($importedProductsCount)
+    {
+        return $this->setData(self::IMPORTED_PRODUCTS_COUNT, $importedProductsCount);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTotalProductsCount()
+    {
+        return $this->getData(self::TOTAL_PRODUCTS_COUNT);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setTotalProductsCount($totalProductsCount)
+    {
+        return $this->setData(self::TOTAL_PRODUCTS_COUNT, $totalProductsCount);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getImportErrorMessage()
+    {
+        return $this->getData(self::IMPORT_ERROR_MESSAGE);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setImportErrorMessage($importErrorMessage)
+    {
+        return $this->setData(self::IMPORT_ERROR_MESSAGE, $importErrorMessage);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getImportedAt()
+    {
+        return $this->getData(self::IMPORTED_AT);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setImportedAt($importedAt)
+    {
+        return $this->setData(self::IMPORTED_AT, $importedAt);
+    }
 }
 

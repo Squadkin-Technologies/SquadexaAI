@@ -1,0 +1,52 @@
+.import-processing-status {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.import-processing-status p {
+    margin-bottom: 10px;
+}
+
+.import-processing-status strong {
+    color: #0066cc;
+    font-size: 16px;
+}
+
+.import-processing-status .message {
+    margin: 15px 0;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.import-processing-status .message-notice {
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+}
+
+.import-processing-status .message-error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.import-processing-status .admin__field-control {
+    margin-top: 20px;
+}
+
+.import-processing-status .admin__field-control button {
+    margin-right: 10px;
+}
+
+.action-processing-view {
+    background-color: #f0ad4e;
+    color: white !important;
+}
+
+.action-processing-view:hover {
+    background-color: #ec971f;
+    color: white !important;
+} 
