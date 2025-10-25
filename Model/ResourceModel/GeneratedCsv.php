@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Model\ResourceModel;
+namespace Squadkin\SquadexaAI\Model\ResourceModel;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
@@ -17,7 +17,7 @@ class GeneratedCsv extends AbstractDb
      */
     protected function _construct()
     {
-        $this->_init('squadkin_aiautoproductbuilder_generatedcsv', 'generatedcsv_id');
+        $this->_init('squadkin_squadexaai_generatedcsv', 'generatedcsv_id');
     }
 }
 

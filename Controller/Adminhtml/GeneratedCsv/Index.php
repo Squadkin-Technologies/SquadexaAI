@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Controller\Adminhtml\GeneratedCsv;
+namespace Squadkin\SquadexaAI\Controller\Adminhtml\GeneratedCsv;
 
 class Index extends \Magento\Backend\App\Action
 {

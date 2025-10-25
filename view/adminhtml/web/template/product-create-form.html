@@ -1,0 +1,251 @@
+<form id="product-create-form" class="admin__scope-old">
+    <div class="product-create-modal-content">
+        <% if (data.isSingle) { %>
+            <!-- Single Product Form -->
+            <% _.each(data.products, function(product) { %>
+                <div class="product-data-row" data-product-id="<%= product.aiproduct_id %>">
+                    <fieldset class="admin__fieldset">
+                        <legend class="admin__legend"><span><%- $.mage.__('Product Information') %></span></legend>
+                        
+                        <div class="admin__field admin__field-wide _required">
+                            <label class="admin__field-label" for="product_sku">
+                                <span><%- $.mage.__('SKU') %></span>
+                            </label>
+                            <div class="admin__field-control">
+                                <input type="text" 
+                                       name="product[<%= product.aiproduct_id %>][sku]" 
+                                       id="product_sku"
+                                       class="admin__control-text required-entry" 
+                                       value="<%= product.sku %>" 
+                                       required="required" />
+                            </div>
+                        </div>
+
+                        <div class="admin__field admin__field-wide _required">
+                            <label class="admin__field-label" for="product_name">
+                                <span><%- $.mage.__('Product Name') %></span>
+                            </label>
+                            <div class="admin__field-control">
+                                <input type="text" 
+                                       name="product[<%= product.aiproduct_id %>][name]" 
+                                       id="product_name"
+                                       class="admin__control-text required-entry" 
+                                       value="<%= product.name %>" 
+                                       required="required" />
+                            </div>
+                        </div>
+
+                        <div class="admin__field-group admin__field-group-columns admin__field-group-2columns">
+                            <div class="admin__field _required">
+                                <label class="admin__field-label" for="product_price">
+                                    <span><%- $.mage.__('Price') %></span>
+                                </label>
+                                <div class="admin__field-control">
+                                    <input type="number" 
+                                           name="product[<%= product.aiproduct_id %>][price]" 
+                                           id="product_price"
+                                           class="admin__control-text required-entry validate-zero-or-greater" 
+                                           value="<%= product.price %>" 
+                                           step="0.01"
+                                           required="required" />
+                                </div>
+                            </div>
+
+                            <div class="admin__field">
+                                <label class="admin__field-label" for="product_special_price">
+                                    <span><%- $.mage.__('Special Price') %></span>
+                                </label>
+                                <div class="admin__field-control">
+                                    <input type="number" 
+                                           name="product[<%= product.aiproduct_id %>][special_price]" 
+                                           id="product_special_price"
+                                           class="admin__control-text validate-zero-or-greater" 
+                                           value="<%= product.special_price || '' %>" 
+                                           step="0.01" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="admin__field-group admin__field-group-columns admin__field-group-2columns">
+                            <div class="admin__field _required">
+                                <label class="admin__field-label" for="product_qty">
+                                    <span><%- $.mage.__('Quantity') %></span>
+                                </label>
+                                <div class="admin__field-control">
+                                    <input type="number" 
+                                           name="product[<%= product.aiproduct_id %>][qty]" 
+                                           id="product_qty"
+                                           class="admin__control-text required-entry validate-zero-or-greater" 
+                                           value="<%= product.qty || 100 %>" 
+                                           required="required" />
+                                </div>
+                            </div>
+
+                            <div class="admin__field">
+                                <label class="admin__field-label" for="product_weight">
+                                    <span><%- $.mage.__('Weight') %></span>
+                                </label>
+                                <div class="admin__field-control">
+                                    <input type="number" 
+                                           name="product[<%= product.aiproduct_id %>][weight]" 
+                                           id="product_weight"
+                                           class="admin__control-text validate-zero-or-greater" 
+                                           value="<%= product.weight || 1 %>" 
+                                           step="0.01" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="admin__field-group admin__field-group-columns admin__field-group-2columns">
+                            <div class="admin__field">
+                                <label class="admin__field-label" for="product_status">
+                                    <span><%- $.mage.__('Status') %></span>
+                                </label>
+                                <div class="admin__field-control">
+                                    <select name="product[<%= product.aiproduct_id %>][status]" 
+                                            id="product_status"
+                                            class="admin__control-select">
+                                        <option value="1" <%= product.status === 'Enabled' ? 'selected' : '' %>><%- $.mage.__('Enabled') %></option>
+                                        <option value="2" <%= product.status === 'Disabled' ? 'selected' : '' %>><%- $.mage.__('Disabled') %></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="admin__field">
+                                <label class="admin__field-label" for="product_visibility">
+                                    <span><%- $.mage.__('Visibility') %></span>
+                                </label>
+                                <div class="admin__field-control">
+                                    <select name="product[<%= product.aiproduct_id %>][visibility]" 
+                                            id="product_visibility"
+                                            class="admin__control-select">
+                                        <option value="1"><%- $.mage.__('Not Visible Individually') %></option>
+                                        <option value="2"><%- $.mage.__('Catalog') %></option>
+                                        <option value="3"><%- $.mage.__('Search') %></option>
+                                        <option value="4" selected><%- $.mage.__('Catalog, Search') %></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="admin__field admin__field-wide">
+                            <label class="admin__field-label" for="product_description">
+                                <span><%- $.mage.__('Description') %></span>
+                            </label>
+                            <div class="admin__field-control">
+                                <textarea name="product[<%= product.aiproduct_id %>][description]" 
+                                          id="product_description"
+                                          class="admin__control-textarea" 
+                                          rows="5"><%= product.description %></textarea>
+                            </div>
+                        </div>
+
+                        <div class="admin__field admin__field-wide">
+                            <label class="admin__field-label" for="product_short_description">
+                                <span><%- $.mage.__('Short Description') %></span>
+                            </label>
+                            <div class="admin__field-control">
+                                <textarea name="product[<%= product.aiproduct_id %>][short_description]" 
+                                          id="product_short_description"
+                                          class="admin__control-textarea" 
+                                          rows="3"><%= product.short_description %></textarea>
+                            </div>
+                        </div>
+
+                        <!-- SEO Fields -->
+                        <div class="admin__collapsible-block-wrapper admin__collapsible-block-wrapper-closed">
+                            <div class="admin__collapsible-title" data-role="title" onclick="this.parentElement.classList.toggle('admin__collapsible-block-wrapper-closed')">
+                                <strong><%- $.mage.__('SEO Fields (Optional)') %></strong>
+                            </div>
+                            <div class="admin__collapsible-content" data-role="content">
+                                <div class="admin__field admin__field-wide">
+                                    <label class="admin__field-label" for="product_meta_title">
+                                        <span><%- $.mage.__('Meta Title') %></span>
+                                    </label>
+                                    <div class="admin__field-control">
+                                        <input type="text" 
+                                               name="product[<%= product.aiproduct_id %>][meta_title]" 
+                                               id="product_meta_title"
+                                               class="admin__control-text" 
+                                               value="<%= product.meta_title || '' %>" />
+                                    </div>
+                                </div>
+
+                                <div class="admin__field admin__field-wide">
+                                    <label class="admin__field-label" for="product_meta_description">
+                                        <span><%- $.mage.__('Meta Description') %></span>
+                                    </label>
+                                    <div class="admin__field-control">
+                                        <textarea name="product[<%= product.aiproduct_id %>][meta_description]" 
+                                                  id="product_meta_description"
+                                                  class="admin__control-textarea" 
+                                                  rows="3"><%= product.meta_description || '' %></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="admin__field admin__field-wide">
+                                    <label class="admin__field-label" for="product_url_key">
+                                        <span><%- $.mage.__('URL Key') %></span>
+                                    </label>
+                                    <div class="admin__field-control">
+                                        <input type="text" 
+                                               name="product[<%= product.aiproduct_id %>][url_key]" 
+                                               id="product_url_key"
+                                               class="admin__control-text" 
+                                               value="<%= product.url_key || '' %>" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </fieldset>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <!-- Multiple Products - Show compact list -->
+            <div class="message message-notice">
+                <p><%- $.mage.__('You are about to create %1 products in the Magento catalog. Please review the information below.').replace('%1', data.products.length) %></p>
+            </div>
+            
+            <table class="data-grid">
+                <thead>
+                    <tr>
+                        <th><%- $.mage.__('SKU') %></th>
+                        <th><%- $.mage.__('Name') %></th>
+                        <th><%- $.mage.__('Price') %></th>
+                        <th><%- $.mage.__('Qty') %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% _.each(data.products, function(product) { %>
+                        <tr class="product-data-row" data-product-id="<%= product.aiproduct_id %>">
+                            <td>
+                                <input type="hidden" name="product[<%= product.aiproduct_id %>][sku]" value="<%= product.sku %>" />
+                                <%= product.sku %>
+                            </td>
+                            <td>
+                                <input type="hidden" name="product[<%= product.aiproduct_id %>][name]" value="<%= product.name %>" />
+                                <%= product.name %>
+                            </td>
+                            <td>
+                                <input type="hidden" name="product[<%= product.aiproduct_id %>][price]" value="<%= product.price %>" />
+                                <%= product.price %>
+                            </td>
+                            <td>
+                                <input type="hidden" name="product[<%= product.aiproduct_id %>][qty]" value="<%= product.qty || 100 %>" />
+                                <%= product.qty || 100 %>
+                            </td>
+                            <!-- Hidden fields for other data -->
+                            <input type="hidden" name="product[<%= product.aiproduct_id %>][weight]" value="<%= product.weight || 1 %>" />
+                            <input type="hidden" name="product[<%= product.aiproduct_id %>][status]" value="1" />
+                            <input type="hidden" name="product[<%= product.aiproduct_id %>][visibility]" value="4" />
+                            <input type="hidden" name="product[<%= product.aiproduct_id %>][description]" value="<%= product.description %>" />
+                            <input type="hidden" name="product[<%= product.aiproduct_id %>][short_description]" value="<%= product.short_description %>" />
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } %>
+    </div>
+</form>
+

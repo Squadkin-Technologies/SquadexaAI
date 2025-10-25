@@ -5,13 +5,13 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Controller\Adminhtml\AiProduct;
+namespace Squadkin\SquadexaAI\Controller\Adminhtml\AiProduct;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\Result\Json;
-use Squadkin\AIAutoProductBuilder\Service\AttributeService;
+use Squadkin\SquadexaAI\Service\AttributeService;
 
 class AttributeDetails extends Action
 {
@@ -88,6 +88,6 @@ class AttributeDetails extends Action
      */
     protected function _isAllowed(): bool
     {
-        return $this->_authorization->isAllowed('Squadkin_AIAutoProductBuilder::AiProduct');
+        return $this->_authorization->isAllowed('Squadkin_SquadexaAI::AiProduct');
     }
 } 

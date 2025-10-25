@@ -1,29 +1,44 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-	<preference for="Squadkin\AIAutoProductBuilder\Api\GeneratedCsvRepositoryInterface" type="Squadkin\AIAutoProductBuilder\Model\GeneratedCsvRepository"/>
-	<preference for="Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface" type="Squadkin\AIAutoProductBuilder\Model\GeneratedCsv"/>
-	<preference for="Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
-	<preference for="Squadkin\AIAutoProductBuilder\Api\AiProductRepositoryInterface" type="Squadkin\AIAutoProductBuilder\Model\AiProductRepository"/>
-	<preference for="Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface" type="Squadkin\AIAutoProductBuilder\Model\AiProduct"/>
-	<preference for="Squadkin\AIAutoProductBuilder\Api\Data\AiProductSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
-	<virtualType name="Squadkin\AIAutoProductBuilder\Model\ResourceModel\GeneratedCsv\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+	<preference for="Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface" type="Squadkin\SquadexaAI\Model\GeneratedCsvRepository"/>
+	<preference for="Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface" type="Squadkin\SquadexaAI\Model\GeneratedCsv"/>
+	<preference for="Squadkin\SquadexaAI\Api\Data\GeneratedCsvSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+	<preference for="Squadkin\SquadexaAI\Api\AiProductRepositoryInterface" type="Squadkin\SquadexaAI\Model\AiProductRepository"/>
+	<preference for="Squadkin\SquadexaAI\Api\Data\AiProductInterface" type="Squadkin\SquadexaAI\Model\AiProduct"/>
+	<preference for="Squadkin\SquadexaAI\Api\Data\AiProductSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+	<virtualType name="Squadkin\SquadexaAI\Model\ResourceModel\GeneratedCsv\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
 		<arguments>
-			<argument name="mainTable" xsi:type="string">squadkin_aiautoproductbuilder_generatedcsv</argument>
-			<argument name="resourceModel" xsi:type="string">Squadkin\AIAutoProductBuilder\Model\ResourceModel\GeneratedCsv\Collection</argument>
+			<argument name="mainTable" xsi:type="string">squadkin_squadexaai_generatedcsv</argument>
+			<argument name="resourceModel" xsi:type="string">Squadkin\SquadexaAI\Model\ResourceModel\GeneratedCsv\Collection</argument>
 		</arguments>
 	</virtualType>
-	<virtualType name="Squadkin\AIAutoProductBuilder\Model\ResourceModel\AiProduct\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+	<virtualType name="Squadkin\SquadexaAI\Model\ResourceModel\AiProduct\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
 		<arguments>
-			<argument name="mainTable" xsi:type="string">squadkin_aiautoproductbuilder_aiproduct</argument>
-			<argument name="resourceModel" xsi:type="string">Squadkin\AIAutoProductBuilder\Model\ResourceModel\AiProduct</argument>
+			<argument name="mainTable" xsi:type="string">squadkin_squadexaai_aiproduct</argument>
+			<argument name="resourceModel" xsi:type="string">Squadkin\SquadexaAI\Model\ResourceModel\AiProduct</argument>
 		</arguments>
 	</virtualType>
 	<type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
 		<arguments>
 			<argument name="collections" xsi:type="array">
-				<item name="squadkin_aiautoproductbuilder_generatedcsv_listing_data_source" xsi:type="string">Squadkin\AIAutoProductBuilder\Model\ResourceModel\GeneratedCsv\Grid\Collection</item>
-				<item name="squadkin_aiautoproductbuilder_aiproduct_listing_data_source" xsi:type="string">Squadkin\AIAutoProductBuilder\Model\ResourceModel\AiProduct\Grid\Collection</item>
+				<item name="squadkin_squadexaai_generatedcsv_listing_data_source" xsi:type="string">Squadkin\SquadexaAI\Model\ResourceModel\GeneratedCsv\Grid\Collection</item>
+				<item name="squadkin_squadexaai_aiproduct_listing_data_source" xsi:type="string">Squadkin\SquadexaAI\Model\ResourceModel\AiProduct\Grid\Collection</item>
 			</argument>
+		</arguments>
+	</type>
+	
+	<!-- Custom Logger for Squadexa AI API -->
+	<virtualType name="SquadexaAILogger" type="Magento\Framework\Logger\Monolog">
+		<arguments>
+			<argument name="handlers" xsi:type="array">
+				<item name="squadexa_handler" xsi:type="object">Squadkin\SquadexaAI\Logger\Handler</item>
+			</argument>
+		</arguments>
+	</virtualType>
+	
+	<type name="Squadkin\SquadexaAI\Logger\Logger">
+		<arguments>
+			<argument name="logger" xsi:type="object">SquadexaAILogger</argument>
 		</arguments>
 	</type>
 </config>

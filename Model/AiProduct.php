@@ -5,11 +5,11 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Model;
+namespace Squadkin\SquadexaAI\Model;
 
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Serialize\Serializer\Json;
-use Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface;
+use Squadkin\SquadexaAI\Api\Data\AiProductInterface;
 
 class AiProduct extends AbstractModel implements AiProductInterface
 {
@@ -43,7 +43,7 @@ class AiProduct extends AbstractModel implements AiProductInterface
      */
     public function _construct()
     {
-        $this->_init(\Squadkin\AIAutoProductBuilder\Model\ResourceModel\AiProduct::class);
+        $this->_init(\Squadkin\SquadexaAI\Model\ResourceModel\AiProduct::class);
     }
 
     /**
@@ -67,7 +67,7 @@ class AiProduct extends AbstractModel implements AiProductInterface
      */
     public function getGeneratedcsvId()
     {
-        return $this->getData(self::GENERATEDCSV_ID);
+        return (int)$this->getData(self::GENERATEDCSV_ID);
     }
 
     /**

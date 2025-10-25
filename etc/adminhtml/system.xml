@@ -4,20 +4,84 @@
 		<tab id="squadkin" translate="label" sortOrder="999">
 			<label>Squadkin</label>
 		</tab>
-		<section id="aiproductbuilder" sortOrder="10" showInWebsite="1" showInStore="1" showInDefault="1" translate="label">
-			<label>AI Product Builder Configuration</label>
+		<section id="squadexaiproductcreator" sortOrder="10" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+			<label>SquadexaAI Configuration</label>
 			<tab>squadkin</tab>
-			<resource>Squadkin_AIAutoProductBuilder::config_squadkin_aiautoproductbuilder</resource>
-			<group id="general" sortOrder="10" showInWebsite="1" showInStore="1" showInDefault="1" translate="label">
-				<label>general</label>
-				<field id="is_enable" type="select" sortOrder="10" showInWebsite="1" showInStore="1" showInDefault="1" translate="label">
+			<resource>Squadkin_SquadexaAI::config_squadkin_squadexaai</resource>
+			<group id="general" sortOrder="10" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+				<label>General Settings</label>
+				<field id="is_enable" type="select" sortOrder="10" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
 					<label>Is Enabled</label>
-					<comment/>
+					<comment>Enable or disable SquadexaAI module</comment>
 					<source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
 				</field>
-				<field id="licence_key" type="text" sortOrder="10" showInWebsite="1" showInStore="1" showInDefault="1" translate="label">
-					<label>Licence Key</label>
-					<comment/>
+			</group>
+        <group id="authentication" sortOrder="20" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+            <label>🔐 Authentication Settings</label>
+            <comment>Configure your Squadexa AI authentication credentials</comment>
+            
+            <field id="username" type="text" sortOrder="10" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+                <label>📧 Username/Email</label>
+                <comment>Your Squadexa AI account email address</comment>
+                <depends>
+                    <field id="is_enable">1</field>
+                </depends>
+            </field>
+            
+            <field id="password" type="obscure" sortOrder="20" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+                <label>🔑 Password</label>
+                <comment>Your Squadexa AI account password</comment>
+                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                <depends>
+                    <field id="is_enable">1</field>
+                </depends>
+            </field>
+            
+            <field id="generate_token" type="button" sortOrder="30" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+                <label>🚀 Generate API Key</label>
+                <comment><strong>2-Step Authentication Process:</strong><br/>
+                Step 1: Login with username/password → Get temporary access token (expires in 30 minutes)<br/>
+                Step 2: Use access token → Generate permanent API key (never expires)<br/>
+                Both fields will be populated automatically.</comment>
+                <frontend_model>Squadkin\SquadexaAI\Block\Adminhtml\System\Config\GenerateTokenButton</frontend_model>
+                <depends>
+                    <field id="is_enable">1</field>
+                </depends>
+            </field>
+            
+            <field id="access_token" type="obscure" sortOrder="40" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+                <label>⏰ Access Token (Temporary)</label>
+                <comment>Temporary access token (expires in 30 minutes). Automatically generated and refreshed as needed.</comment>
+                <depends>
+                    <field id="is_enable">1</field>
+                </depends>
+            </field>
+            
+            <field id="api_key" type="obscure" sortOrder="50" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+                <label>🔐 API Key (Permanent)</label>
+                <comment>Permanent API key (never expires). Used for all AI service calls. Generated automatically from access token.</comment>
+                <depends>
+                    <field id="is_enable">1</field>
+                </depends>
+            </field>
+            
+            <field id="token_created" type="note" sortOrder="60" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+                <label>🕒 Token Information</label>
+                <comment>Token creation time and status will be displayed here</comment>
+                <frontend_model>Squadkin\SquadexaAI\Block\Adminhtml\System\Config\TokenStatus</frontend_model>
+                <depends>
+                    <field id="is_enable">1</field>
+                </depends>
+            </field>
+        </group>
+			<group id="account_status" sortOrder="30" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+				<label>Account Status</label>
+				<field id="account_info" type="note" sortOrder="10" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+					<comment>Account details will be displayed here after API key validation</comment>
+					<frontend_model>Squadkin\SquadexaAI\Block\Adminhtml\System\Config\AccountStatus</frontend_model>
+					<depends>
+						<field id="is_enable">1</field>
+					</depends>
 				</field>
 			</group>
 		</section>

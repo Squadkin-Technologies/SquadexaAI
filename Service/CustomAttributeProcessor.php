@@ -5,13 +5,13 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Service;
+namespace Squadkin\SquadexaAI\Service;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\Serializer\Json;
-use Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface;
+use Squadkin\SquadexaAI\Api\Data\AiProductInterface;
 
 class CustomAttributeProcessor
 {

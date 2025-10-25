@@ -5,14 +5,14 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Controller\Adminhtml\GeneratedCsv;
+namespace Squadkin\SquadexaAI\Controller\Adminhtml\GeneratedCsv;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\Page;
 use Magento\Framework\View\Result\PageFactory;
 use Psr\Log\LoggerInterface;
-use Squadkin\AIAutoProductBuilder\Api\GeneratedCsvRepositoryInterface;
+use Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface;
 
 class ImportModal extends Action
 {
@@ -60,41 +60,41 @@ class ImportModal extends Action
     {
         $csvId = (int)$this->getRequest()->getParam('id');
         
-        $this->logger->info('AIAutoProductBuilder ImportModal: Starting import modal for CSV ID: ' . $csvId);
+        $this->logger->info('SquadexaAI ImportModal: Starting import modal for CSV ID: ' . $csvId);
         
         if (!$csvId) {
-            $this->logger->error('AIAutoProductBuilder ImportModal: Invalid CSV ID provided');
+            $this->logger->error('SquadexaAI ImportModal: Invalid CSV ID provided');
             $this->messageManager->addErrorMessage(__('Invalid CSV ID provided.'));
             return $this->createErrorPage();
         }
 
         try {
-            $this->logger->info('AIAutoProductBuilder ImportModal: Loading CSV data for ID: ' . $csvId);
+            $this->logger->info('SquadexaAI ImportModal: Loading CSV data for ID: ' . $csvId);
             $generatedCsv = $this->generatedCsvRepository->get($csvId);
             
-            $this->logger->info('AIAutoProductBuilder ImportModal: CSV data loaded successfully');
+            $this->logger->info('SquadexaAI ImportModal: CSV data loaded successfully');
             
             $resultPage = $this->resultPageFactory->create();
-            $resultPage->setActiveMenu('Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_generatedcsv');
+            $resultPage->setActiveMenu('Squadkin_SquadexaAI::squadkin_squadexaai_generatedcsv');
             $resultPage->getConfig()->getTitle()->prepend(__('Import AI Products to Magento'));
             
-            $this->logger->info('AIAutoProductBuilder ImportModal: Result page created successfully');
+            $this->logger->info('SquadexaAI ImportModal: Result page created successfully');
             
             // Pass data to the block
             $block = $resultPage->getLayout()->getBlock('import.modal.content');
             if ($block) {
                 $block->setGeneratedCsv($generatedCsv);
-                $this->logger->info('AIAutoProductBuilder ImportModal: Block data set successfully');
+                $this->logger->info('SquadexaAI ImportModal: Block data set successfully');
             } else {
-                $this->logger->warning('AIAutoProductBuilder ImportModal: Block import.modal.content not found in layout');
+                $this->logger->warning('SquadexaAI ImportModal: Block import.modal.content not found in layout');
             }
             
-            $this->logger->info('AIAutoProductBuilder ImportModal: Import modal loaded successfully');
+            $this->logger->info('SquadexaAI ImportModal: Import modal loaded successfully');
             return $resultPage;
             
         } catch (\Exception $e) {
-            $this->logger->error('AIAutoProductBuilder ImportModal: Error loading CSV data: ' . $e->getMessage());
-            $this->logger->error('AIAutoProductBuilder ImportModal: Exception trace: ' . $e->getTraceAsString());
+            $this->logger->error('SquadexaAI ImportModal: Error loading CSV data: ' . $e->getMessage());
+            $this->logger->error('SquadexaAI ImportModal: Exception trace: ' . $e->getTraceAsString());
             $this->messageManager->addErrorMessage(__('Unable to load CSV data: %1', $e->getMessage()));
             return $this->createErrorPage();
         }
@@ -119,6 +119,6 @@ class ImportModal extends Action
      */
     protected function _isAllowed(): bool
     {
-        return $this->_authorization->isAllowed('Squadkin_AIAutoProductBuilder::GeneratedCsv_save');
+        return $this->_authorization->isAllowed('Squadkin_SquadexaAI::GeneratedCsv_save');
     }
 } 

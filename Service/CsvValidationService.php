@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Service;
+namespace Squadkin\SquadexaAI\Service;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\File\Csv;
@@ -438,10 +438,10 @@ class CsvValidationService
         // Generate error report file name
         $pathInfo = pathinfo($originalFileName);
         $errorFileName = 'error_report_' . $pathInfo['filename'] . '_' . date('Y-m-d_H-i-s') . '.csv';
-        $errorFilePath = 'AiBuilder/ErrorReports/' . $errorFileName;
+        $errorFilePath = 'AIProductCreator/ErrorReports/' . $errorFileName;
 
         // Create error reports directory
-        $errorReportsDir = 'AiBuilder/ErrorReports';
+        $errorReportsDir = 'AIProductCreator/ErrorReports';
         if (!$this->varDirectory->isExist($errorReportsDir)) {
             $this->varDirectory->create($errorReportsDir);
         }

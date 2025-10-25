@@ -1,6 +1,6 @@
-# Mage2 Module Squadkin AIAutoProductBuilder
+# Mage2 Module Squadkin SquadexaAI
 
-    ``squadkin/module-aiautoproductbuilder``
+    ``squadkin/module-squadexaai``
 
  - [Main Functionalities](#markdown-header-main-functionalities)
  - [Installation](#markdown-header-installation)
@@ -18,7 +18,7 @@ AI Auto Product Builder, Product Generator, Product Creator
 ### Type 1: Zip file
 
  - Unzip the zip file in `app/code/Squadkin`
- - Enable the module by running `php bin/magento module:enable Squadkin_AIAutoProductBuilder`
+ - Enable the module by running `php bin/magento module:enable Squadkin_SquadexaAI`
  - Apply database updates by running `php bin/magento setup:upgrade`\*
  - Flush the cache by running `php bin/magento cache:flush`
 
@@ -29,8 +29,8 @@ AI Auto Product Builder, Product Generator, Product Creator
     - public repository `packagist.org`
     - public github repository as vcs
  - Add the composer repository to the configuration by running `composer config repositories.repo.magento.com composer https://repo.magento.com/`
- - Install the module composer by running `composer require squadkin/module-aiautoproductbuilder`
- - enable the module by running `php bin/magento module:enable Squadkin_AIAutoProductBuilder`
+ - Install the module composer by running `composer require squadkin/module-squadexaai`
+ - enable the module by running `php bin/magento module:enable Squadkin_SquadexaAI`
  - apply database updates by running `php bin/magento setup:upgrade`\*
  - Flush the cache by running `php bin/magento cache:flush`
 

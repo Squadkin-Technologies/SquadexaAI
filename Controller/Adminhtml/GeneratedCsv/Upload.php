@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Controller\Adminhtml\GeneratedCsv;
+namespace Squadkin\SquadexaAI\Controller\Adminhtml\GeneratedCsv;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -13,10 +13,10 @@ use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Psr\Log\LoggerInterface;
-use Squadkin\AIAutoProductBuilder\Api\GeneratedCsvRepositoryInterface;
-use Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterfaceFactory;
-use Squadkin\AIAutoProductBuilder\Helper\FileManager;
-use Squadkin\AIAutoProductBuilder\Service\AiGenerationOptionsService;
+use Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface;
+use Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterfaceFactory;
+use Squadkin\SquadexaAI\Helper\FileManager;
+use Squadkin\SquadexaAI\Service\AiGenerationOptionsService;
 
 class Upload extends Action
 {
@@ -83,65 +83,65 @@ class Upload extends Action
         $resultRedirect->setPath('*/*/index');
 
         // Add debug logging
-        $this->logger->info('AIAutoProductBuilder Upload: Starting upload process');
-        $this->logger->info('AIAutoProductBuilder Upload: Request method - ' . $this->getRequest()->getMethod());
-        $this->logger->info('AIAutoProductBuilder Upload: POST data - ' . print_r($this->getRequest()->getPostValue(), true));
-        $this->logger->info('AIAutoProductBuilder Upload: FILES data - ' . print_r($_FILES, true));
+        $this->logger->info('SquadexaAI Upload: Starting upload process');
+        $this->logger->info('SquadexaAI Upload: Request method - ' . $this->getRequest()->getMethod());
+        $this->logger->info('SquadexaAI Upload: POST data - ' . print_r($this->getRequest()->getPostValue(), true));
+        $this->logger->info('SquadexaAI Upload: FILES data - ' . print_r($_FILES, true));
         
         try {
             // Check if file was uploaded
             if (!isset($_FILES['input_file']) || empty($_FILES['input_file']['tmp_name'])) {
-                $this->logger->info('AIAutoProductBuilder Upload: No file uploaded');
+                $this->logger->info('SquadexaAI Upload: No file uploaded');
                 $this->messageManager->addErrorMessage(__('Please select a file to upload.'));
                 return $resultRedirect;
             }
 
-            $this->logger->info('AIAutoProductBuilder Upload: File received - ' . $_FILES['input_file']['name']);
+            $this->logger->info('SquadexaAI Upload: File received - ' . $_FILES['input_file']['name']);
 
             // Validate AI generation options
             $selectedAiOptions = $this->getRequest()->getParam('ai_options', []);
-            $this->logger->info('AIAutoProductBuilder Upload: Selected AI options - ' . print_r($selectedAiOptions, true));
+            $this->logger->info('SquadexaAI Upload: Selected AI options - ' . print_r($selectedAiOptions, true));
             
             if (empty($selectedAiOptions)) {
                 $selectedAiOptions = $this->aiOptionsService->getDefaultSelectedOptions();
-                $this->logger->info('AIAutoProductBuilder Upload: Using default AI options - ' . print_r($selectedAiOptions, true));
+                $this->logger->info('SquadexaAI Upload: Using default AI options - ' . print_r($selectedAiOptions, true));
             }
             
             try {
                 $validatedOptions = $this->aiOptionsService->validateSelectedOptions($selectedAiOptions);
-                $this->logger->info('AIAutoProductBuilder Upload: AI options validated successfully');
+                $this->logger->info('SquadexaAI Upload: AI options validated successfully');
             } catch (LocalizedException $e) {
-                $this->logger->error('AIAutoProductBuilder Upload: AI options validation failed - ' . $e->getMessage());
+                $this->logger->error('SquadexaAI Upload: AI options validation failed - ' . $e->getMessage());
                 $this->messageManager->addErrorMessage($e->getMessage());
                 return $resultRedirect;
             }
 
             $fileData = $_FILES['input_file'];
-            $this->logger->info('AIAutoProductBuilder Upload: Processing file - ' . $fileData['name']);
+            $this->logger->info('SquadexaAI Upload: Processing file - ' . $fileData['name']);
 
             // Validate uploaded file
             $this->fileManager->validateUploadedFile($fileData);
-            $this->logger->info('AIAutoProductBuilder Upload: File validation passed');
+            $this->logger->info('SquadexaAI Upload: File validation passed');
 
             // Save input file
             $inputFileName = $this->fileManager->saveInputFile($fileData);
-            $inputFilePath = '/var/AiBuilder/Input/' . $inputFileName;
-            $this->logger->info('AIAutoProductBuilder Upload: File saved as - ' . $inputFileName);
+            $inputFilePath = '/var/AIProductCreator/Input/' . $inputFileName;
+            $this->logger->info('SquadexaAI Upload: File saved as - ' . $inputFileName);
 
             // Process file with AI API
             $this->messageManager->addNoticeMessage(__('Processing file with AI API...'));
-            $this->logger->info('AIAutoProductBuilder Upload: Starting AI processing');
+            $this->logger->info('SquadexaAI Upload: Starting AI processing');
             $aiResponse = $this->fileManager->processWithAI($inputFileName, $validatedOptions);
-            $this->logger->info('AIAutoProductBuilder Upload: AI processing completed. Response count: ' . count($aiResponse));
+            $this->logger->info('SquadexaAI Upload: AI processing completed. Response count: ' . count($aiResponse));
 
             // Filter AI response based on selected options
             $filteredAiResponse = $this->aiOptionsService->filterAiResponseBySelectedOptions($aiResponse, $validatedOptions);
-            $this->logger->info('AIAutoProductBuilder Upload: Filtered response count: ' . count($filteredAiResponse));
+            $this->logger->info('SquadexaAI Upload: Filtered response count: ' . count($filteredAiResponse));
 
             // Save AI response as output CSV
             $outputFileName = $this->fileManager->saveOutputFile($filteredAiResponse, $inputFileName);
-            $outputFilePath = '/var/AiBuilder/Output/' . $outputFileName;
-            $this->logger->info('AIAutoProductBuilder Upload: Output file saved as - ' . $outputFileName);
+            $outputFilePath = '/var/AIProductCreator/Output/' . $outputFileName;
+            $this->logger->info('SquadexaAI Upload: Output file saved as - ' . $outputFileName);
 
             // Save record to database
             $generatedCsv = $this->generatedCsvFactory->create();
@@ -150,13 +150,14 @@ class Upload extends Action
             $generatedCsv->setResponseFileName($outputFileName);
             $generatedCsv->setResponseFilePath($outputFilePath);
             $generatedCsv->setTotalProductsCount(count($filteredAiResponse));
+            $generatedCsv->setGenerationType('csv');
 
             $this->generatedCsvRepository->save($generatedCsv);
-            $this->logger->info('AIAutoProductBuilder Upload: Database record saved with ID - ' . $generatedCsv->getGeneratedcsvId());
+            $this->logger->info('SquadexaAI Upload: Database record saved with ID - ' . $generatedCsv->getGeneratedcsvId());
 
             // Save AI product data to database
             $this->fileManager->saveAiProductData($filteredAiResponse, (int)$generatedCsv->getGeneratedcsvId());
-            $this->logger->info('AIAutoProductBuilder Upload: AI product data saved to database');
+            $this->logger->info('SquadexaAI Upload: AI product data saved to database');
 
             $selectedOptionsLabels = $this->aiOptionsService->getSelectedOptionsWithLabels($validatedOptions);
             $successMessage = __('File processed successfully! Input file: %1, Output file: %2. %3 products saved to database with AI-generated fields: %4', 
@@ -166,15 +167,15 @@ class Upload extends Action
                    implode(', ', array_values($selectedOptionsLabels))
                 );
             $this->messageManager->addSuccessMessage($successMessage);
-            $this->logger->info('AIAutoProductBuilder Upload: Process completed successfully - ' . $successMessage);
+            $this->logger->info('SquadexaAI Upload: Process completed successfully - ' . $successMessage);
 
         } catch (LocalizedException $e) {
-            $this->logger->error('AIAutoProductBuilder Upload: LocalizedException - ' . $e->getMessage());
-            $this->logger->error('AIAutoProductBuilder Upload: Exception trace - ' . $e->getTraceAsString());
+            $this->logger->error('SquadexaAI Upload: LocalizedException - ' . $e->getMessage());
+            $this->logger->error('SquadexaAI Upload: Exception trace - ' . $e->getTraceAsString());
             $this->messageManager->addErrorMessage($e->getMessage());
         } catch (\Exception $e) {
-            $this->logger->error('AIAutoProductBuilder Upload: General Exception - ' . $e->getMessage());
-            $this->logger->error('AIAutoProductBuilder Upload: Exception trace - ' . $e->getTraceAsString());
+            $this->logger->error('SquadexaAI Upload: General Exception - ' . $e->getMessage());
+            $this->logger->error('SquadexaAI Upload: Exception trace - ' . $e->getTraceAsString());
             $this->messageManager->addErrorMessage(
                 __('An error occurred while processing the file: %1', $e->getMessage())
             );
@@ -190,6 +191,6 @@ class Upload extends Action
      */
     protected function _isAllowed(): bool
     {
-        return $this->_authorization->isAllowed('Squadkin_AIAutoProductBuilder::GeneratedCsv_save');
+        return $this->_authorization->isAllowed('Squadkin_SquadexaAI::GeneratedCsv_save');
     }
 } 

@@ -1,0 +1,366 @@
+<?php
+/**
+ * @var \Squadkin\SquadexaAI\Block\Adminhtml\Dashboard\UsageStats $block
+ */
+$usageData = $block->getFormattedUsageData();
+$usagePercentage = $block->getUsagePercentage();
+$progressColor = $block->getProgressBarColor();
+?>
+
+<?php if (!$block->isModuleEnabled()): ?>
+    <div class="squadexa-dashboard-widget">
+        <div class="widget-header">
+            <h3>SquadexaAI Dashboard</h3>
+        </div>
+        <div class="widget-content">
+            <div class="module-disabled">
+                <p><strong>SquadexaAI module is disabled.</strong></p>
+                <p>Please enable the module in <a href="<?= $block->getUrl('admin/system_config/edit/section/squadexaiproductcreator') ?>">System Configuration</a> to view usage statistics.</p>
+            </div>
+        </div>
+    </div>
+<?php elseif (!$block->isApiKeyConfigured()): ?>
+    <div class="squadexa-dashboard-widget">
+        <div class="widget-header">
+            <h3>SquadexaAI Dashboard</h3>
+        </div>
+        <div class="widget-content">
+            <div class="api-key-not-configured">
+                <p><strong>API key not configured.</strong></p>
+                <p>Please configure your Squadexa AI API key in <a href="<?= $block->getUrl('admin/system_config/edit/section/squadexaiproductcreator') ?>">System Configuration</a>.</p>
+                <p>Don't have an account? <a href="<?= $block->getRedirectUrl() ?>" target="_blank">Create account and get API key</a></p>
+            </div>
+        </div>
+    </div>
+<?php elseif ($usageData['error']): ?>
+    <div class="squadexa-dashboard-widget">
+        <div class="widget-header">
+            <h3>SquadexaAI Dashboard</h3>
+        </div>
+        <div class="widget-content">
+            <div class="api-error">
+                <p><strong>Error loading account information:</strong></p>
+                <p><?= $block->escapeHtml($usageData['message']) ?></p>
+                <p>Please check your API key configuration.</p>
+            </div>
+        </div>
+    </div>
+<?php else: ?>
+    <div class="squadexa-dashboard-widget">
+        <div class="widget-header">
+            <h3>📊 SquadexaAI Usage & Overview</h3>
+            <p>Your API usage and activity at a glance</p>
+        </div>
+        <div class="widget-content">
+            <div class="usage-overview">
+                <!-- API Usage Section -->
+                <div class="api-usage-section">
+                    <h4>⚡ API Usage</h4>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: <?= $usagePercentage ?>%; background-color: <?= $progressColor ?>;"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span class="calls-remaining"><?= $usageData['calls_remaining'] ?>/<?= $usageData['calls_limit'] ?></span>
+                            <span class="calls-label">calls remaining</span>
+                        </div>
+                    </div>
+                    <div class="usage-stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-value"><?= $usageData['calls_used'] ?></span>
+                            <span class="stat-label">Total Generated</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value"><?= $usageData['plan_name'] ?></span>
+                            <span class="stat-label">Current Plan</span>
+                        </div>
+                    </div>
+                    <?php if ($usageData['calls_remaining'] > 0): ?>
+                        <div class="trial-banner">
+                            <p>🎉 You have <?= $usageData['calls_remaining'] ?> free calls remaining. <a href="<?= $block->getRedirectUrl() ?>" target="_blank">Upgrade for unlimited access</a>.</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Today's Activity Section -->
+                <div class="activity-section">
+                    <h4>📈 Today's Activity</h4>
+                    <div class="activity-grid">
+                        <div class="activity-item">
+                            <div class="activity-icon">📝</div>
+                            <div class="activity-content">
+                                <span class="activity-count"><?= $usageData['descriptions_today'] ?></span>
+                                <span class="activity-label">Product Descriptions Today</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">🤖</div>
+                            <div class="activity-content">
+                                <span class="activity-count"><?= $usageData['ai_humanizer_today'] ?></span>
+                                <span class="activity-label">AI Humanizer Today</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">🔍</div>
+                            <div class="activity-content">
+                                <span class="activity-count"><?= $usageData['ai_detector_today'] ?></span>
+                                <span class="activity-label">AI Detector Today</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">🛠️</div>
+                            <div class="activity-content">
+                                <span class="activity-count"><?= $usageData['ai_tools_this_week'] ?></span>
+                                <span class="activity-label">AI Tools This Week</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="total-activity">
+                        <div class="total-item">
+                            <span class="total-label">Total Today</span>
+                            <span class="total-value"><?= $usageData['total_today'] ?> API calls</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usage Overview Section -->
+                <div class="usage-overview-section">
+                    <h4>📋 Usage Overview</h4>
+                    <div class="descriptions-progress">
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: <?= $usagePercentage ?>%; background-color: <?= $progressColor ?>;"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span class="descriptions-count"><?= $usageData['calls_used'] ?>/<?= $usageData['calls_limit'] ?></span>
+                                <span class="descriptions-label">descriptions generated</span>
+                            </div>
+                        </div>
+                    </div>
+                    <?php if ($usageData['calls_remaining'] > 0): ?>
+                        <div class="trial-banner">
+                            <p>🎉 <strong>Free Trial</strong> You have <?= $usageData['calls_remaining'] ?> descriptions remaining in your free trial. <a href="<?= $block->getRedirectUrl() ?>" target="_blank">Upgrade now</a> to get unlimited access.</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    .squadexa-dashboard-widget {
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .widget-header {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        border-bottom: 1px solid #e5e5e5;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .widget-header h3 {
+        margin: 0;
+        color: #333;
+        font-size: 18px;
+    }
+    
+    .widget-header p {
+        margin: 5px 0 0 0;
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .widget-content {
+        padding: 20px;
+    }
+    
+    .usage-overview {
+        display: grid;
+        gap: 25px;
+    }
+    
+    .api-usage-section, .activity-section, .usage-overview-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
+    }
+    
+    .api-usage-section h4, .activity-section h4, .usage-overview-section h4 {
+        margin: 0 0 15px 0;
+        color: #495057;
+        font-size: 16px;
+    }
+    
+    .progress-container {
+        margin: 15px 0;
+    }
+    
+    .progress-bar {
+        background: #e9ecef;
+        border-radius: 10px;
+        height: 20px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        transition: width 0.3s ease;
+        border-radius: 10px;
+    }
+    
+    .progress-text {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .calls-remaining, .descriptions-count {
+        font-weight: bold;
+        font-size: 18px;
+        color: #007bff;
+    }
+    
+    .calls-label, .descriptions-label {
+        color: #6c757d;
+        font-size: 14px;
+    }
+    
+    .usage-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .stat-item {
+        background: white;
+        padding: 15px;
+        border-radius: 6px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+    }
+    
+    .stat-value {
+        display: block;
+        font-size: 20px;
+        font-weight: bold;
+        color: #007bff;
+    }
+    
+    .stat-label {
+        display: block;
+        font-size: 12px;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+    
+    .activity-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .activity-item {
+        background: white;
+        padding: 15px;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .activity-icon {
+        font-size: 24px;
+    }
+    
+    .activity-content {
+        flex: 1;
+    }
+    
+    .activity-count {
+        display: block;
+        font-size: 18px;
+        font-weight: bold;
+        color: #007bff;
+    }
+    
+    .activity-label {
+        display: block;
+        font-size: 12px;
+        color: #6c757d;
+        margin-top: 2px;
+    }
+    
+    .total-activity {
+        background: white;
+        padding: 15px;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .total-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .total-label {
+        font-weight: 500;
+        color: #495057;
+    }
+    
+    .total-value {
+        font-weight: bold;
+        color: #007bff;
+    }
+    
+    .trial-banner {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 6px;
+        padding: 15px;
+        margin-top: 15px;
+    }
+    
+    .trial-banner p {
+        margin: 0;
+        color: #856404;
+    }
+    
+    .trial-banner a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    
+    .trial-banner a:hover {
+        text-decoration: underline;
+    }
+    
+    .module-disabled, .api-key-not-configured, .api-error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 6px;
+        padding: 15px;
+        color: #721c24;
+    }
+    
+    .module-disabled a, .api-key-not-configured a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    
+    .module-disabled a:hover, .api-key-not-configured a:hover {
+        text-decoration: underline;
+    }
+    </style>
+<?php endif; ?>

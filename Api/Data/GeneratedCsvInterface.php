@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Api\Data;
+namespace Squadkin\SquadexaAI\Api\Data;
 
 interface GeneratedCsvInterface
 {
@@ -30,7 +30,7 @@ interface GeneratedCsvInterface
     /**
      * Set generatedcsv_id
      * @param string $generatedcsvId
-     * @return \Squadkin\AIAutoProductBuilder\GeneratedCsv\Api\Data\GeneratedCsvInterface
+     * @return \Squadkin\SquadexaAI\GeneratedCsv\Api\Data\GeneratedCsvInterface
      */
     public function setGeneratedcsvId($generatedcsvId);
 
@@ -43,7 +43,7 @@ interface GeneratedCsvInterface
     /**
      * Set input_file_name
      * @param string $inputFileName
-     * @return \Squadkin\AIAutoProductBuilder\GeneratedCsv\Api\Data\GeneratedCsvInterface
+     * @return \Squadkin\SquadexaAI\GeneratedCsv\Api\Data\GeneratedCsvInterface
      */
     public function setInputFileName($inputFileName);
 
@@ -56,7 +56,7 @@ interface GeneratedCsvInterface
     /**
      * Set input_file_path
      * @param string $inputFilePath
-     * @return \Squadkin\AIAutoProductBuilder\GeneratedCsv\Api\Data\GeneratedCsvInterface
+     * @return \Squadkin\SquadexaAI\GeneratedCsv\Api\Data\GeneratedCsvInterface
      */
     public function setInputFilePath($inputFilePath);
 
@@ -69,7 +69,7 @@ interface GeneratedCsvInterface
     /**
      * Set response_file_name
      * @param string $responseFileName
-     * @return \Squadkin\AIAutoProductBuilder\GeneratedCsv\Api\Data\GeneratedCsvInterface
+     * @return \Squadkin\SquadexaAI\GeneratedCsv\Api\Data\GeneratedCsvInterface
      */
     public function setResponseFileName($responseFileName);
 
@@ -82,7 +82,7 @@ interface GeneratedCsvInterface
     /**
      * Set response_file_path
      * @param string $responseFilePath
-     * @return \Squadkin\AIAutoProductBuilder\GeneratedCsv\Api\Data\GeneratedCsvInterface
+     * @return \Squadkin\SquadexaAI\GeneratedCsv\Api\Data\GeneratedCsvInterface
      */
     public function setResponseFilePath($responseFilePath);
 
@@ -95,7 +95,7 @@ interface GeneratedCsvInterface
     /**
      * Set import_status
      * @param string $importStatus
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface
      */
     public function setImportStatus($importStatus);
 
@@ -108,7 +108,7 @@ interface GeneratedCsvInterface
     /**
      * Set imported_products_count
      * @param int $importedProductsCount
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface
      */
     public function setImportedProductsCount($importedProductsCount);
 
@@ -121,7 +121,7 @@ interface GeneratedCsvInterface
     /**
      * Set total_products_count
      * @param int $totalProductsCount
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface
      */
     public function setTotalProductsCount($totalProductsCount);
 
@@ -134,7 +134,7 @@ interface GeneratedCsvInterface
     /**
      * Set import_error_message
      * @param string $importErrorMessage
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface
      */
     public function setImportErrorMessage($importErrorMessage);
 
@@ -147,7 +147,7 @@ interface GeneratedCsvInterface
     /**
      * Set imported_at
      * @param string $importedAt
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface
      */
     public function setImportedAt($importedAt);
 }

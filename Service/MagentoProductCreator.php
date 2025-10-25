@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Service;
+namespace Squadkin\SquadexaAI\Service;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\Data\ProductInterfaceFactory;
@@ -17,8 +17,8 @@ use Magento\Catalog\Model\Product\Visibility;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
-use Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface;
-use Squadkin\AIAutoProductBuilder\Api\AiProductRepositoryInterface;
+use Squadkin\SquadexaAI\Api\Data\AiProductInterface;
+use Squadkin\SquadexaAI\Api\AiProductRepositoryInterface;
 
 class MagentoProductCreator
 {

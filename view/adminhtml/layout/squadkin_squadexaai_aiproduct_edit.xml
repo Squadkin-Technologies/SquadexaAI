@@ -5,7 +5,7 @@
     </head>
     <body>
         <referenceContainer name="content">
-            <uiComponent name="squadkin_aiautoproductbuilder_aiproduct_form"/>
+            <uiComponent name="squadkin_squadexaai_aiproduct_form"/>
         </referenceContainer>
     </body>
 </page> 

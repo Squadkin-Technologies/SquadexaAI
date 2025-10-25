@@ -1,6 +1,6 @@
 {
-    "name": "squadkin/module-aiautoproductbuilder",
-    "description": "AI Auto Product Builder, Product Generator, Product Creator",
+    "name": "squadkin/module-squadexaai",
+    "description": "SquadexaAI - AI Product Builder, Product Generator, Product Creator",
     "type": "magento2-module",
     "license": "GPL-3.0",
     "authors": [
@@ -16,7 +16,7 @@
             "registration.php"
         ],
         "psr-4": {
-            "Squadkin\\AIAutoProductBuilder\\": ""
+            "Squadkin\\SquadexaAI\\": ""
         }
     }
 }

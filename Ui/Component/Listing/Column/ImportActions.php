@@ -5,13 +5,13 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Ui\Component\Listing\Column;
+namespace Squadkin\SquadexaAI\Ui\Component\Listing\Column;
 
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 use Magento\Framework\UrlInterface;
-use Squadkin\AIAutoProductBuilder\Model\Config\Source\ImportStatus;
+use Squadkin\SquadexaAI\Model\Config\Source\ImportStatus;
 
 class ImportActions extends Column
 {
@@ -76,7 +76,7 @@ class ImportActions extends Column
                 // Show Import button for pending items
                 $actions[] = [
                     'href' => $this->urlBuilder->getUrl(
-                        'squadkin_aiautoproductbuilder/generatedcsv/importmodal',
+                        'squadkin_squadexaai/generatedcsv/importmodal',
                         ['id' => $csvId]
                     ),
                     'label' => __('Import to Magento'),
@@ -89,7 +89,7 @@ class ImportActions extends Column
                 // Allow access to import page even during processing to see progress
                 $actions[] = [
                     'href' => $this->urlBuilder->getUrl(
-                        'squadkin_aiautoproductbuilder/generatedcsv/importmodal',
+                        'squadkin_squadexaai/generatedcsv/importmodal',
                         ['id' => $item['generatedcsv_id']]
                     ),
                     'label' => __('View Processing Status'),
@@ -109,7 +109,7 @@ class ImportActions extends Column
                 // Show view imported products link
                 $actions[] = [
                     'href' => $this->urlBuilder->getUrl(
-                        'squadkin_aiautoproductbuilder/generatedcsv/viewimported',
+                        'squadkin_squadexaai/generatedcsv/viewimported',
                         ['id' => $csvId]
                     ),
                     'label' => __('View Imported Products'),
@@ -119,7 +119,7 @@ class ImportActions extends Column
                 // Show re-import option
                 $actions[] = [
                     'href' => $this->urlBuilder->getUrl(
-                        'squadkin_aiautoproductbuilder/generatedcsv/importmodal',
+                        'squadkin_squadexaai/generatedcsv/importmodal',
                         ['id' => $csvId]
                     ),
                     'label' => __('Re-Import'),
@@ -132,7 +132,7 @@ class ImportActions extends Column
                 // Show error details and retry option
                 $actions[] = [
                     'href' => $this->urlBuilder->getUrl(
-                        'squadkin_aiautoproductbuilder/generatedcsv/importerrors',
+                        'squadkin_squadexaai/generatedcsv/importerrors',
                         ['id' => $csvId]
                     ),
                     'label' => __('View Error Details'),
@@ -142,7 +142,7 @@ class ImportActions extends Column
                 
                 $actions[] = [
                     'href' => $this->urlBuilder->getUrl(
-                        'squadkin_aiautoproductbuilder/generatedcsv/importmodal',
+                        'squadkin_squadexaai/generatedcsv/importmodal',
                         ['id' => $csvId]
                     ),
                     'label' => __('Retry Import'),

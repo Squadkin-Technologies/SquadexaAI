@@ -5,12 +5,12 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Model\AiProduct;
+namespace Squadkin\SquadexaAI\Model\AiProduct;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
-use Squadkin\AIAutoProductBuilder\Model\ResourceModel\AiProduct\CollectionFactory;
-use Squadkin\AIAutoProductBuilder\Service\CustomAttributeProcessor;
+use Squadkin\SquadexaAI\Model\ResourceModel\AiProduct\CollectionFactory;
+use Squadkin\SquadexaAI\Service\CustomAttributeProcessor;
 
 class DataProvider extends AbstractDataProvider
 {
@@ -79,12 +79,12 @@ class DataProvider extends AbstractDataProvider
             $this->loadedData[$model->getId()] = $data;
         }
         
-        $data = $this->dataPersistor->get('squadkin_aiautoproductbuilder_aiproduct');
+        $data = $this->dataPersistor->get('squadkin_squadexaai_aiproduct');
         if (!empty($data)) {
             $model = $this->collection->getNewEmptyItem();
             $model->setData($data);
             $this->loadedData[$model->getId()] = $model->getData();
-            $this->dataPersistor->clear('squadkin_aiautoproductbuilder_aiproduct');
+            $this->dataPersistor->clear('squadkin_squadexaai_aiproduct');
         }
         
         return $this->loadedData;

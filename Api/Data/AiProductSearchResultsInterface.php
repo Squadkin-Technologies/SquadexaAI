@@ -5,19 +5,19 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Api\Data;
+namespace Squadkin\SquadexaAI\Api\Data;
 
 interface AiProductSearchResultsInterface extends \Magento\Framework\Api\SearchResultsInterface
 {
     /**
      * Get AiProduct list.
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface[]
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface[]
      */
     public function getItems();
 
     /**
      * Set AiProduct list.
-     * @param \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface[] $items
+     * @param \Squadkin\SquadexaAI\Api\Data\AiProductInterface[] $items
      * @return $this
      */
     public function setItems(array $items);

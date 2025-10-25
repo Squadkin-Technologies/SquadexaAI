@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Block\Adminhtml\GeneratedCsv;
+namespace Squadkin\SquadexaAI\Block\Adminhtml\GeneratedCsv;
 
 use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;
@@ -16,7 +16,7 @@ class Upload extends Template
     /**
      * @var string
      */
-    protected $_template = 'Squadkin_AIAutoProductBuilder::generatedcsv/upload.phtml';
+    protected $_template = 'Squadkin_SquadexaAI::generatedcsv/upload.phtml';
 
     /**
      * Upload constructor.
@@ -38,7 +38,7 @@ class Upload extends Template
      */
     public function getUploadUrl(): string
     {
-        return $this->getUrl('squadkin_aiautoproductbuilder/generatedcsv/upload');
+        return $this->getUrl('squadkin_squadexaai/generatedcsv/upload');
     }
 
     /**

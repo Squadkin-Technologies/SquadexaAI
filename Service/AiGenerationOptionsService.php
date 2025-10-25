@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Service;
+namespace Squadkin\SquadexaAI\Service;
 
 use Magento\Framework\Exception\LocalizedException;
 

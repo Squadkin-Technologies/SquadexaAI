@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Model\ResourceModel;
+namespace Squadkin\SquadexaAI\Model\ResourceModel;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
@@ -16,6 +16,6 @@ class AiProduct extends AbstractDb
      */
     protected function _construct()
     {
-        $this->_init('squadkin_aiautoproductbuilder_aiproduct', 'aiproduct_id');
+        $this->_init('squadkin_squadexaai_aiproduct', 'aiproduct_id');
     }
 } 

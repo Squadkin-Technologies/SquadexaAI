@@ -2,24 +2,24 @@
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
 	<argument name="data" xsi:type="array">
 		<item name="js_config" xsi:type="array">
-			<item name="provider" xsi:type="string">squadkin_aiautoproductbuilder_generatedcsv_listing.squadkin_aiautoproductbuilder_generatedcsv_listing_data_source</item>
+			<item name="provider" xsi:type="string">squadkin_squadexaai_generatedcsv_listing.squadkin_squadexaai_generatedcsv_listing_data_source</item>
 		</item>
 	</argument>
 	<settings>
-		<spinner>squadkin_aiautoproductbuilder_generatedcsv_columns</spinner>
+		<spinner>squadkin_squadexaai_generatedcsv_columns</spinner>
 		<deps>
-			<dep>squadkin_aiautoproductbuilder_generatedcsv_listing.squadkin_aiautoproductbuilder_generatedcsv_listing_data_source</dep>
+			<dep>squadkin_squadexaai_generatedcsv_listing.squadkin_squadexaai_generatedcsv_listing_data_source</dep>
 		</deps>
 	</settings>
-	<dataSource name="squadkin_aiautoproductbuilder_generatedcsv_listing_data_source" component="Magento_Ui/js/grid/provider">
+	<dataSource name="squadkin_squadexaai_generatedcsv_listing_data_source" component="Magento_Ui/js/grid/provider">
 		<settings>
 			<storageConfig>
 				<param name="indexField" xsi:type="string">generatedcsv_id</param>
 			</storageConfig>
 			<updateUrl path="mui/index/render"/>
 		</settings>
-		<aclResource>Squadkin_AIAutoProductBuilder::GeneratedCsv</aclResource>
-		<dataProvider name="squadkin_aiautoproductbuilder_generatedcsv_listing_data_source" class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+		<aclResource>Squadkin_SquadexaAI::GeneratedCsv</aclResource>
+		<dataProvider name="squadkin_squadexaai_generatedcsv_listing_data_source" class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
 			<settings>
 				<requestFieldName>id</requestFieldName>
 				<primaryFieldName>generatedcsv_id</primaryFieldName>
@@ -35,7 +35,7 @@
 		<filters name="listing_filters"/>
 		<paging name="listing_paging"/>
 	</listingToolbar>
-	<columns name="squadkin_aiautoproductbuilder_generatedcsv_columns">
+	<columns name="squadkin_squadexaai_generatedcsv_columns">
 		<selectionsColumn name="ids">
 			<settings>
 				<indexField>generatedcsv_id</indexField>
@@ -54,7 +54,7 @@
 				<label translate="true">Input File Name</label>
 			</settings>
 		</column>
-		<actionsColumn name="input_file_download" class="Squadkin\AIAutoProductBuilder\Ui\Component\Listing\Column\InputFileActions">
+		<actionsColumn name="input_file_download" class="Squadkin\SquadexaAI\Ui\Component\Listing\Column\InputFileActions">
 			<settings>
 				<label translate="true">Input File Download</label>
 				<sortable>false</sortable>
@@ -66,7 +66,7 @@
 				<label translate="true">Response File Name</label>
 			</settings>
 		</column>
-		<actionsColumn name="response_file_download" class="Squadkin\AIAutoProductBuilder\Ui\Component\Listing\Column\OutputFileActions">
+		<actionsColumn name="response_file_download" class="Squadkin\SquadexaAI\Ui\Component\Listing\Column\OutputFileActions">
 			<settings>
 				<label translate="true">Output File Download</label>
 				<sortable>false</sortable>
@@ -75,9 +75,26 @@
 		<column name="import_status">
 			<settings>
 				<filter>select</filter>
-				<options class="Squadkin\AIAutoProductBuilder\Model\Config\Source\ImportStatus"/>
+				<options class="Squadkin\SquadexaAI\Model\Config\Source\ImportStatus"/>
 				<dataType>select</dataType>
 				<label translate="true">Import Status</label>
+			</settings>
+		</column>
+		<column name="generation_type" component="Magento_Ui/js/grid/columns/select">
+			<settings>
+				<filter>select</filter>
+				<dataType>select</dataType>
+				<label translate="true">Generation Type</label>
+				<options>
+					<option name="single" xsi:type="array">
+						<item name="value" xsi:type="string">single</item>
+						<item name="label" xsi:type="string" translate="true">Single Product</item>
+					</option>
+					<option name="csv" xsi:type="array">
+						<item name="value" xsi:type="string">csv</item>
+						<item name="label" xsi:type="string" translate="true">CSV Upload</item>
+					</option>
+				</options>
 			</settings>
 		</column>
 		<column name="imported_products_count">
@@ -93,9 +110,9 @@
 				<label translate="true">Import Date</label>
 			</settings>
 		</column>
-		<actionsColumn name="import_actions" class="Squadkin\AIAutoProductBuilder\Ui\Component\Listing\Column\ImportActions">
+		<actionsColumn name="product_actions" class="Squadkin\SquadexaAI\Ui\Component\Listing\Column\ProductCreateActions">
 			<settings>
-				<label translate="true">Import Actions</label>
+				<label translate="true">Product Actions</label>
 				<sortable>false</sortable>
 			</settings>
 		</actionsColumn>

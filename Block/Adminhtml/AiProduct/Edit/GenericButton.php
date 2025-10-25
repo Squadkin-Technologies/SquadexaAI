@@ -5,11 +5,11 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Block\Adminhtml\AiProduct\Edit;
+namespace Squadkin\SquadexaAI\Block\Adminhtml\AiProduct\Edit;
 
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Squadkin\AIAutoProductBuilder\Api\AiProductRepositoryInterface;
+use Squadkin\SquadexaAI\Api\AiProductRepositoryInterface;
 
 class GenericButton
 {

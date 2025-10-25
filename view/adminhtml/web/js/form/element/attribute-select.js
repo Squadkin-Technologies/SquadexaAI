@@ -40,7 +40,7 @@ define([
          */
         fetchAttributeDetails: function (attributeCode) {
             var self = this;
-            var url = this.attributeDetailsUrl || urlBuilder.build('squadkin_aiautoproductbuilder/aiproduct/attributedetails');
+            var url = this.attributeDetailsUrl || urlBuilder.build('squadkin_squadexaai/aiproduct/attributedetails');
             
             $.ajax({
                 url: url,

@@ -5,12 +5,12 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Controller\Adminhtml\AiProduct;
+namespace Squadkin\SquadexaAI\Controller\Adminhtml\AiProduct;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
-use Squadkin\AIAutoProductBuilder\Api\AiProductRepositoryInterface;
+use Squadkin\SquadexaAI\Api\AiProductRepositoryInterface;
 
 class Edit extends Action
 {
@@ -74,6 +74,6 @@ class Edit extends Action
      */
     protected function _isAllowed(): bool
     {
-        return $this->_authorization->isAllowed('Squadkin_AIAutoProductBuilder::AiProduct_update');
+        return $this->_authorization->isAllowed('Squadkin_SquadexaAI::AiProduct_update');
     }
 } 

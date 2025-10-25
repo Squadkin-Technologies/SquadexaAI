@@ -2,13 +2,13 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd" layout="admin-1column">
     <head>
         <title>Import AI Products to Magento</title>
-        <css src="Squadkin_AIAutoProductBuilder::css/import-processing.css"/>
+        <css src="Squadkin_SquadexaAI::css/import-processing.css"/>
     </head>
     <body>
         <referenceContainer name="content">
-            <block class="Squadkin\AIAutoProductBuilder\Block\Adminhtml\GeneratedCsv\ImportModal" 
+            <block class="Squadkin\SquadexaAI\Block\Adminhtml\GeneratedCsv\ImportModal" 
                    name="import.modal.content" 
-                   template="Squadkin_AIAutoProductBuilder::generatedcsv/import_modal.phtml"/>
+                   template="Squadkin_SquadexaAI::generatedcsv/import_modal.phtml"/>
         </referenceContainer>
     </body>
 </page> 

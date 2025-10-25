@@ -5,20 +5,20 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Api\Data;
+namespace Squadkin\SquadexaAI\Api\Data;
 
 interface GeneratedCsvSearchResultsInterface extends \Magento\Framework\Api\SearchResultsInterface
 {
 
     /**
      * Get GeneratedCsv list.
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface[]
+     * @return \Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface[]
      */
     public function getItems();
 
     /**
      * Set input_file_name list.
-     * @param \Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface[] $items
+     * @param \Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface[] $items
      * @return $this
      */
     public function setItems(array $items);

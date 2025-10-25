@@ -2,24 +2,24 @@
 <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">squadkin_aiautoproductbuilder_aiproduct_form.squadkin_aiautoproductbuilder_aiproduct_form_data_source</item>
+            <item name="provider" xsi:type="string">squadkin_squadexaai_aiproduct_form.squadkin_squadexaai_aiproduct_form_data_source</item>
         </item>
         <item name="label" xsi:type="string" translate="true">AI Product Information</item>
         <item name="template" xsi:type="string">templates/form/collapsible</item>
     </argument>
     <settings>
         <buttons>
-            <button name="save" class="Squadkin\AIAutoProductBuilder\Block\Adminhtml\AiProduct\Edit\SaveButton"/>
-            <button name="delete" class="Squadkin\AIAutoProductBuilder\Block\Adminhtml\AiProduct\Edit\DeleteButton"/>
-            <button name="back" class="Squadkin\AIAutoProductBuilder\Block\Adminhtml\AiProduct\Edit\BackButton"/>
+            <button name="save" class="Squadkin\SquadexaAI\Block\Adminhtml\AiProduct\Edit\SaveButton"/>
+            <button name="delete" class="Squadkin\SquadexaAI\Block\Adminhtml\AiProduct\Edit\DeleteButton"/>
+            <button name="back" class="Squadkin\SquadexaAI\Block\Adminhtml\AiProduct\Edit\BackButton"/>
         </buttons>
-        <namespace>squadkin_aiautoproductbuilder_aiproduct_form</namespace>
+        <namespace>squadkin_squadexaai_aiproduct_form</namespace>
         <dataScope>data</dataScope>
         <deps>
-            <dep>squadkin_aiautoproductbuilder_aiproduct_form.squadkin_aiautoproductbuilder_aiproduct_form_data_source</dep>
+            <dep>squadkin_squadexaai_aiproduct_form.squadkin_squadexaai_aiproduct_form_data_source</dep>
         </deps>
     </settings>
-    <dataSource name="squadkin_aiautoproductbuilder_aiproduct_form_data_source">
+    <dataSource name="squadkin_squadexaai_aiproduct_form_data_source">
         <argument name="data" xsi:type="array">
             <item name="js_config" xsi:type="array">
                 <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
@@ -28,7 +28,7 @@
         <settings>
             <submitUrl path="*/*/save"/>
         </settings>
-        <dataProvider class="Squadkin\AIAutoProductBuilder\Model\AiProduct\DataProvider" name="squadkin_aiautoproductbuilder_aiproduct_form_data_source">
+        <dataProvider class="Squadkin\SquadexaAI\Model\AiProduct\DataProvider" name="squadkin_squadexaai_aiproduct_form_data_source">
             <settings>
                 <requestFieldName>aiproduct_id</requestFieldName>
                 <primaryFieldName>aiproduct_id</primaryFieldName>
@@ -268,9 +268,9 @@
         <container name="custom_attributes_container">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="component" xsi:type="string">Squadkin_AIAutoProductBuilder/js/form/components/custom-attributes</item>
-                    <item name="template" xsi:type="string">Squadkin_AIAutoProductBuilder/form/custom-attributes</item>
-                    <item name="attributeDetailsUrl" xsi:type="url" path="squadkin_aiautoproductbuilder/aiproduct/attributedetails"/>
+                    <item name="component" xsi:type="string">Squadkin_SquadexaAI/js/form/components/custom-attributes</item>
+                    <item name="template" xsi:type="string">Squadkin_SquadexaAI/form/custom-attributes</item>
+                    <item name="attributeDetailsUrl" xsi:type="url" path="squadkin_squadexaai/aiproduct/attributedetails"/>
                     <item name="componentType" xsi:type="string">container</item>
                     <item name="dataScope" xsi:type="string">custom_attributes_data</item>
                     <item name="label" xsi:type="string" translate="true">Custom Attributes</item>
@@ -295,8 +295,8 @@
                         <item name="is_collection" xsi:type="boolean">true</item>
                         <item name="componentType" xsi:type="string">container</item>
                         <item name="dataScope" xsi:type="string"></item>
-                        <item name="component" xsi:type="string">Squadkin_AIAutoProductBuilder/js/form/components/attribute-row</item>
-                        <item name="attributeDetailsUrl" xsi:type="url" path="squadkin_aiautoproductbuilder/aiproduct/attributedetails"/>
+                        <item name="component" xsi:type="string">Squadkin_SquadexaAI/js/form/components/attribute-row</item>
+                        <item name="attributeDetailsUrl" xsi:type="url" path="squadkin_squadexaai/aiproduct/attributedetails"/>
                     </item>
                 </argument>
                 <field name="attribute_code" formElement="select" sortOrder="10">
@@ -305,7 +305,7 @@
                             <item name="fit" xsi:type="boolean">true</item>
                             <item name="dataScope" xsi:type="string">attribute_code</item>
                             <item name="breakLine" xsi:type="boolean">false</item>
-                            <item name="component" xsi:type="string">Squadkin_AIAutoProductBuilder/js/form/element/attribute-select</item>
+                            <item name="component" xsi:type="string">Squadkin_SquadexaAI/js/form/element/attribute-select</item>
                         </item>
                     </argument>
                     <settings>
@@ -322,7 +322,7 @@
                     <formElements>
                         <select>
                             <settings>
-                                <options class="Squadkin\AIAutoProductBuilder\Model\Config\Source\AttributeOptions"/>
+                                <options class="Squadkin\SquadexaAI\Model\Config\Source\AttributeOptions"/>
                                 <caption translate="true">-- Please Select Attribute --</caption>
                             </settings>
                         </select>
@@ -331,7 +331,7 @@
                 <container name="value_container" sortOrder="20">
                     <argument name="data" xsi:type="array">
                         <item name="config" xsi:type="array">
-                            <item name="component" xsi:type="string">Squadkin_AIAutoProductBuilder/js/form/components/attribute-value</item>
+                            <item name="component" xsi:type="string">Squadkin_SquadexaAI/js/form/components/attribute-value</item>
                             <item name="dataScope" xsi:type="string">value_container</item>
                             <item name="breakLine" xsi:type="boolean">false</item>
                             <item name="componentType" xsi:type="string">container</item>

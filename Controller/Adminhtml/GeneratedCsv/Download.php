@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Controller\Adminhtml\GeneratedCsv;
+namespace Squadkin\SquadexaAI\Controller\Adminhtml\GeneratedCsv;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -13,7 +13,7 @@ use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
-use Squadkin\AIAutoProductBuilder\Helper\FileManager;
+use Squadkin\SquadexaAI\Helper\FileManager;
 
 class Download extends Action
 {
@@ -118,6 +118,6 @@ class Download extends Action
      */
     protected function _isAllowed(): bool
     {
-        return $this->_authorization->isAllowed('Squadkin_AIAutoProductBuilder::GeneratedCsv_view');
+        return $this->_authorization->isAllowed('Squadkin_SquadexaAI::GeneratedCsv_view');
     }
 } 

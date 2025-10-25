@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Model\ResourceModel\GeneratedCsv;
+namespace Squadkin\SquadexaAI\Model\ResourceModel\GeneratedCsv;
 
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
@@ -23,8 +23,8 @@ class Collection extends AbstractCollection
     protected function _construct()
     {
         $this->_init(
-            \Squadkin\AIAutoProductBuilder\Model\GeneratedCsv::class,
-            \Squadkin\AIAutoProductBuilder\Model\ResourceModel\GeneratedCsv::class
+            \Squadkin\SquadexaAI\Model\GeneratedCsv::class,
+            \Squadkin\SquadexaAI\Model\ResourceModel\GeneratedCsv::class
         );
     }
 }

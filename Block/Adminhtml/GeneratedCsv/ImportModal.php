@@ -5,13 +5,13 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Block\Adminhtml\GeneratedCsv;
+namespace Squadkin\SquadexaAI\Block\Adminhtml\GeneratedCsv;
 
 use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;
 use Magento\ImportExport\Model\Import;
 use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregatorInterface;
-use Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface;
+use Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface;
 
 class ImportModal extends Template
 {
@@ -60,7 +60,7 @@ class ImportModal extends Template
      */
     public function getImportExecuteUrl(): string
     {
-        return $this->getUrl('squadkin_aiautoproductbuilder/generatedcsv/importexecute');
+        return $this->getUrl('squadkin_squadexaai/generatedcsv/importexecute');
     }
 
     /**
@@ -127,6 +127,6 @@ class ImportModal extends Template
      */
     public function getBackUrl(): string
     {
-        return $this->getUrl('squadkin_aiautoproductbuilder/generatedcsv/index');
+        return $this->getUrl('squadkin_squadexaai/generatedcsv/index');
     }
 } 

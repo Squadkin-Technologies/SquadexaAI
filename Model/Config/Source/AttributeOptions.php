@@ -5,10 +5,10 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Model\Config\Source;
+namespace Squadkin\SquadexaAI\Model\Config\Source;
 
 use Magento\Framework\Data\OptionSourceInterface;
-use Squadkin\AIAutoProductBuilder\Service\AttributeService;
+use Squadkin\SquadexaAI\Service\AttributeService;
 use Psr\Log\LoggerInterface;
 
 class AttributeOptions implements OptionSourceInterface

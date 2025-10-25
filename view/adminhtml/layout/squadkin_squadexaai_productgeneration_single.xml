@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Squadkin_SquadexaAI::css/product-generation.css"/>
+        <css src="Squadkin_SquadexaAI::css/product-create-modal.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Backend\Block\Template" name="product.generation.forms" template="Squadkin_SquadexaAI::productgeneration/unified.phtml"/>
+            <uiComponent name="squadkin_squadexaai_generatedcsv_listing"/>
+        </referenceContainer>
+    </body>
+</page>

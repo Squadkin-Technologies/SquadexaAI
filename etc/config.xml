@@ -1,11 +1,17 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
 	<default>
-		<aiproductbuilder>
+		<squadexaiproductcreator>
 			<general>
-				<is_enable/>
-				<licence_key/>
+				<is_enable>0</is_enable>
 			</general>
-		</aiproductbuilder>
+                <authentication>
+                    <username/>
+                    <password/>
+                    <access_token/>
+                    <api_key/>
+                    <token_created/>
+                </authentication>
+		</squadexaiproductcreator>
 	</default>
 </config>

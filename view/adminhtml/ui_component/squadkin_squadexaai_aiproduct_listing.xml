@@ -2,13 +2,13 @@
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">squadkin_aiautoproductbuilder_aiproduct_listing.squadkin_aiautoproductbuilder_aiproduct_listing_data_source</item>
+            <item name="provider" xsi:type="string">squadkin_squadexaai_aiproduct_listing.squadkin_squadexaai_aiproduct_listing_data_source</item>
         </item>
     </argument>
     <settings>
-        <spinner>squadkin_aiautoproductbuilder_aiproduct_columns</spinner>
+        <spinner>squadkin_squadexaai_aiproduct_columns</spinner>
         <deps>
-            <dep>squadkin_aiautoproductbuilder_aiproduct_listing.squadkin_aiautoproductbuilder_aiproduct_listing_data_source</dep>
+            <dep>squadkin_squadexaai_aiproduct_listing.squadkin_squadexaai_aiproduct_listing_data_source</dep>
         </deps>
         <buttons>
             <button name="add">
@@ -18,15 +18,15 @@
             </button>
         </buttons>
     </settings>
-    <dataSource name="squadkin_aiautoproductbuilder_aiproduct_listing_data_source" component="Magento_Ui/js/grid/provider">
+    <dataSource name="squadkin_squadexaai_aiproduct_listing_data_source" component="Magento_Ui/js/grid/provider">
         <settings>
             <storageConfig>
                 <param name="indexField" xsi:type="string">aiproduct_id</param>
             </storageConfig>
             <updateUrl path="mui/index/render"/>
         </settings>
-        <aclResource>Squadkin_AIAutoProductBuilder::AiProduct</aclResource>
-        <dataProvider name="squadkin_aiautoproductbuilder_aiproduct_listing_data_source" class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+        <aclResource>Squadkin_SquadexaAI::AiProduct</aclResource>
+        <dataProvider name="squadkin_squadexaai_aiproduct_listing_data_source" class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
             <settings>
                 <requestFieldName>id</requestFieldName>
                 <primaryFieldName>aiproduct_id</primaryFieldName>
@@ -47,7 +47,7 @@
                         <message translate="true">Are you sure you want to delete selected items?</message>
                         <title translate="true">Delete items</title>
                     </confirm>
-                    <url path="squadkin_aiautoproductbuilder/aiproduct/massDelete"/>
+                    <url path="squadkin_squadexaai/aiproduct/massDelete"/>
                     <type>delete</type>
                     <label translate="true">Delete</label>
                 </settings>
@@ -58,7 +58,7 @@
                         <message translate="true">Are you sure you want to create Magento products from selected AI products?</message>
                         <title translate="true">Create Magento Products</title>
                     </confirm>
-                    <url path="squadkin_aiautoproductbuilder/aiproduct/createMagentoProducts"/>
+                    <url path="squadkin_squadexaai/aiproduct/createMagentoProducts"/>
                     <type>create_magento_products</type>
                     <label translate="true">Create Magento Products</label>
                 </settings>
@@ -66,7 +66,7 @@
         </massaction>
         <paging name="listing_paging"/>
     </listingToolbar>
-    <columns name="squadkin_aiautoproductbuilder_aiproduct_columns">
+    <columns name="squadkin_squadexaai_aiproduct_columns">
         <selectionsColumn name="ids">
             <settings>
                 <indexField>aiproduct_id</indexField>
@@ -141,7 +141,7 @@
                 <label translate="true">Created At</label>
             </settings>
         </column>
-        <actionsColumn name="actions" class="Squadkin\AIAutoProductBuilder\Ui\Component\Listing\Column\AiProductActions">
+        <actionsColumn name="actions" class="Squadkin\SquadexaAI\Ui\Component\Listing\Column\AiProductActions">
             <settings>
                 <indexField>aiproduct_id</indexField>
                 <resizeEnabled>false</resizeEnabled>

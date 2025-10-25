@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Model\Config\Source;
+namespace Squadkin\SquadexaAI\Model\Config\Source;
 
 use Magento\Framework\Data\OptionSourceInterface;
 

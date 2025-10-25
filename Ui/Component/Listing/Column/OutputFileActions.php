@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Ui\Component\Listing\Column;
+namespace Squadkin\SquadexaAI\Ui\Component\Listing\Column;
 
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
@@ -54,7 +54,7 @@ class OutputFileActions extends Column
                     $item[$name] = [
                         'download' => [
                             'href' => $this->urlBuilder->getUrl(
-                                'squadkin_aiautoproductbuilder/generatedcsv/download',
+                                'squadkin_squadexaai/generatedcsv/download',
                                 [
                                     'file' => $item['response_file_name'],
                                     'type' => 'output'

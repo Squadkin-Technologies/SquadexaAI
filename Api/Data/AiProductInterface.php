@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Api\Data;
+namespace Squadkin\SquadexaAI\Api\Data;
 
 interface AiProductInterface
 {
@@ -44,20 +44,20 @@ interface AiProductInterface
     /**
      * Set aiproduct_id
      * @param string $aiproductId
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setAiproductId($aiproductId);
 
     /**
      * Get generatedcsv_id
-     * @return string|null
+     * @return int|null
      */
     public function getGeneratedcsvId();
 
     /**
      * Set generatedcsv_id
-     * @param string $generatedcsvId
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @param int $generatedcsvId
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setGeneratedcsvId($generatedcsvId);
 
@@ -70,7 +70,7 @@ interface AiProductInterface
     /**
      * Set sku
      * @param string $sku
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setSku($sku);
 
@@ -83,7 +83,7 @@ interface AiProductInterface
     /**
      * Set name
      * @param string $name
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setName($name);
 
@@ -96,7 +96,7 @@ interface AiProductInterface
     /**
      * Set description
      * @param string $description
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setDescription($description);
 
@@ -109,7 +109,7 @@ interface AiProductInterface
     /**
      * Set short_description
      * @param string $shortDescription
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setShortDescription($shortDescription);
 
@@ -122,7 +122,7 @@ interface AiProductInterface
     /**
      * Set price
      * @param float $price
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setPrice($price);
 
@@ -135,7 +135,7 @@ interface AiProductInterface
     /**
      * Set special_price
      * @param float $specialPrice
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setSpecialPrice($specialPrice);
 
@@ -148,7 +148,7 @@ interface AiProductInterface
     /**
      * Set weight
      * @param float $weight
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setWeight($weight);
 
@@ -161,7 +161,7 @@ interface AiProductInterface
     /**
      * Set qty
      * @param int $qty
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setQty($qty);
 
@@ -174,7 +174,7 @@ interface AiProductInterface
     /**
      * Set category
      * @param string $category
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setCategory($category);
 
@@ -187,7 +187,7 @@ interface AiProductInterface
     /**
      * Set status
      * @param string $status
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setStatus($status);
 
@@ -200,7 +200,7 @@ interface AiProductInterface
     /**
      * Set visibility
      * @param string $visibility
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setVisibility($visibility);
 
@@ -213,7 +213,7 @@ interface AiProductInterface
     /**
      * Set type
      * @param string $type
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setType($type);
 
@@ -226,7 +226,7 @@ interface AiProductInterface
     /**
      * Set attribute_set
      * @param string $attributeSet
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setAttributeSet($attributeSet);
 
@@ -239,7 +239,7 @@ interface AiProductInterface
     /**
      * Set tax_class
      * @param string $taxClass
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setTaxClass($taxClass);
 
@@ -252,7 +252,7 @@ interface AiProductInterface
     /**
      * Set meta_title
      * @param string $metaTitle
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setMetaTitle($metaTitle);
 
@@ -265,7 +265,7 @@ interface AiProductInterface
     /**
      * Set meta_description
      * @param string $metaDescription
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setMetaDescription($metaDescription);
 
@@ -278,7 +278,7 @@ interface AiProductInterface
     /**
      * Set meta_keywords
      * @param string $metaKeywords
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setMetaKeywords($metaKeywords);
 
@@ -291,7 +291,7 @@ interface AiProductInterface
     /**
      * Set url_key
      * @param string $urlKey
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setUrlKey($urlKey);
 
@@ -304,7 +304,7 @@ interface AiProductInterface
     /**
      * Set magento_product_id
      * @param int $magentoProductId
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setMagentoProductId($magentoProductId);
 
@@ -317,7 +317,7 @@ interface AiProductInterface
     /**
      * Set is_created_in_magento
      * @param bool $isCreatedInMagento
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setIsCreatedInMagento($isCreatedInMagento);
 
@@ -330,7 +330,7 @@ interface AiProductInterface
     /**
      * Set additional_data
      * @param string $additionalData
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setAdditionalData($additionalData);
 
@@ -343,7 +343,7 @@ interface AiProductInterface
     /**
      * Set custom attributes
      * @param array $customAttributes
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setCustomAttributes($customAttributes);
 
@@ -358,7 +358,7 @@ interface AiProductInterface
      * Set custom attribute value
      * @param string $attributeCode
      * @param mixed $value
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setCustomAttribute($attributeCode, $value);
 
@@ -371,7 +371,7 @@ interface AiProductInterface
     /**
      * Set created_at
      * @param string $createdAt
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setCreatedAt($createdAt);
 
@@ -384,7 +384,7 @@ interface AiProductInterface
     /**
      * Set updated_at
      * @param string $updatedAt
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setUpdatedAt($updatedAt);
 } 

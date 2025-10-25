@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Helper;
+namespace Squadkin\SquadexaAI\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
@@ -18,13 +18,14 @@ use Magento\Framework\File\Csv;
 use Magento\Framework\HTTP\Client\Curl;
 use Magento\Framework\Serialize\Serializer\Json;
 use Psr\Log\LoggerInterface;
-use Squadkin\AIAutoProductBuilder\Api\AiProductRepositoryInterface;
-use Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterfaceFactory;
+use Squadkin\SquadexaAI\Api\AiProductRepositoryInterface;
+use Squadkin\SquadexaAI\Api\Data\AiProductInterfaceFactory;
+use Squadkin\SquadexaAI\Service\SquadexaApiService;
 
 class FileManager extends AbstractHelper
 {
-    const INPUT_DIR = 'AiBuilder/Input';
-    const OUTPUT_DIR = 'AiBuilder/Output';
+    const INPUT_DIR = 'AIProductCreator/Input';
+    const OUTPUT_DIR = 'AIProductCreator/Output';
     
     /**
      * @var Filesystem
@@ -67,6 +68,11 @@ class FileManager extends AbstractHelper
     private $aiProductFactory;
 
     /**
+     * @var SquadexaApiService
+     */
+    private $apiService;
+
+    /**
      * FileManager constructor.
      *
      * @param Context $context
@@ -77,6 +83,7 @@ class FileManager extends AbstractHelper
      * @param LoggerInterface $logger
      * @param AiProductRepositoryInterface $aiProductRepository
      * @param AiProductInterfaceFactory $aiProductFactory
+     * @param SquadexaApiService $apiService
      */
     public function __construct(
         Context $context,
@@ -86,7 +93,8 @@ class FileManager extends AbstractHelper
         Json $jsonSerializer,
         LoggerInterface $logger,
         AiProductRepositoryInterface $aiProductRepository,
-        AiProductInterfaceFactory $aiProductFactory
+        AiProductInterfaceFactory $aiProductFactory,
+        SquadexaApiService $apiService
     ) {
         parent::__construct($context);
         $this->filesystem = $filesystem;
@@ -97,6 +105,7 @@ class FileManager extends AbstractHelper
         $this->logger = $logger;
         $this->aiProductRepository = $aiProductRepository;
         $this->aiProductFactory = $aiProductFactory;
+        $this->apiService = $apiService;
     }
 
     /**
@@ -159,16 +168,50 @@ class FileManager extends AbstractHelper
     {
         try {
             $inputFilePath = self::INPUT_DIR . '/' . $inputFileName;
-            $fullPath = $this->varDirectory->getAbsolutePath($inputFilePath);
             
-            // Read file content
-            $fileContent = $this->varDirectory->readFile($inputFilePath);
+            // Read and parse CSV file
+            $csvData = $this->csvProcessor->getData($this->varDirectory->getAbsolutePath($inputFilePath));
             
-            // For now, using a mock AI API endpoint
-            // This will be replaced with the actual API later
-            $apiResponse = $this->callMockAIAPI($fileContent, $inputFileName, $aiOptions);
+            if (empty($csvData) || count($csvData) < 2) {
+                throw new LocalizedException(__('CSV file is empty or invalid.'));
+            }
             
-            return $apiResponse;
+            // Get headers and data rows
+            $headers = array_shift($csvData);
+            $products = [];
+            
+            // Process each row
+            foreach ($csvData as $row) {
+                if (empty($row[0])) continue; // Skip empty rows
+                
+                $productData = array_combine($headers, $row);
+                
+                // Prepare data for API
+                $apiData = [
+                    'product_name' => $productData['product_name'] ?? '',
+                    'primary_keywords' => isset($productData['primary_keywords']) ? 
+                        explode(',', $productData['primary_keywords']) : [],
+                    'secondary_keywords' => isset($productData['secondary_keywords']) ? 
+                        explode(',', $productData['secondary_keywords']) : [],
+                    'include_pricing' => isset($productData['include_pricing']) ? 
+                        (bool)$productData['include_pricing'] : false
+                ];
+                
+                // Call API for each product
+                try {
+                    $apiResponse = $this->apiService->generateProduct($apiData);
+                    $products[] = array_merge($productData, $apiResponse);
+                } catch (\Exception $e) {
+                    $this->logger->error('Error generating product with AI: ' . $e->getMessage(), [
+                        'product_name' => $apiData['product_name'],
+                        'error' => $e->getMessage()
+                    ]);
+                    // Continue with next product
+                    continue;
+                }
+            }
+            
+            return $products;
         } catch (\Exception $e) {
             $this->logger->error('Error processing file with AI: ' . $e->getMessage());
             throw new LocalizedException(__('Could not process file with AI: %1', $e->getMessage()));
@@ -424,9 +467,9 @@ class FileManager extends AbstractHelper
      * @return void
      * @throws LocalizedException
      */
-    public function saveAiProductData(array $aiProductData, int $generatedCsvId): void
+    public function saveAiProductData(array $aiProductData, int $generatedCsvId, string $generationType = 'csv'): void
     {
-        $this->logger->info('FileManager saveAiProductData: Starting to save ' . count($aiProductData) . ' products for CSV ID: ' . $generatedCsvId);
+        $this->logger->info('FileManager saveAiProductData: Starting to save ' . count($aiProductData) . ' products for CSV ID: ' . $generatedCsvId . ', Type: ' . $generationType);
         
         try {
             $savedCount = 0;
@@ -436,6 +479,7 @@ class FileManager extends AbstractHelper
                 
                 // Set basic product data
                 $aiProduct->setGeneratedcsvId($generatedCsvId);
+                $aiProduct->setGenerationType($generationType);
                 $aiProduct->setSku($productData['sku'] ?? '');
                 $aiProduct->setName($productData['name'] ?? '');
                 $aiProduct->setDescription($productData['description'] ?? '');
@@ -456,6 +500,17 @@ class FileManager extends AbstractHelper
                 $aiProduct->setMetaDescription($productData['meta_description'] ?? $productData['description'] ?? '');
                 $aiProduct->setMetaKeywords($productData['meta_keywords'] ?? '');
                 $aiProduct->setUrlKey($this->generateUrlKey($productData['name'] ?? '', $productData['sku'] ?? ''));
+                
+                // Set keywords (for single product generation)
+                if (isset($productData['primary_keywords'])) {
+                    $aiProduct->setPrimaryKeywords($productData['primary_keywords']);
+                }
+                if (isset($productData['secondary_keywords'])) {
+                    $aiProduct->setSecondaryKeywords($productData['secondary_keywords']);
+                }
+                if (isset($productData['ai_response'])) {
+                    $aiProduct->setAiResponse($productData['ai_response']);
+                }
                 
                 // Set Magento product creation status
                 $aiProduct->setIsCreatedInMagento(false);

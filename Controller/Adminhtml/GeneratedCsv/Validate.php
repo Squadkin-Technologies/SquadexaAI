@@ -5,16 +5,16 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Controller\Adminhtml\GeneratedCsv;
+namespace Squadkin\SquadexaAI\Controller\Adminhtml\GeneratedCsv;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Exception\LocalizedException;
-use Squadkin\AIAutoProductBuilder\Service\CsvValidationService;
-use Squadkin\AIAutoProductBuilder\Service\AiGenerationOptionsService;
-use Squadkin\AIAutoProductBuilder\Helper\FileManager;
+use Squadkin\SquadexaAI\Service\CsvValidationService;
+use Squadkin\SquadexaAI\Service\AiGenerationOptionsService;
+use Squadkin\SquadexaAI\Helper\FileManager;
 
 class Validate extends Action
 {
@@ -101,7 +101,7 @@ class Validate extends Action
 
             // Save file temporarily for validation
             $tempFileName = $this->fileManager->saveInputFile($fileData);
-            $tempFilePath = 'AiBuilder/Input/' . $tempFileName;
+            $tempFilePath = 'AIProductCreator/Input/' . $tempFileName;
 
             // Perform CSV validation
             $validationResult = $this->csvValidationService->validateCsvFile($tempFilePath);
@@ -177,6 +177,6 @@ class Validate extends Action
      */
     protected function _isAllowed(): bool
     {
-        return $this->_authorization->isAllowed('Squadkin_AIAutoProductBuilder::GeneratedCsv_save');
+        return $this->_authorization->isAllowed('Squadkin_SquadexaAI::GeneratedCsv_save');
     }
 } 

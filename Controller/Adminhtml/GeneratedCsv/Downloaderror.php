@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Controller\Adminhtml\GeneratedCsv;
+namespace Squadkin\SquadexaAI\Controller\Adminhtml\GeneratedCsv;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -68,7 +68,7 @@ class Downloaderror extends Action
 
         try {
             $varDirectory = $this->filesystem->getDirectoryWrite(DirectoryList::VAR_DIR);
-            $filePath = 'AiBuilder/ErrorReports/' . $fileName;
+            $filePath = 'AIProductCreator/ErrorReports/' . $fileName;
 
             if (!$varDirectory->isExist($filePath)) {
                 throw new LocalizedException(__('Error report file not found.'));
@@ -110,6 +110,6 @@ class Downloaderror extends Action
      */
     protected function _isAllowed(): bool
     {
-        return $this->_authorization->isAllowed('Squadkin_AIAutoProductBuilder::GeneratedCsv_download');
+        return $this->_authorization->isAllowed('Squadkin_SquadexaAI::GeneratedCsv_download');
     }
 } 

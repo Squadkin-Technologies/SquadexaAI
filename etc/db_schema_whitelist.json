@@ -1,0 +1,64 @@
+{
+    "squadkin_squadexaai_generatedcsv": {
+        "column": {
+            "generatedcsv_id": true,
+            "input_file_name": true,
+            "input_file_path": true,
+            "response_file_name": true,
+            "response_file_path": true,
+            "import_status": true,
+            "imported_products_count": true,
+            "total_products_count": true,
+            "import_error_message": true,
+            "imported_at": true,
+            "created_at": true,
+            "generation_type": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "squadkin_squadexaai_aiproduct": {
+        "column": {
+            "aiproduct_id": true,
+            "generatedcsv_id": true,
+            "sku": true,
+            "name": true,
+            "description": true,
+            "short_description": true,
+            "price": true,
+            "special_price": true,
+            "weight": true,
+            "qty": true,
+            "category": true,
+            "status": true,
+            "visibility": true,
+            "type": true,
+            "attribute_set": true,
+            "tax_class": true,
+            "meta_title": true,
+            "meta_description": true,
+            "meta_keywords": true,
+            "url_key": true,
+            "magento_product_id": true,
+            "is_created_in_magento": true,
+            "additional_data": true,
+            "created_at": true,
+            "updated_at": true,
+            "generation_type": true,
+            "primary_keywords": true,
+            "secondary_keywords": true,
+            "ai_response": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "SQUADKIN_AIPRODUCT_GENERATEDCSV_ID": true,
+            "SQUADKIN_AIPRODUCT_SKU_UNIQUE": true
+        },
+        "index": {
+            "SQUADKIN_AIPRODUCT_GENERATEDCSV_ID": true,
+            "SQUADKIN_AIPRODUCT_MAGENTO_PRODUCT_ID": true
+        }
+    }
+}
+

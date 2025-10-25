@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Ui\Component\Listing\Column;
+namespace Squadkin\SquadexaAI\Ui\Component\Listing\Column;
 
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
@@ -14,8 +14,8 @@ use Magento\Framework\UrlInterface;
 
 class AiProductActions extends Column
 {
-    const URL_PATH_EDIT = 'squadkin_aiautoproductbuilder/aiproduct/edit';
-    const URL_PATH_DELETE = 'squadkin_aiautoproductbuilder/aiproduct/delete';
+    const URL_PATH_EDIT = 'squadkin_squadexaai/aiproduct/edit';
+    const URL_PATH_DELETE = 'squadkin_squadexaai/aiproduct/delete';
 
     /**
      * @var UrlInterface

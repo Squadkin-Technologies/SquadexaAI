@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Squadkin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="form-action">
+            <values>
+                <value id="squadexa_ai_api" type="host">https://squadexa-ai.magento2extensions.com</value>
+                <value id="prodexa_ai_api" type="host">https://prodexa-ai.magento2extensions.com</value>
+            </values>
+        </policy>
+        <policy id="script-src">
+            <values>
+                <value id="squadexa_inline" type="host">https://squadexa-ai.magento2extensions.com</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="squadexa_connect" type="host">https://squadexa-ai.magento2extensions.com</value>
+                <value id="prodexa_connect" type="host">https://prodexa-ai.magento2extensions.com</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>
+

@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Block\Adminhtml\AiProduct\Edit;
+namespace Squadkin\SquadexaAI\Block\Adminhtml\AiProduct\Edit;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 

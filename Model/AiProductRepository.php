@@ -5,18 +5,18 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Model;
+namespace Squadkin\SquadexaAI\Model;
 
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface;
-use Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterfaceFactory;
-use Squadkin\AIAutoProductBuilder\Api\Data\AiProductSearchResultsInterfaceFactory;
-use Squadkin\AIAutoProductBuilder\Api\AiProductRepositoryInterface;
-use Squadkin\AIAutoProductBuilder\Model\ResourceModel\AiProduct as ResourceAiProduct;
-use Squadkin\AIAutoProductBuilder\Model\ResourceModel\AiProduct\CollectionFactory as AiProductCollectionFactory;
+use Squadkin\SquadexaAI\Api\Data\AiProductInterface;
+use Squadkin\SquadexaAI\Api\Data\AiProductInterfaceFactory;
+use Squadkin\SquadexaAI\Api\Data\AiProductSearchResultsInterfaceFactory;
+use Squadkin\SquadexaAI\Api\AiProductRepositoryInterface;
+use Squadkin\SquadexaAI\Model\ResourceModel\AiProduct as ResourceAiProduct;
+use Squadkin\SquadexaAI\Model\ResourceModel\AiProduct\CollectionFactory as AiProductCollectionFactory;
 
 class AiProductRepository implements AiProductRepositoryInterface
 {

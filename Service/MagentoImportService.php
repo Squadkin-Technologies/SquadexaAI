@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Service;
+namespace Squadkin\SquadexaAI\Service;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\ImportExport\Model\Import;
@@ -16,10 +16,10 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
 use Magento\Framework\File\Csv;
 use Psr\Log\LoggerInterface;
-use Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface;
-use Squadkin\AIAutoProductBuilder\Api\GeneratedCsvRepositoryInterface;
-use Squadkin\AIAutoProductBuilder\Api\AiProductRepositoryInterface;
-use Squadkin\AIAutoProductBuilder\Model\Config\Source\ImportStatus;
+use Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface;
+use Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface;
+use Squadkin\SquadexaAI\Api\AiProductRepositoryInterface;
+use Squadkin\SquadexaAI\Model\Config\Source\ImportStatus;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 
 class MagentoImportService
@@ -112,23 +112,23 @@ class MagentoImportService
 
         try {
             $csvId = (int)$generatedCsv->getGeneratedcsvId();
-            $this->logger->info('AIAutoProductBuilder Import: Looking for AI products with CSV ID: ' . $csvId);
+            $this->logger->info('SquadexaAI Import: Looking for AI products with CSV ID: ' . $csvId);
             
             // Get AI products for this CSV
             $aiProducts = $this->getAiProductsByCsvId($csvId);
           
-            $this->logger->info('AIAutoProductBuilder Import: Found ' . count($aiProducts) . ' AI products');
+            $this->logger->info('SquadexaAI Import: Found ' . count($aiProducts) . ' AI products');
             
             if (empty($aiProducts)) {
-                $this->logger->error('AIAutoProductBuilder Import: No AI products found for CSV ID: ' . $csvId);
+                $this->logger->error('SquadexaAI Import: No AI products found for CSV ID: ' . $csvId);
                 
                 // Let's check if there are ANY AI products in the database
                 $allProducts = $this->aiProductRepository->getList($this->searchCriteriaBuilder->create());
-                $this->logger->info('AIAutoProductBuilder Import: Total AI products in database: ' . $allProducts->getTotalCount());
+                $this->logger->info('SquadexaAI Import: Total AI products in database: ' . $allProducts->getTotalCount());
                 
                 if ($allProducts->getTotalCount() > 0) {
                     foreach ($allProducts->getItems() as $product) {
-                        $this->logger->info('AIAutoProductBuilder Import: Found AI product with CSV ID: ' . $product->getGeneratedcsvId());
+                        $this->logger->info('SquadexaAI Import: Found AI product with CSV ID: ' . $product->getGeneratedcsvId());
                     }
                 }
                 
@@ -204,7 +204,7 @@ class MagentoImportService
     private function createImportCsv(array $aiProducts, int $csvId): string
     {
         $varDirectory = $this->filesystem->getDirectoryWrite(DirectoryList::VAR_DIR);
-        $importDir = 'AiBuilder/Import';
+        $importDir = 'AIProductCreator/Import';
         
         if (!$varDirectory->isExist($importDir)) {
             $varDirectory->create($importDir);

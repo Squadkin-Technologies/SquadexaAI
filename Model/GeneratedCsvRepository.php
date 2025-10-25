@@ -5,18 +5,18 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Model;
+namespace Squadkin\SquadexaAI\Model;
 
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface;
-use Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterfaceFactory;
-use Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvSearchResultsInterfaceFactory;
-use Squadkin\AIAutoProductBuilder\Api\GeneratedCsvRepositoryInterface;
-use Squadkin\AIAutoProductBuilder\Model\ResourceModel\GeneratedCsv as ResourceGeneratedCsv;
-use Squadkin\AIAutoProductBuilder\Model\ResourceModel\GeneratedCsv\CollectionFactory as GeneratedCsvCollectionFactory;
+use Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface;
+use Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterfaceFactory;
+use Squadkin\SquadexaAI\Api\Data\GeneratedCsvSearchResultsInterfaceFactory;
+use Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface;
+use Squadkin\SquadexaAI\Model\ResourceModel\GeneratedCsv as ResourceGeneratedCsv;
+use Squadkin\SquadexaAI\Model\ResourceModel\GeneratedCsv\CollectionFactory as GeneratedCsvCollectionFactory;
 
 class GeneratedCsvRepository implements GeneratedCsvRepositoryInterface
 {

@@ -4,7 +4,7 @@
  * See COPYING.txt for license details.
  */
 
-/** @var \Squadkin\AIAutoProductBuilder\Block\Adminhtml\GeneratedCsv\Upload $block */
+/** @var \Squadkin\SquadexaAI\Block\Adminhtml\GeneratedCsv\Upload $block */
 ?>
 <div class="admin__page-section">
     <div class="admin__page-section-title">
@@ -463,7 +463,7 @@ require(['jquery', 'mage/translate'], function($, $t) {
             
             // Send validation request
             $.ajax({
-                url: '<?= $block->escapeUrl($block->getUrl('squadkin_aiautoproductbuilder/generatedcsv/validate')) ?>',
+                url: '<?= $block->escapeUrl($block->getUrl('squadkin_squadexaai/generatedcsv/validate')) ?>',
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -545,7 +545,7 @@ require(['jquery', 'mage/translate'], function($, $t) {
                 
                 // Show error report download if available
                 if (response.error_report) {
-                    downloadErrorReport.attr('href', '<?= $block->escapeUrl($block->getUrl('squadkin_aiautoproductbuilder/generatedcsv/downloaderror')) ?>?file=' + response.error_report);
+                    downloadErrorReport.attr('href', '<?= $block->escapeUrl($block->getUrl('squadkin_squadexaai/generatedcsv/downloaderror')) ?>?file=' + response.error_report);
                     errorReportSection.show();
                 }
             }

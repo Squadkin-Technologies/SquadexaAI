@@ -5,14 +5,14 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Controller\Adminhtml\AiProduct;
+namespace Squadkin\SquadexaAI\Controller\Adminhtml\AiProduct;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
-use Squadkin\AIAutoProductBuilder\Service\MagentoProductCreator;
+use Squadkin\SquadexaAI\Service\MagentoProductCreator;
 
 class CreateMagentoProducts extends Action
 {
@@ -102,6 +102,6 @@ class CreateMagentoProducts extends Action
      */
     protected function _isAllowed(): bool
     {
-        return $this->_authorization->isAllowed('Squadkin_AIAutoProductBuilder::AiProduct_save');
+        return $this->_authorization->isAllowed('Squadkin_SquadexaAI::AiProduct_save');
     }
 } 

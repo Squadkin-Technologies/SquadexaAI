@@ -1,0 +1,388 @@
+<?php
+/**
+ * Copyright © 2024 Squadkin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Magento\Backend\Block\Template $block */
+?>
+<div class="page-main-actions">
+    <div class="page-actions">
+        <div class="page-actions-inner">
+            <div class="page-actions-buttons">
+                <button type="button" class="action-primary" id="generate-single-product">
+                    <span><?= $block->escapeHtml(__('Generate Product Description')) ?></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('Single Product Generation')) ?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item single-product-form">
+            <form id="single-product-form" method="post">
+                <input name="form_key" type="hidden" value="<?= $block->escapeHtmlAttr($block->getFormKey()) ?>" />
+                
+                <div class="admin__field admin__field-product-name">
+                    <label class="admin__field-label" for="product_name">
+                        <span><?= $block->escapeHtml(__('Product Name')) ?> <span class="required">*</span></span>
+                    </label>
+                    <div class="admin__field-control">
+                        <input type="text" 
+                               name="product_name" 
+                               id="product_name" 
+                               class="admin__control-text" 
+                               placeholder="<?= $block->escapeHtmlAttr(__('e.g., Wireless Bluetooth Headphones')) ?>"
+                               required="required" />
+                        <div class="admin__field-note">
+                            <span><?= $block->escapeHtml(__('Enter the name of the product you want to generate a description for.')) ?></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin__field admin__field-primary-keywords">
+                    <label class="admin__field-label" for="primary_keywords">
+                        <span><?= $block->escapeHtml(__('Primary Keywords')) ?> <span class="required">*</span></span>
+                    </label>
+                    <div class="admin__field-control">
+                        <input type="text" 
+                               name="primary_keywords" 
+                               id="primary_keywords" 
+                               class="admin__control-text" 
+                               placeholder="<?= $block->escapeHtmlAttr(__('e.g., wireless, bluetooth, noise-cancelling')) ?>"
+                               required="required" />
+                        <div class="admin__field-note">
+                            <span><?= $block->escapeHtml(__('Separate keywords with commas. These are the main features of your product.')) ?></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin__field admin__field-secondary-keywords">
+                    <label class="admin__field-label" for="secondary_keywords">
+                        <span><?= $block->escapeHtml(__('Secondary Keywords')) ?></span>
+                    </label>
+                    <div class="admin__field-control">
+                        <input type="text" 
+                               name="secondary_keywords" 
+                               id="secondary_keywords" 
+                               class="admin__control-text" 
+                               placeholder="<?= $block->escapeHtmlAttr(__('e.g., premium, comfortable, long-lasting')) ?>" />
+                        <div class="admin__field-note">
+                            <span><?= $block->escapeHtml(__('Optional: Additional keywords for better SEO and description quality.')) ?></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin__field admin__field-pricing">
+                    <label class="admin__field-label" for="include_pricing">
+                        <span><?= $block->escapeHtml(__('Include Pricing Information')) ?></span>
+                    </label>
+                    <div class="admin__field-control">
+                        <div class="admin__field-option">
+                            <input type="checkbox" 
+                                   name="include_pricing" 
+                                   id="include_pricing" 
+                                   class="admin__control-checkbox" 
+                                   value="1" />
+                            <label for="include_pricing" class="admin__field-label">
+                                <span><?= $block->escapeHtml(__('Include pricing details in the description')) ?></span>
+                            </label>
+                        </div>
+                        <div class="admin__field-note">
+                            <span><?= $block->escapeHtml(__('Check this box to include pricing information in the generated description.')) ?></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin__field admin__field-estimated-time">
+                    <div class="admin__field-control">
+                        <div class="estimated-time-info">
+                            <span class="time-icon">⏱️</span>
+                            <span class="time-label"><?= $block->escapeHtml(__('Estimated Generation Time:')) ?></span>
+                            <span class="time-value" id="estimated-time">13s</span>
+                        </div>
+                        <div class="admin__field-note">
+                            <span><?= $block->escapeHtml(__('Based on your current form data')) ?></span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="admin__page-section" id="generation-results" style="display: none;">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('Generated Product Description')) ?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item generation-results">
+            <div id="generation-output"></div>
+        </div>
+    </div>
+</div>
+
+<div class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $block->escapeHtml(__('Generated Products History')) ?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item">
+            <div id="single-product-grid">
+                <?= $block->getChildHtml('single_product_grid') ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.single-product-form {
+    background: #f8f8f8;
+    padding: 20px;
+    border: 1px solid #e3e3e3;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.single-product-form .admin__field {
+    margin-bottom: 20px;
+}
+
+.single-product-form .admin__field-label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.single-product-form .admin__control-text {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #adadad;
+    border-radius: 3px;
+    background: #fff;
+    font-size: 14px;
+}
+
+.single-product-form .admin__control-text:focus {
+    border-color: #007bdb;
+    box-shadow: 0 0 0 1px #007bdb;
+}
+
+.single-product-form .admin__field-note {
+    margin-top: 5px;
+    color: #666;
+    font-size: 12px;
+}
+
+.single-product-form .admin__field-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.single-product-form .admin__control-checkbox {
+    margin-right: 8px;
+}
+
+.estimated-time-info {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: #e3f2fd;
+    border: 1px solid #2196f3;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.time-icon {
+    font-size: 18px;
+    margin-right: 8px;
+}
+
+.time-label {
+    font-weight: 600;
+    color: #1976d2;
+    margin-right: 8px;
+}
+
+.time-value {
+    font-weight: bold;
+    color: #1976d2;
+    font-size: 16px;
+}
+
+.generation-results {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 20px;
+}
+
+.generation-output {
+    white-space: pre-wrap;
+    font-family: monospace;
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+}
+
+.required {
+    color: #e02b27;
+}
+
+.page-main-actions .action-primary {
+    background: #eb5202;
+    border: 1px solid #eb5202;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.page-main-actions .action-primary:hover {
+    background: #d44a02;
+    border-color: #d44a02;
+}
+
+.page-main-actions .action-primary:disabled {
+    background: #ccc;
+    border-color: #ccc;
+    cursor: not-allowed;
+}
+</style>
+
+<script>
+require(['jquery', 'mage/translate'], function($, $t) {
+    $(document).ready(function() {
+        var form = $('#single-product-form');
+        var generateButton = $('#generate-single-product');
+        var productNameInput = $('#product_name');
+        var primaryKeywordsInput = $('#primary_keywords');
+        var secondaryKeywordsInput = $('#secondary_keywords');
+        var includePricingCheckbox = $('#include_pricing');
+        var estimatedTimeSpan = $('#estimated-time');
+        var resultsSection = $('#generation-results');
+        var outputDiv = $('#generation-output');
+        
+        // Update estimated time based on form data
+        function updateEstimatedTime() {
+            var productName = productNameInput.val().trim();
+            var primaryKeywords = primaryKeywordsInput.val().trim();
+            var secondaryKeywords = secondaryKeywordsInput.val().trim();
+            var includePricing = includePricingCheckbox.is(':checked');
+            
+            var baseTime = 10; // Base time in seconds
+            var complexity = 0;
+            
+            if (productName.length > 50) complexity += 2;
+            if (primaryKeywords.split(',').length > 5) complexity += 2;
+            if (secondaryKeywords.length > 0) complexity += 1;
+            if (includePricing) complexity += 2;
+            
+            var estimatedTime = baseTime + complexity;
+            estimatedTimeSpan.text(estimatedTime + 's');
+        }
+        
+        // Update estimated time on input change
+        productNameInput.on('input', updateEstimatedTime);
+        primaryKeywordsInput.on('input', updateEstimatedTime);
+        secondaryKeywordsInput.on('input', updateEstimatedTime);
+        includePricingCheckbox.on('change', updateEstimatedTime);
+        
+        // Form validation
+        function validateForm() {
+            var productName = productNameInput.val().trim();
+            var primaryKeywords = primaryKeywordsInput.val().trim();
+            
+            if (!productName) {
+                alert($t('Please enter a product name.'));
+                productNameInput.focus();
+                return false;
+            }
+            
+            if (!primaryKeywords) {
+                alert($t('Please enter primary keywords.'));
+                primaryKeywordsInput.focus();
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Generate product description
+        generateButton.on('click', function() {
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Show loading state
+            generateButton.prop('disabled', true);
+            generateButton.html('<span>' + $t('Generating...') + '</span>');
+            
+            // Show processing message
+            $('<div class="message message-notice" id="processing-message">' + 
+              '<div>' + $t('Generating product description with AI. This may take a few moments...') + '</div>' + 
+              '</div>').insertAfter('.page-main-actions');
+            
+            // Prepare data
+            var formData = {
+                form_key: $('input[name="form_key"]').val(),
+                product_name: productNameInput.val().trim(),
+                primary_keywords: primaryKeywordsInput.val().trim(),
+                secondary_keywords: secondaryKeywordsInput.val().trim(),
+                include_pricing: includePricingCheckbox.is(':checked') ? 1 : 0
+            };
+            
+            // Make AJAX request
+            $.ajax({
+                url: '<?= $block->escapeUrl($block->getUrl('squadkin_squadexaai/productgeneration/single/generate')) ?>',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    $('#processing-message').remove();
+                    
+                    if (response.success) {
+                        // Display results
+                        outputDiv.html('<pre>' + JSON.stringify(response.data, null, 2) + '</pre>');
+                        resultsSection.show();
+                        
+                        // Show success message
+                        $('<div class="message message-success">' + 
+                          '<div>' + response.message + '</div>' + 
+                          '</div>').insertAfter('.page-main-actions');
+                        
+                        // Refresh grid
+                        $(document).trigger('singleProductGenerated');
+                    } else {
+                        // Show error message
+                        $('<div class="message message-error">' + 
+                          '<div>' + response.message + '</div>' + 
+                          '</div>').insertAfter('.page-main-actions');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#processing-message').remove();
+                    
+                    // Show error message
+                    $('<div class="message message-error">' + 
+                      '<div>' + $t('An error occurred while generating the product description.') + '</div>' + 
+                      '</div>').insertAfter('.page-main-actions');
+                },
+                complete: function() {
+                    // Reset button state
+                    generateButton.prop('disabled', false);
+                    generateButton.html('<span>' + $t('Generate Product Description') + '</span>');
+                }
+            });
+        });
+    });
+});
+</script>

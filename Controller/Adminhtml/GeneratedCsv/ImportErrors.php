@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Controller\Adminhtml\GeneratedCsv;
+namespace Squadkin\SquadexaAI\Controller\Adminhtml\GeneratedCsv;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
@@ -13,7 +13,7 @@ use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\View\Result\Page;
 use Magento\Framework\View\Result\PageFactory;
-use Squadkin\AIAutoProductBuilder\Api\GeneratedCsvRepositoryInterface;
+use Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface;
 
 class ImportErrors extends Action
 {
@@ -72,7 +72,7 @@ class ImportErrors extends Action
             
             $this->messageManager->addErrorMessage(__('Invalid CSV ID provided.'));
             $resultRedirect = $this->resultRedirectFactory->create();
-            return $resultRedirect->setPath('squadkin_aiautoproductbuilder/generatedcsv/index');
+            return $resultRedirect->setPath('squadkin_squadexaai/generatedcsv/index');
         }
 
         try {
@@ -93,7 +93,7 @@ class ImportErrors extends Action
             } else {
                 // Return HTML page for direct access
                 $resultPage = $this->resultPageFactory->create();
-                $resultPage->setActiveMenu('Squadkin_AIAutoProductBuilder::squadkin_aiautoproductbuilder_generatedcsv');
+                $resultPage->setActiveMenu('Squadkin_SquadexaAI::squadkin_squadexaai_generatedcsv');
                 $resultPage->getConfig()->getTitle()->prepend(__('Import Error Details'));
                 
                 // Pass data to the block
@@ -116,7 +116,7 @@ class ImportErrors extends Action
             
             $this->messageManager->addErrorMessage(__('Unable to load error details: %1', $e->getMessage()));
             $resultRedirect = $this->resultRedirectFactory->create();
-            return $resultRedirect->setPath('squadkin_aiautoproductbuilder/generatedcsv/index');
+            return $resultRedirect->setPath('squadkin_squadexaai/generatedcsv/index');
         }
     }
 
@@ -160,6 +160,6 @@ class ImportErrors extends Action
      */
     protected function _isAllowed(): bool
     {
-        return $this->_authorization->isAllowed('Squadkin_AIAutoProductBuilder::GeneratedCsv_save');
+        return $this->_authorization->isAllowed('Squadkin_SquadexaAI::GeneratedCsv_save');
     }
 } 

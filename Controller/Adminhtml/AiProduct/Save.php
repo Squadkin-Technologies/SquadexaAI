@@ -5,16 +5,16 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Controller\Adminhtml\AiProduct;
+namespace Squadkin\SquadexaAI\Controller\Adminhtml\AiProduct;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
-use Squadkin\AIAutoProductBuilder\Api\AiProductRepositoryInterface;
-use Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterfaceFactory;
-use Squadkin\AIAutoProductBuilder\Service\CustomAttributeProcessor;
+use Squadkin\SquadexaAI\Api\AiProductRepositoryInterface;
+use Squadkin\SquadexaAI\Api\Data\AiProductInterfaceFactory;
+use Squadkin\SquadexaAI\Service\CustomAttributeProcessor;
 
 class Save extends Action
 {
@@ -142,6 +142,6 @@ class Save extends Action
      */
     protected function _isAllowed(): bool
     {
-        return $this->_authorization->isAllowed('Squadkin_AIAutoProductBuilder::AiProduct_save');
+        return $this->_authorization->isAllowed('Squadkin_SquadexaAI::AiProduct_save');
     }
 } 

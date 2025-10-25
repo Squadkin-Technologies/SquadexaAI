@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Api;
+namespace Squadkin\SquadexaAI\Api;
 
 use Magento\Framework\Api\SearchCriteriaInterface;
 
@@ -13,18 +13,18 @@ interface AiProductRepositoryInterface
 {
     /**
      * Save AiProduct
-     * @param \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface $aiProduct
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @param \Squadkin\SquadexaAI\Api\Data\AiProductInterface $aiProduct
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function save(
-        \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface $aiProduct
+        \Squadkin\SquadexaAI\Api\Data\AiProductInterface $aiProduct
     );
 
     /**
      * Retrieve AiProduct
      * @param string $aiproductId
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function get($aiproductId);
@@ -32,7 +32,7 @@ interface AiProductRepositoryInterface
     /**
      * Retrieve AiProduct matching the specified criteria.
      * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
-     * @return \Squadkin\AIAutoProductBuilder\Api\Data\AiProductSearchResultsInterface
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductSearchResultsInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getList(
@@ -41,12 +41,12 @@ interface AiProductRepositoryInterface
 
     /**
      * Delete AiProduct
-     * @param \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface $aiProduct
+     * @param \Squadkin\SquadexaAI\Api\Data\AiProductInterface $aiProduct
      * @return bool true on success
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function delete(
-        \Squadkin\AIAutoProductBuilder\Api\Data\AiProductInterface $aiProduct
+        \Squadkin\SquadexaAI\Api\Data\AiProductInterface $aiProduct
     );
 
     /**

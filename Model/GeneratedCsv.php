@@ -5,10 +5,10 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Model;
+namespace Squadkin\SquadexaAI\Model;
 
 use Magento\Framework\Model\AbstractModel;
-use Squadkin\AIAutoProductBuilder\Api\Data\GeneratedCsvInterface;
+use Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface;
 
 class GeneratedCsv extends AbstractModel implements GeneratedCsvInterface
 {
@@ -18,7 +18,7 @@ class GeneratedCsv extends AbstractModel implements GeneratedCsvInterface
      */
     public function _construct()
     {
-        $this->_init(\Squadkin\AIAutoProductBuilder\Model\ResourceModel\GeneratedCsv::class);
+        $this->_init(\Squadkin\SquadexaAI\Model\ResourceModel\GeneratedCsv::class);
     }
 
     /**
@@ -26,7 +26,7 @@ class GeneratedCsv extends AbstractModel implements GeneratedCsvInterface
      */
     public function getGeneratedcsvId()
     {
-        return $this->getData(self::GENERATEDCSV_ID);
+        return (int)$this->getData(self::GENERATEDCSV_ID);
     }
 
     /**

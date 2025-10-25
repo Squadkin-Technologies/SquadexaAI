@@ -1,33 +1,33 @@
 <?xml version="1.0" ?>
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
-	<route url="/V1/squadkin-aiautoproductbuilder/generatedcsv" method="POST">
-		<service class="Squadkin\AIAutoProductBuilder\Api\GeneratedCsvRepositoryInterface" method="save"/>
+	<route url="/V1/squadkin-squadexaai/generatedcsv" method="POST">
+		<service class="Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface" method="save"/>
 		<resources>
-			<resource ref="Squadkin_AIAutoProductBuilder::GeneratedCsv_save"/>
+			<resource ref="Squadkin_SquadexaAI::GeneratedCsv_save"/>
 		</resources>
 	</route>
-	<route url="/V1/squadkin-aiautoproductbuilder/generatedcsv/search" method="GET">
-		<service class="Squadkin\AIAutoProductBuilder\Api\GeneratedCsvRepositoryInterface" method="getList"/>
+	<route url="/V1/squadkin-squadexaai/generatedcsv/search" method="GET">
+		<service class="Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface" method="getList"/>
 		<resources>
-			<resource ref="Squadkin_AIAutoProductBuilder::GeneratedCsv_view"/>
+			<resource ref="Squadkin_SquadexaAI::GeneratedCsv_view"/>
 		</resources>
 	</route>
-	<route url="/V1/squadkin-aiautoproductbuilder/generatedcsv/:generatedcsvId" method="GET">
-		<service class="Squadkin\AIAutoProductBuilder\Api\GeneratedCsvRepositoryInterface" method="get"/>
+	<route url="/V1/squadkin-squadexaai/generatedcsv/:generatedcsvId" method="GET">
+		<service class="Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface" method="get"/>
 		<resources>
-			<resource ref="Squadkin_AIAutoProductBuilder::GeneratedCsv_view"/>
+			<resource ref="Squadkin_SquadexaAI::GeneratedCsv_view"/>
 		</resources>
 	</route>
-	<route url="/V1/squadkin-aiautoproductbuilder/generatedcsv/:generatedcsvId" method="PUT">
-		<service class="Squadkin\AIAutoProductBuilder\Api\GeneratedCsvRepositoryInterface" method="save"/>
+	<route url="/V1/squadkin-squadexaai/generatedcsv/:generatedcsvId" method="PUT">
+		<service class="Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface" method="save"/>
 		<resources>
-			<resource ref="Squadkin_AIAutoProductBuilder::GeneratedCsv_update"/>
+			<resource ref="Squadkin_SquadexaAI::GeneratedCsv_update"/>
 		</resources>
 	</route>
-	<route url="/V1/squadkin-aiautoproductbuilder/generatedcsv/:generatedcsvId" method="DELETE">
-		<service class="Squadkin\AIAutoProductBuilder\Api\GeneratedCsvRepositoryInterface" method="deleteById"/>
+	<route url="/V1/squadkin-squadexaai/generatedcsv/:generatedcsvId" method="DELETE">
+		<service class="Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface" method="deleteById"/>
 		<resources>
-			<resource ref="Squadkin_AIAutoProductBuilder::GeneratedCsv_delete"/>
+			<resource ref="Squadkin_SquadexaAI::GeneratedCsv_delete"/>
 		</resources>
 	</route>
 </routes>

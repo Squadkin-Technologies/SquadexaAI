@@ -5,15 +5,15 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Controller\Adminhtml\Debug;
+namespace Squadkin\SquadexaAI\Controller\Adminhtml\Debug;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Squadkin\AIAutoProductBuilder\Api\AiProductRepositoryInterface;
-use Squadkin\AIAutoProductBuilder\Api\GeneratedCsvRepositoryInterface;
+use Squadkin\SquadexaAI\Api\AiProductRepositoryInterface;
+use Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
 class CheckAiProducts extends Action
@@ -134,6 +134,6 @@ class CheckAiProducts extends Action
      */
     protected function _isAllowed(): bool
     {
-        return $this->_authorization->isAllowed('Squadkin_AIAutoProductBuilder::GeneratedCsv_view');
+        return $this->_authorization->isAllowed('Squadkin_SquadexaAI::GeneratedCsv_view');
     }
 } 

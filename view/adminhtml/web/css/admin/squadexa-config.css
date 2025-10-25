@@ -1,0 +1,102 @@
+/**
+ * Copyright © 2024 Squadkin. All rights reserved.
+ * Squadexa AI Configuration - Full Width Dashboard Styles
+ */
+
+/* Full width configuration section */
+.config-nav-block .item-squadexaiproductcreator {
+    width: 100% !important;
+}
+
+/* Full width for Squadexa AI section when JavaScript class is added */
+.squadexa-fullwidth-section {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* Squadexa AI configuration section styling */
+.section-config .section-config .section-config {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* Full width for Squadexa AI groups */
+#squadexaiproductcreator_general,
+#squadexaiproductcreator_authentication,
+#squadexaiproductcreator_account_status {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* Full width for fields within Squadexa AI section */
+#squadexaiproductcreator_general .admin__field,
+#squadexaiproductcreator_authentication .admin__field,
+#squadexaiproductcreator_account_status .admin__field {
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+}
+
+/* Label and control layout for full width */
+#squadexaiproductcreator_general .admin__field-label,
+#squadexaiproductcreator_authentication .admin__field-label,
+#squadexaiproductcreator_account_status .admin__field-label {
+    width: 20% !important;
+    min-width: 200px !important;
+    flex: 0 0 20% !important;
+}
+
+#squadexaiproductcreator_general .admin__field-control,
+#squadexaiproductcreator_authentication .admin__field-control,
+#squadexaiproductcreator_account_status .admin__field-control {
+    width: 80% !important;
+    flex: 1 1 80% !important;
+}
+
+/* Full width for field notes and comments */
+#squadexaiproductcreator_general .admin__field-note,
+#squadexaiproductcreator_authentication .admin__field-note,
+#squadexaiproductcreator_account_status .admin__field-note {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-top: 10px !important;
+}
+
+/* Account status and token information full width */
+.squadexa-account-dashboard,
+.token-status-info,
+.account-status-info {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* Button styling for full width */
+#squadexaiproductcreator_authentication_generate_token .admin__field-control {
+    width: 100% !important;
+}
+
+#row_squadexaiproductcreator_account_status_account_info td.label{
+    display: none;
+}
+
+#row_squadexaiproductcreator_account_status_account_info td.value{
+    width: 100% !important;
+}
+
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    #squadexaiproductcreator_general .admin__field-label,
+    #squadexaiproductcreator_authentication .admin__field-label,
+    #squadexaiproductcreator_account_status .admin__field-label {
+        width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+    
+    #squadexaiproductcreator_general .admin__field-control,
+    #squadexaiproductcreator_authentication .admin__field-control,
+    #squadexaiproductcreator_account_status .admin__field-control {
+        width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+}

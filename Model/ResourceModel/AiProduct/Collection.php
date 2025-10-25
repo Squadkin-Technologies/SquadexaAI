@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Squadkin\AIAutoProductBuilder\Model\ResourceModel\AiProduct;
+namespace Squadkin\SquadexaAI\Model\ResourceModel\AiProduct;
 
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
@@ -22,8 +22,8 @@ class Collection extends AbstractCollection
     protected function _construct()
     {
         $this->_init(
-            \Squadkin\AIAutoProductBuilder\Model\AiProduct::class,
-            \Squadkin\AIAutoProductBuilder\Model\ResourceModel\AiProduct::class
+            \Squadkin\SquadexaAI\Model\AiProduct::class,
+            \Squadkin\SquadexaAI\Model\ResourceModel\AiProduct::class
         );
     }
 } 

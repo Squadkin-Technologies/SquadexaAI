@@ -4,7 +4,7 @@
  * See COPYING.txt for license details.
  */
 
-/** @var \Squadkin\AIAutoProductBuilder\Block\Adminhtml\GeneratedCsv\Upload $block */
+/** @var \Squadkin\SquadexaAI\Block\Adminhtml\GeneratedCsv\Upload $block */
 ?>
 <div class="admin__page-section">
     <div class="admin__page-section-title">
@@ -32,123 +32,6 @@
                                required="required" />
                         <div class="admin__field-note">
                             <span><?= $block->escapeHtml(__('Accepted file types: CSV. Maximum file size: %1 MB.', $block->getMaxFileSize())) ?></span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="admin__field admin__field-options">
-                    <label class="admin__field-label">
-                        <span><?= $block->escapeHtml(__('Select AI Generation Options')) ?></span>
-                    </label>
-                    <div class="admin__field-control">
-                        <div class="admin__field-note" style="margin-bottom: 10px;">
-                            <span><?= $block->escapeHtml(__('Select at least %1 options for AI to generate:', 3)) ?></span>
-                        </div>
-                        <div class="ai-options-grid">
-                            <div class="admin__field admin__field-option">
-                                <input type="checkbox" 
-                                       name="ai_options[]" 
-                                       value="name" 
-                                       id="ai_option_name" 
-                                       class="admin__control-checkbox ai-option-checkbox"
-                                       checked="checked" />
-                                <label for="ai_option_name" class="admin__field-label">
-                                    <span><?= $block->escapeHtml(__('Name')) ?></span>
-                                </label>
-                            </div>
-                            <div class="admin__field admin__field-option">
-                                <input type="checkbox" 
-                                       name="ai_options[]" 
-                                       value="short_description" 
-                                       id="ai_option_short_description" 
-                                       class="admin__control-checkbox ai-option-checkbox" />
-                                <label for="ai_option_short_description" class="admin__field-label">
-                                    <span><?= $block->escapeHtml(__('Short Description')) ?></span>
-                                </label>
-                            </div>
-                            <div class="admin__field admin__field-option">
-                                <input type="checkbox" 
-                                       name="ai_options[]" 
-                                       value="description" 
-                                       id="ai_option_description" 
-                                       class="admin__control-checkbox ai-option-checkbox" />
-                                <label for="ai_option_description" class="admin__field-label">
-                                    <span><?= $block->escapeHtml(__('Description')) ?></span>
-                                </label>
-                            </div>
-                            <div class="admin__field admin__field-option">
-                                <input type="checkbox" 
-                                       name="ai_options[]" 
-                                       value="meta_title" 
-                                       id="ai_option_meta_title" 
-                                       class="admin__control-checkbox ai-option-checkbox" />
-                                <label for="ai_option_meta_title" class="admin__field-label">
-                                    <span><?= $block->escapeHtml(__('Meta Title')) ?></span>
-                                </label>
-                            </div>
-                            <div class="admin__field admin__field-option">
-                                <input type="checkbox" 
-                                       name="ai_options[]" 
-                                       value="meta_description" 
-                                       id="ai_option_meta_description" 
-                                       class="admin__control-checkbox ai-option-checkbox" />
-                                <label for="ai_option_meta_description" class="admin__field-label">
-                                    <span><?= $block->escapeHtml(__('Meta Description')) ?></span>
-                                </label>
-                            </div>
-                            <div class="admin__field admin__field-option">
-                                <input type="checkbox" 
-                                       name="ai_options[]" 
-                                       value="meta_keywords" 
-                                       id="ai_option_meta_keywords" 
-                                       class="admin__control-checkbox ai-option-checkbox" />
-                                <label for="ai_option_meta_keywords" class="admin__field-label">
-                                    <span><?= $block->escapeHtml(__('Meta Keywords')) ?></span>
-                                </label>
-                            </div>
-                            <div class="admin__field admin__field-option">
-                                <input type="checkbox" 
-                                       name="ai_options[]" 
-                                       value="ingredients" 
-                                       id="ai_option_ingredients" 
-                                       class="admin__control-checkbox ai-option-checkbox" />
-                                <label for="ai_option_ingredients" class="admin__field-label">
-                                    <span><?= $block->escapeHtml(__('Ingredients')) ?></span>
-                                </label>
-                            </div>
-                            <div class="admin__field admin__field-option">
-                                <input type="checkbox" 
-                                       name="ai_options[]" 
-                                       value="how_to_use" 
-                                       id="ai_option_how_to_use" 
-                                       class="admin__control-checkbox ai-option-checkbox" />
-                                <label for="ai_option_how_to_use" class="admin__field-label">
-                                    <span><?= $block->escapeHtml(__('How to Use')) ?></span>
-                                </label>
-                            </div>
-                            <div class="admin__field admin__field-option">
-                                <input type="checkbox" 
-                                       name="ai_options[]" 
-                                       value="highest_price_google" 
-                                       id="ai_option_highest_price_google" 
-                                       class="admin__control-checkbox ai-option-checkbox" />
-                                <label for="ai_option_highest_price_google" class="admin__field-label">
-                                    <span><?= $block->escapeHtml(__('Highest Price on Google Search Results')) ?></span>
-                                </label>
-                            </div>
-                            <div class="admin__field admin__field-option">
-                                <input type="checkbox" 
-                                       name="ai_options[]" 
-                                       value="lowest_price_google" 
-                                       id="ai_option_lowest_price_google" 
-                                       class="admin__control-checkbox ai-option-checkbox" />
-                                <label for="ai_option_lowest_price_google" class="admin__field-label">
-                                    <span><?= $block->escapeHtml(__('Lowest Price on Google Search Results')) ?></span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="ai-options-validation" style="display: none; color: #e02b27; margin-top: 5px;">
-                            <span><?= $block->escapeHtml(__('Please select at least 3 AI generation options.')) ?></span>
                         </div>
                     </div>
                 </div>
@@ -286,38 +169,12 @@ require(['jquery', 'mage/translate'], function($, $t) {
             }
         });
         
-        // AI Options validation
-        function validateAiOptions() {
-            var checkedOptions = $('.ai-option-checkbox:checked').length;
-            var validationMessage = $('.ai-options-validation');
-            
-            if (checkedOptions < 3) {
-                validationMessage.show();
-                return false;
-            } else {
-                validationMessage.hide();
-                return true;
-            }
-        }
-        
-        // Check AI options on change
-        $('.ai-option-checkbox').on('change', function() {
-            validateAiOptions();
-        });
-        
         // Form submission validation
         uploadForm.on('submit', function(e) {
             // Check if file is selected
             if (!fileInput.val()) {
                 e.preventDefault();
                 alert($t('Please select a CSV file to upload.'));
-                return false;
-            }
-            
-            // Validate AI options
-            if (!validateAiOptions()) {
-                e.preventDefault();
-                alert($t('Please select at least 3 AI generation options.'));
                 return false;
             }
             
