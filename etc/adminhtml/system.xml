@@ -18,11 +18,17 @@
 			</group>
         <group id="authentication" sortOrder="20" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
             <label>🔐 Authentication Settings</label>
-            <comment>Configure your Squadexa AI authentication credentials</comment>
+            <comment><![CDATA[<strong>How to setup API Authentication:</strong><br/>
+            1. Enter your Squadexa AI account email and password below<br/>
+            2. Click "Generate API Key" button<br/>
+            3. Your permanent API Key will be generated automatically<br/>
+            4. Start using AI-powered product generation!<br/>
+            <br/>
+            <strong>Note:</strong> If you don't have an account, visit <a href="https://squadexa.ai/" target="_blank">Squadexa AI Portal</a> to register first.]]></comment>
             
             <field id="username" type="text" sortOrder="10" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
-                <label>📧 Username/Email</label>
-                <comment>Your Squadexa AI account email address</comment>
+                <label>📧 Email</label>
+                <comment>Your Squadexa AI account email</comment>
                 <depends>
                     <field id="is_enable">1</field>
                 </depends>
@@ -39,51 +45,79 @@
             
             <field id="generate_token" type="button" sortOrder="30" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
                 <label>🚀 Generate API Key</label>
-                <comment><strong>2-Step Authentication Process:</strong><br/>
-                Step 1: Login with username/password → Get temporary access token (expires in 30 minutes)<br/>
-                Step 2: Use access token → Generate permanent API key (never expires)<br/>
-                Both fields will be populated automatically.</comment>
+                <comment><![CDATA[<strong>Click this button to generate your API Key automatically!</strong><br/>
+                <br/>
+                The system will:<br/>
+                • Securely login with your credentials<br/>
+                • Generate a permanent API Key<br/>
+                • Save it automatically for immediate use<br/>
+                <br/>
+                Your API Key never expires and is used for all product generation requests.]]></comment>
                 <frontend_model>Squadkin\SquadexaAI\Block\Adminhtml\System\Config\GenerateTokenButton</frontend_model>
                 <depends>
                     <field id="is_enable">1</field>
                 </depends>
             </field>
             
-            <field id="access_token" type="obscure" sortOrder="40" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
-                <label>⏰ Access Token (Temporary)</label>
-                <comment>Temporary access token (expires in 30 minutes). Automatically generated and refreshed as needed.</comment>
+            <field id="api_key" type="obscure" sortOrder="40" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+                <label>🔐 API Key</label>
+                <comment>Your permanent API key - automatically generated when you click "Generate API Key" button above.</comment>
+                <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 <depends>
                     <field id="is_enable">1</field>
                 </depends>
             </field>
             
-            <field id="api_key" type="obscure" sortOrder="50" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
-                <label>🔐 API Key (Permanent)</label>
-                <comment>Permanent API key (never expires). Used for all AI service calls. Generated automatically from access token.</comment>
-                <depends>
-                    <field id="is_enable">1</field>
-                </depends>
-            </field>
-            
-            <field id="token_created" type="note" sortOrder="60" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
-                <label>🕒 Token Information</label>
-                <comment>Token creation time and status will be displayed here</comment>
+            <field id="api_key_status" type="note" sortOrder="50" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+                <label>📊 API Key Status</label>
+                <comment>API key information and usage statistics</comment>
                 <frontend_model>Squadkin\SquadexaAI\Block\Adminhtml\System\Config\TokenStatus</frontend_model>
                 <depends>
                     <field id="is_enable">1</field>
                 </depends>
             </field>
         </group>
-			<group id="account_status" sortOrder="30" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
-				<label>Account Status</label>
-				<field id="account_info" type="note" sortOrder="10" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
-					<comment>Account details will be displayed here after API key validation</comment>
-					<frontend_model>Squadkin\SquadexaAI\Block\Adminhtml\System\Config\AccountStatus</frontend_model>
-					<depends>
-						<field id="is_enable">1</field>
-					</depends>
-				</field>
-			</group>
-		</section>
-	</system>
+        <group id="field_mapping" sortOrder="30" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+            <label>Field Mapping Configuration</label>
+            <comment><![CDATA[Configure how AI-generated fields map to Magento product attributes.<br/>
+            <strong>Default Mapping:</strong> Used when no specific mapping profile is selected.<br/>
+            <strong>Format:</strong> JSON object with "map" key containing field mappings.<br/>
+            <br/>
+            <strong>Example:</strong><br/>
+            {<br/>
+            &nbsp;&nbsp;"map": {<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;"product_name": "name",<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;"meta_title": "meta_title",<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;"description": "description",<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;"upc": "sku"<br/>
+            &nbsp;&nbsp;}<br/>
+            }]]></comment>
+            <field id="default_mapping_rules" type="textarea" sortOrder="10" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+                <label>Default Mapping Rules (JSON)</label>
+                <comment>Default field mapping rules in JSON format. This will be used when creating products from AI data if no specific mapping profile is selected.</comment>
+                <frontend_class>textarea</frontend_class>
+                <rows>10</rows>
+                <depends>
+                    <field id="is_enable">1</field>
+                </depends>
+            </field>
+            <field id="default_product_type" type="select" sortOrder="20" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+                <label>Default Product Type</label>
+                <comment>Default product type to use when creating products from AI data</comment>
+                <source_model>Magento\Catalog\Model\Product\Type</source_model>
+                <depends>
+                    <field id="is_enable">1</field>
+                </depends>
+            </field>
+            <field id="auto_generate_sku" type="select" sortOrder="30" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+                <label>Auto Generate SKU</label>
+                <comment>Automatically generate SKU if not provided in AI data</comment>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <depends>
+                    <field id="is_enable">1</field>
+                </depends>
+            </field>
+        </group>
+	</section>
+</system>
 </config>

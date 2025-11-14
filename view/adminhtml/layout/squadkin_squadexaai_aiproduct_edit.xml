@@ -2,10 +2,12 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
         <title>Edit AI Product</title>
+        <script src="Squadkin_SquadexaAI::js/create-product-modal.js"/>
     </head>
     <body>
         <referenceContainer name="content">
             <uiComponent name="squadkin_squadexaai_aiproduct_form"/>
+            <block class="Magento\Backend\Block\Template" name="create.product.modal" template="Squadkin_SquadexaAI::create-product-modal.phtml" after="-"/>
         </referenceContainer>
     </body>
 </page> 

@@ -20,6 +20,7 @@ interface GeneratedCsvInterface
     const TOTAL_PRODUCTS_COUNT = 'total_products_count';
     const IMPORT_ERROR_MESSAGE = 'import_error_message';
     const IMPORTED_AT = 'imported_at';
+    const JOB_ID = 'job_id';
 
     /**
      * Get generatedcsv_id
@@ -150,5 +151,18 @@ interface GeneratedCsvInterface
      * @return \Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface
      */
     public function setImportedAt($importedAt);
+
+    /**
+     * Get job_id
+     * @return string|null
+     */
+    public function getJobId();
+
+    /**
+     * Set job_id
+     * @param string $jobId
+     * @return \Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface
+     */
+    public function setJobId($jobId);
 }
 

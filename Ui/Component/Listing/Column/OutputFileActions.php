@@ -50,7 +50,10 @@ class OutputFileActions extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
                 $name = $this->getData('name');
+                
+                // Check if response file exists
                 if (isset($item['response_file_name']) && !empty($item['response_file_name'])) {
+                    // File is available - show download link
                     $item[$name] = [
                         'download' => [
                             'href' => $this->urlBuilder->getUrl(
@@ -65,7 +68,18 @@ class OutputFileActions extends Column
                             'target' => '_blank'
                         ]
                     ];
+                } elseif (isset($item['job_id']) && !empty($item['job_id'])) {
+                    // Job ID exists but file not ready - show In Progress status
+                    $item[$name] = [
+                        'in_progress' => [
+                            'label' => __('In Progress...'),
+                            'class' => 'action-in-progress',
+                            'generatedcsv_id' => $item['generatedcsv_id'] ?? null,
+                            'job_id' => $item['job_id']
+                        ]
+                    ];
                 } else {
+                    // No job ID and no file - show No File Available
                     $item[$name] = [
                         'label' => __('No File Available')
                     ];

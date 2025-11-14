@@ -7,7 +7,6 @@
     <body>
         <referenceContainer name="content">
             <block class="Magento\Backend\Block\Template" name="product.generation.forms" template="Squadkin_SquadexaAI::productgeneration/unified.phtml"/>
-            <uiComponent name="squadkin_squadexaai_generatedcsv_listing"/>
         </referenceContainer>
     </body>
 </page>

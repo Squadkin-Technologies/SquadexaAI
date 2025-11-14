@@ -12,7 +12,8 @@
             "import_error_message": true,
             "imported_at": true,
             "created_at": true,
-            "generation_type": true
+            "generation_type": true,
+            "job_id": true
         },
         "constraint": {
             "PRIMARY": true
@@ -22,42 +23,57 @@
         "column": {
             "aiproduct_id": true,
             "generatedcsv_id": true,
-            "sku": true,
-            "name": true,
-            "description": true,
-            "short_description": true,
-            "price": true,
-            "special_price": true,
-            "weight": true,
-            "qty": true,
-            "category": true,
-            "status": true,
-            "visibility": true,
-            "type": true,
-            "attribute_set": true,
-            "tax_class": true,
+            "product_name": true,
             "meta_title": true,
             "meta_description": true,
-            "meta_keywords": true,
-            "url_key": true,
+            "short_description": true,
+            "description": true,
+            "key_features": true,
+            "how_to_use": true,
+            "ingredients": true,
+            "upc": true,
+            "keywords": true,
+            "pricing_usd_min": true,
+            "pricing_usd_max": true,
+            "pricing_cad_min": true,
+            "pricing_cad_max": true,
+            "additional_information": true,
             "magento_product_id": true,
             "is_created_in_magento": true,
-            "additional_data": true,
-            "created_at": true,
-            "updated_at": true,
             "generation_type": true,
             "primary_keywords": true,
             "secondary_keywords": true,
-            "ai_response": true
+            "ai_response": true,
+            "created_at": true,
+            "updated_at": true
         },
         "constraint": {
             "PRIMARY": true,
-            "SQUADKIN_AIPRODUCT_GENERATEDCSV_ID": true,
-            "SQUADKIN_AIPRODUCT_SKU_UNIQUE": true
+            "SQUADKIN_AIPRODUCT_GENERATEDCSV_ID": true
         },
         "index": {
             "SQUADKIN_AIPRODUCT_GENERATEDCSV_ID": true,
             "SQUADKIN_AIPRODUCT_MAGENTO_PRODUCT_ID": true
+        }
+    },
+    "squadkin_squadexaai_field_mapping": {
+        "column": {
+            "mapping_id": true,
+            "profile_name": true,
+            "is_default": true,
+            "product_type": true,
+            "attribute_set_id": true,
+            "mapping_rules": true,
+            "description": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "SQUADKIN_FIELD_MAPPING_PROFILE_NAME": true,
+            "SQUADKIN_FIELD_MAPPING_IS_DEFAULT": true
         }
     }
 }

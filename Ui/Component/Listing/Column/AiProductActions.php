@@ -63,6 +63,11 @@ class AiProductActions extends Column
                             ),
                             'label' => __('Edit')
                         ],
+                        'create_product' => [
+                            'href' => '#',
+                            'label' => __('Create Product from AI'),
+                            'onclick' => 'window.createProductFromAiModal && window.createProductFromAiModal.open(' . $item['aiproduct_id'] . '); return false;'
+                        ],
                         'delete' => [
                             'href' => $this->urlBuilder->getUrl(
                                 static::URL_PATH_DELETE,
@@ -72,8 +77,8 @@ class AiProductActions extends Column
                             ),
                             'label' => __('Delete'),
                             'confirm' => [
-                                'title' => __('Delete "%1"', $item['name']),
-                                'message' => __('Are you sure you want to delete the AI product "%1"?', $item['name'])
+                                'title' => __('Delete "%1"', $item['product_name'] ?? $item['name'] ?? ''),
+                                'message' => __('Are you sure you want to delete the AI product "%1"?', $item['product_name'] ?? $item['name'] ?? '')
                             ]
                         ]
                     ];

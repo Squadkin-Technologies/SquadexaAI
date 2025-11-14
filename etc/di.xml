@@ -6,6 +6,9 @@
 	<preference for="Squadkin\SquadexaAI\Api\AiProductRepositoryInterface" type="Squadkin\SquadexaAI\Model\AiProductRepository"/>
 	<preference for="Squadkin\SquadexaAI\Api\Data\AiProductInterface" type="Squadkin\SquadexaAI\Model\AiProduct"/>
 	<preference for="Squadkin\SquadexaAI\Api\Data\AiProductSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+	<preference for="Squadkin\SquadexaAI\Api\FieldMappingRepositoryInterface" type="Squadkin\SquadexaAI\Model\FieldMappingRepository"/>
+	<preference for="Squadkin\SquadexaAI\Api\Data\FieldMappingInterface" type="Squadkin\SquadexaAI\Model\FieldMapping"/>
+	<preference for="Squadkin\SquadexaAI\Api\Data\FieldMappingSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
 	<virtualType name="Squadkin\SquadexaAI\Model\ResourceModel\GeneratedCsv\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
 		<arguments>
 			<argument name="mainTable" xsi:type="string">squadkin_squadexaai_generatedcsv</argument>
@@ -22,6 +25,7 @@
 		<arguments>
 			<argument name="collections" xsi:type="array">
 				<item name="squadkin_squadexaai_generatedcsv_listing_data_source" xsi:type="string">Squadkin\SquadexaAI\Model\ResourceModel\GeneratedCsv\Grid\Collection</item>
+				<item name="squadkin_squadexaai_generatedcsv_simple_listing_data_source" xsi:type="string">Squadkin\SquadexaAI\Model\ResourceModel\GeneratedCsv\Grid\Collection</item>
 				<item name="squadkin_squadexaai_aiproduct_listing_data_source" xsi:type="string">Squadkin\SquadexaAI\Model\ResourceModel\AiProduct\Grid\Collection</item>
 			</argument>
 		</arguments>
@@ -40,5 +44,10 @@
 		<arguments>
 			<argument name="logger" xsi:type="object">SquadexaAILogger</argument>
 		</arguments>
+	</type>
+	
+	<!-- Plugin to add Update from AI button to product edit page -->
+	<type name="Magento\Catalog\Block\Adminhtml\Product\Edit\Button\Generic">
+		<plugin name="add_update_from_ai_button" type="Squadkin\SquadexaAI\Plugin\Product\Edit\AddUpdateFromAiButton" sortOrder="10"/>
 	</type>
 </config>

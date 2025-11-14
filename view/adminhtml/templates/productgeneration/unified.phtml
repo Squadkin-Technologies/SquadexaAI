@@ -158,7 +158,8 @@ $csvUploadUrl = $block->getUrl('squadkin_squadexaai/generatedcsv/upload');
             "submitButtonSelector": "#generate-single-button",
             "resultContainerSelector": "#single-product-result",
             "generateUrl": "<?= $block->escapeJs($generateUrl) ?>",
-            "formKey": "<?= $block->escapeJs($formKey) ?>"
+            "formKey": "<?= $block->escapeJs($formKey) ?>",
+            "generatedCsvUrl": "<?= $block->escapeJs($block->getUrl('squadkin_squadexaai/generatedcsv/index')) ?>"
         },
         "Squadkin_SquadexaAI/js/product-generation/csv-upload-simple": {
             "formSelector": "#csv-upload-form",

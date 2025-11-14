@@ -1,0 +1,7 @@
+/**
+ * Remove icon from SquadexaAI Dashboard menu item
+ */
+li[data-ui-id="menu-squadkin-squadexaai-squadexa-dashboard"] > a::before {
+    content: none !important;
+}
+

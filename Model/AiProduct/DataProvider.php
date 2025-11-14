@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Squadkin\SquadexaAI\Model\AiProduct;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Squadkin\SquadexaAI\Model\ResourceModel\AiProduct\CollectionFactory;
 use Squadkin\SquadexaAI\Service\CustomAttributeProcessor;
@@ -30,12 +31,18 @@ class DataProvider extends AbstractDataProvider
     private $customAttributeProcessor;
 
     /**
+     * @var Json
+     */
+    private $jsonSerializer;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param CollectionFactory $collectionFactory
      * @param DataPersistorInterface $dataPersistor
      * @param CustomAttributeProcessor $customAttributeProcessor
+     * @param Json $jsonSerializer
      * @param array $meta
      * @param array $data
      */
@@ -46,12 +53,14 @@ class DataProvider extends AbstractDataProvider
         CollectionFactory $collectionFactory,
         DataPersistorInterface $dataPersistor,
         CustomAttributeProcessor $customAttributeProcessor,
+        Json $jsonSerializer,
         array $meta = [],
         array $data = []
     ) {
         $this->collection = $collectionFactory->create();
         $this->dataPersistor = $dataPersistor;
         $this->customAttributeProcessor = $customAttributeProcessor;
+        $this->jsonSerializer = $jsonSerializer;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
@@ -69,6 +78,28 @@ class DataProvider extends AbstractDataProvider
         $items = $this->collection->getItems();
         foreach ($items as $model) {
             $data = $model->getData();
+            
+            // Process JSON fields - convert JSON strings to readable format for form display
+            $jsonFields = ['key_features', 'how_to_use', 'ingredients', 'keywords'];
+            foreach ($jsonFields as $field) {
+                if (isset($data[$field]) && !empty($data[$field])) {
+                    try {
+                        // Try to decode JSON, if successful convert array to readable format
+                        $decoded = $this->jsonSerializer->unserialize($data[$field]);
+                        if (is_array($decoded)) {
+                            // For keywords, use comma-separated; for others, use newline-separated
+                            if ($field === 'keywords') {
+                                $data[$field] = implode(', ', $decoded);
+                            } else {
+                                $data[$field] = implode("\n", $decoded);
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        // If JSON decode fails, keep the original value (might be plain text)
+                        // This handles cases where data might not be JSON
+                    }
+                }
+            }
             
             // Process custom attributes for form display
             $customAttributes = $model->getCustomAttributes();

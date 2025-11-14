@@ -12,6 +12,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Serialize\Serializer\Json;
 use Squadkin\SquadexaAI\Api\AiProductRepositoryInterface;
 use Squadkin\SquadexaAI\Api\Data\AiProductInterfaceFactory;
 use Squadkin\SquadexaAI\Service\CustomAttributeProcessor;
@@ -34,23 +35,31 @@ class Save extends Action
     private $customAttributeProcessor;
 
     /**
+     * @var Json
+     */
+    private $jsonSerializer;
+
+    /**
      * Constructor
      *
      * @param Context $context
      * @param AiProductRepositoryInterface $aiProductRepository
      * @param AiProductInterfaceFactory $aiProductFactory
      * @param CustomAttributeProcessor $customAttributeProcessor
+     * @param Json $jsonSerializer
      */
     public function __construct(
         Context $context,
         AiProductRepositoryInterface $aiProductRepository,
         AiProductInterfaceFactory $aiProductFactory,
-        CustomAttributeProcessor $customAttributeProcessor
+        CustomAttributeProcessor $customAttributeProcessor,
+        Json $jsonSerializer
     ) {
         parent::__construct($context);
         $this->aiProductRepository = $aiProductRepository;
         $this->aiProductFactory = $aiProductFactory;
         $this->customAttributeProcessor = $customAttributeProcessor;
+        $this->jsonSerializer = $jsonSerializer;
     }
 
     /**
@@ -78,40 +87,54 @@ class Save extends Action
                 $aiProduct = $this->aiProductFactory->create();
             }
 
-            // Set data from form
-            $aiProduct->setSku($data['sku']);
-            $aiProduct->setName($data['name']);
+            // Set basic fields
+            $aiProduct->setProductName($data['product_name'] ?? '');
+            $aiProduct->setPrimaryKeywords($data['primary_keywords'] ?? '');
+            $aiProduct->setSecondaryKeywords($data['secondary_keywords'] ?? '');
             $aiProduct->setDescription($data['description'] ?? '');
             $aiProduct->setShortDescription($data['short_description'] ?? '');
-            $aiProduct->setPrice((float)($data['price'] ?? 0));
-            $aiProduct->setSpecialPrice(!empty($data['special_price']) ? (float)$data['special_price'] : null);
-            $aiProduct->setWeight((float)($data['weight'] ?? 0));
-            $aiProduct->setQty((int)($data['qty'] ?? 0));
-            $aiProduct->setCategory($data['category'] ?? '');
-            $aiProduct->setStatus($data['status'] ?? 'Enabled');
-            $aiProduct->setVisibility($data['visibility'] ?? 'Catalog, Search');
-            $aiProduct->setType($data['type'] ?? 'simple');
-            $aiProduct->setAttributeSet($data['attribute_set'] ?? 'Default');
-            $aiProduct->setTaxClass($data['tax_class'] ?? '');
             $aiProduct->setMetaTitle($data['meta_title'] ?? '');
             $aiProduct->setMetaDescription($data['meta_description'] ?? '');
-            $aiProduct->setMetaKeywords($data['meta_keywords'] ?? '');
-            $aiProduct->setUrlKey($data['url_key'] ?? '');
-
-            // Process custom attributes
-            $customAttributes = $this->customAttributeProcessor->processCustomAttributesFromForm($data);
+            $aiProduct->setUpc($data['upc'] ?? '');
             
-            // Validate custom attributes
-            $validationErrors = $this->customAttributeProcessor->validateCustomAttributes($customAttributes);
-            if (!empty($validationErrors)) {
-                foreach ($validationErrors as $error) {
-                    $this->messageManager->addErrorMessage($error);
+            // Handle include_pricing checkbox
+            $includePricing = isset($data['include_pricing']) && $data['include_pricing'] == '1';
+            // Note: include_pricing is not stored in database, it's only used during generation
+            
+            // Process JSON fields - convert newline/comma-separated strings to JSON arrays
+            // key_features, how_to_use, ingredients: newline-separated
+            $jsonArrayFields = ['key_features', 'how_to_use', 'ingredients'];
+            foreach ($jsonArrayFields as $field) {
+                if (isset($data[$field]) && !empty(trim($data[$field]))) {
+                    // Split by newlines and filter empty lines
+                    $lines = array_filter(array_map('trim', explode("\n", $data[$field])));
+                    if (!empty($lines)) {
+                        $aiProduct->setData($field, $this->jsonSerializer->serialize(array_values($lines)));
+                    } else {
+                        $aiProduct->setData($field, null);
+                    }
+                } else {
+                    $aiProduct->setData($field, null);
                 }
-                throw new LocalizedException(__('Custom attributes validation failed.'));
             }
             
-            // Set custom attributes
-            $aiProduct->setCustomAttributes($customAttributes);
+            // keywords: comma-separated
+            if (isset($data['keywords']) && !empty(trim($data['keywords']))) {
+                $keywords = array_filter(array_map('trim', explode(',', $data['keywords'])));
+                if (!empty($keywords)) {
+                    $aiProduct->setKeywords($this->jsonSerializer->serialize(array_values($keywords)));
+                } else {
+                    $aiProduct->setKeywords(null);
+                }
+            } else {
+                $aiProduct->setKeywords(null);
+            }
+            
+            // Set pricing fields
+            $aiProduct->setPricingUsdMin(!empty($data['pricing_usd_min']) ? (float)$data['pricing_usd_min'] : null);
+            $aiProduct->setPricingUsdMax(!empty($data['pricing_usd_max']) ? (float)$data['pricing_usd_max'] : null);
+            $aiProduct->setPricingCadMin(!empty($data['pricing_cad_min']) ? (float)$data['pricing_cad_min'] : null);
+            $aiProduct->setPricingCadMax(!empty($data['pricing_cad_max']) ? (float)$data['pricing_cad_max'] : null);
 
             $this->aiProductRepository->save($aiProduct);
             $this->messageManager->addSuccessMessage(__('AI Product has been saved.'));

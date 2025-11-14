@@ -1,0 +1,43 @@
+<!--
+/**
+ * Copyright ©  All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div id="create-product-from-ai-modal" style="display: none;">
+    <form id="create-product-form" class="admin__scope-old">
+        <fieldset class="admin__fieldset">
+            <div class="admin__field">
+                <label class="admin__field-label" for="product-type-select">
+                    <span translate="'Product Type'"></span>
+                </label>
+                <div class="admin__field-control">
+                    <select id="product-type-select" class="admin__control-select" data-validate="{required:true}">
+                        <option value="">-- Please Select --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label" for="attribute-set-select">
+                    <span translate="'Attribute Set'"></span>
+                </label>
+                <div class="admin__field-control">
+                    <select id="attribute-set-select" class="admin__control-select">
+                        <option value="">-- Please Select --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label" for="mapping-profile-select">
+                    <span translate="'Mapping Profile'"></span>
+                </label>
+                <div class="admin__field-control">
+                    <select id="mapping-profile-select" class="admin__control-select">
+                        <option value="">-- Use Default --</option>
+                    </select>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</div>
+

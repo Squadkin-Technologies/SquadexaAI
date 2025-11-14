@@ -1,7 +1,7 @@
-product_name,primary_keywords,secondary_keywords
-"Wireless Bluetooth Headphones","wireless,bluetooth,headphones","premium,comfortable,noise-cancelling"
-"Smart Fitness Watch","fitness,smartwatch,tracker","health,waterproof,touchscreen"
-"Portable Power Bank 20000mAh","powerbank,portable,charger","fast-charging,compact,durable"
-"USB-C Fast Charging Cable","usb-c,cable,charging","fast-charge,durable,braided"
-"Gaming Mouse RGB","gaming,mouse,rgb","ergonomic,programmable,wireless"
+product_name,primary_keywords,secondary_keywords,include_pricing
+"Wireless Bluetooth Headphones","wireless,bluetooth,headphones","premium,comfortable,noise-cancelling","true"
+"Smart Fitness Watch","fitness,smartwatch,tracker","health,waterproof,touchscreen","true"
+"Portable Power Bank 20000mAh","powerbank,portable,charger","fast-charging,compact,durable","false"
+"USB-C Fast Charging Cable","usb-c,cable,charging","fast-charge,durable,braided","true"
+"Gaming Mouse RGB","gaming,mouse,rgb","ergonomic,programmable,wireless","false"
 

@@ -11,13 +11,14 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\HTTP\Client\Curl;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Psr\Log\LoggerInterface;
 use Squadkin\SquadexaAI\Logger\Logger as SquadexaLogger;
 
 class SquadexaApiService
 {
-    const API_BASE_URL = 'https://squadexa-ai.magento2extensions.com';
-    const REDIRECT_URL = 'https://squadexa-ai.magento2extensions.com';
+    const API_BASE_URL = 'https://squadexa.ai/';
+    const REDIRECT_URL = 'https://squadexa.ai/';
     const API_KEY_CONFIG = 'squadexaiproductcreator/authentication/api_key';
     
     const API_ENDPOINTS = [
@@ -27,8 +28,10 @@ class SquadexaApiService
         'regenerate_api_key' => '/api/v1/auth/regenerate-api-key',
         'api_key_metadata' => '/api/v1/auth/api-key',
         'user_profile' => '/api/v1/auth/me',
-        'usage_stats' => '/api/v1/auth/usage-stats',
-        'usage_history' => '/api/v1/auth/usage-history',
+        
+        // Usage Statistics endpoints (correct ones!)
+        'usage_stats' => '/api/v1/usage-stats',
+        'usage_history' => '/api/v1/usage-history',
         
         // Health check endpoints
         'health_check' => '/api/v1/health',
@@ -46,11 +49,7 @@ class SquadexaApiService
         'billing_plans' => '/api/v1/billing/plans',
         'billing_subscription' => '/api/v1/billing/subscription',
         'billing_history' => '/api/v1/billing/history',
-        'billing_config' => '/api/v1/billing/config',
-        
-        // Usage statistics endpoints
-        'usage_stats_general' => '/api/v1/usage-stats',
-        'usage_history_general' => '/api/v1/usage-history'
+        'billing_config' => '/api/v1/billing/config'
     ];
 
     /**
@@ -79,24 +78,32 @@ class SquadexaApiService
     private $squadexaLogger;
 
     /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
+
+    /**
      * @param ScopeConfigInterface $scopeConfig
      * @param Curl $curl
      * @param Json $jsonSerializer
      * @param LoggerInterface $logger
      * @param SquadexaLogger $squadexaLogger
+     * @param EncryptorInterface $encryptor
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         Curl $curl,
         Json $jsonSerializer,
         LoggerInterface $logger,
-        SquadexaLogger $squadexaLogger
+        SquadexaLogger $squadexaLogger,
+        EncryptorInterface $encryptor
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->curl = $curl;
         $this->jsonSerializer = $jsonSerializer;
         $this->logger = $logger;
         $this->squadexaLogger = $squadexaLogger;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -110,13 +117,17 @@ class SquadexaApiService
     }
 
     /**
-     * Get API key from configuration
+     * Get API key from configuration (decrypted)
      *
      * @return string
      */
     public function getApiKey(): string
     {
-        return $this->scopeConfig->getValue(self::API_KEY_CONFIG) ?: '';
+        $encryptedKey = $this->scopeConfig->getValue(self::API_KEY_CONFIG);
+        if (!$encryptedKey) {
+            return '';
+        }
+        return $this->encryptor->decrypt($encryptedKey);
     }
 
     /**
@@ -140,13 +151,17 @@ class SquadexaApiService
     }
 
     /**
-     * Get password from configuration
+     * Get password from configuration (decrypted)
      *
      * @return string
      */
     public function getPassword(): string
     {
-        return $this->scopeConfig->getValue('squadexaiproductcreator/authentication/password') ?: '';
+        $encryptedPassword = $this->scopeConfig->getValue('squadexaiproductcreator/authentication/password');
+        if (!$encryptedPassword) {
+            return '';
+        }
+        return $this->encryptor->decrypt($encryptedPassword);
     }
 
     /**
@@ -578,39 +593,6 @@ class SquadexaApiService
     }
 
     /**
-     * Get billing history (requires API key)
-     *
-     * @return array
-     * @throws LocalizedException
-     */
-    public function getBillingHistory(): array
-    {
-        return $this->makeApiRequestWithApiKey(self::API_ENDPOINTS['billing_history']);
-    }
-
-    /**
-     * Get billing plans (no auth required)
-     *
-     * @return array
-     * @throws LocalizedException
-     */
-    public function getBillingPlans(): array
-    {
-        return $this->makeApiRequestWithoutAuth(self::API_ENDPOINTS['billing_plans']);
-    }
-
-    /**
-     * Get billing config (no auth required)
-     *
-     * @return array
-     * @throws LocalizedException
-     */
-    public function getBillingConfig(): array
-    {
-        return $this->makeApiRequestWithoutAuth(self::API_ENDPOINTS['billing_config']);
-    }
-
-    /**
      * Generate single product (requires API key)
      *
      * @param array $productData
@@ -625,6 +607,101 @@ class SquadexaApiService
 
     /**
      * Create batch job (requires API key)
+     *
+     * @param array $batchData
+     * @return array
+     * @throws LocalizedException
+     */
+    /**
+     * Create batch job with file upload (requires API key)
+     *
+     * @param string $filePath Full path to the CSV file to upload
+     * @return array Response containing job_id, total_items, status
+     * @throws LocalizedException
+     */
+    public function createBatchJobWithFile(string $filePath): array
+    {
+        $apiKey = $this->getApiKey();
+        if (empty($apiKey)) {
+            throw new LocalizedException(__('API key is not configured. Please generate an API key first.'));
+        }
+
+        if (!file_exists($filePath) || !is_readable($filePath)) {
+            throw new LocalizedException(__('File does not exist or is not readable: %1', $filePath));
+        }
+
+        $baseUrl = rtrim($this->getApiBaseUrl(), '/');
+        $url = $baseUrl . self::API_ENDPOINTS['batch_jobs'];
+
+        // Prepare multipart form data for file upload
+        $boundary = uniqid();
+        $fileName = basename($filePath);
+        $fileContent = file_get_contents($filePath);
+
+        $body = "--{$boundary}\r\n";
+        $body .= "Content-Disposition: form-data; name=\"file\"; filename=\"{$fileName}\"\r\n";
+        $body .= "Content-Type: text/csv\r\n\r\n";
+        $body .= $fileContent . "\r\n";
+        $body .= "--{$boundary}--\r\n";
+
+        $this->curl->setHeaders([
+            'Authorization' => 'Bearer ' . $apiKey,
+            'Content-Type' => 'multipart/form-data; boundary=' . $boundary,
+            'Accept' => 'application/json'
+        ]);
+
+        $this->logger->info('SquadexaAI API: Creating batch job with file upload', [
+            'url' => $url,
+            'file_path' => $filePath,
+            'file_name' => $fileName,
+            'file_size' => strlen($fileContent)
+        ]);
+
+        try {
+            $this->curl->post($url, $body);
+            $responseCode = $this->curl->getStatus();
+            $responseBody = $this->curl->getBody();
+
+            $this->logger->info('SquadexaAI API: Batch job creation response', [
+                'status' => $responseCode,
+                'response_length' => strlen($responseBody),
+                'response_preview' => substr($responseBody, 0, 500)
+            ]);
+
+            if ($responseCode >= 200 && $responseCode < 300) {
+                $decodedResponse = $this->jsonSerializer->unserialize($responseBody);
+                $this->logger->info('SquadexaAI API: Batch job created successfully', [
+                    'job_id' => $decodedResponse['job_id'] ?? 'N/A',
+                    'total_items' => $decodedResponse['total_items'] ?? 0,
+                    'status' => $decodedResponse['status'] ?? 'N/A'
+                ]);
+                return $decodedResponse;
+            } else {
+                $errorMessage = $this->getErrorMessage($responseCode, $responseBody);
+                $this->logger->error('SquadexaAI API: Batch job creation failed', [
+                    'status' => $responseCode,
+                    'error' => $errorMessage,
+                    'response' => $responseBody
+                ]);
+                throw new LocalizedException(__('Failed to create batch job: %1', $errorMessage));
+            }
+        } catch (\JsonException $e) {
+            $this->logger->error('SquadexaAI API: JSON parse error in batch job creation', [
+                'error' => $e->getMessage(),
+                'response_body' => $responseBody ?? ''
+            ]);
+            throw new LocalizedException(__('Invalid JSON response from API: %1', $e->getMessage()));
+        } catch (\Exception $e) {
+            $this->logger->error('SquadexaAI API: Exception in batch job creation', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw new LocalizedException(__('Failed to create batch job: %1', $e->getMessage()));
+        }
+    }
+
+    /**
+     * Create batch job (legacy method - kept for compatibility)
      *
      * @param array $batchData
      * @return array
@@ -649,52 +726,61 @@ class SquadexaApiService
     }
 
     /**
-     * Download job results (requires API key)
+     * Download job results as CSV content (requires API key)
      *
      * @param string $jobId
-     * @return array
+     * @return string CSV content as string
      * @throws LocalizedException
      */
-    public function downloadJobResults(string $jobId): array
+    public function downloadJobResults(string $jobId): string
     {
+        $apiKey = $this->getApiKey();
+        if (empty($apiKey)) {
+            throw new LocalizedException(__('API key is not configured. Please generate an API key first.'));
+        }
+
+        $baseUrl = rtrim($this->getApiBaseUrl(), '/');
         $endpoint = self::API_ENDPOINTS['job_download'] . '/' . $jobId;
-        return $this->makeApiRequestWithApiKey($endpoint, 'GET');
-    }
+        $url = $baseUrl . $endpoint;
 
-    /**
-     * AI Humanizer (requires API key)
-     *
-     * @param string $text
-     * @return array
-     * @throws LocalizedException
-     */
-    public function aiHumanizer(string $text): array
-    {
-        return $this->makeApiRequestWithApiKey('/api/v1/ai-humanizer', 'POST', ['text' => $text]);
-    }
+        $this->curl->setHeaders([
+            'Authorization' => 'Bearer ' . $apiKey,
+            'Accept' => 'text/csv, application/json'
+        ]);
 
-    /**
-     * AI Detector (requires API key)
-     *
-     * @param string $text
-     * @return array
-     * @throws LocalizedException
-     */
-    public function aiDetector(string $text): array
-    {
-        return $this->makeApiRequestWithApiKey('/api/v1/ai-detector', 'POST', ['text' => $text]);
-    }
+        $this->logger->info('SquadexaAI API: Downloading job results', [
+            'url' => $url,
+            'job_id' => $jobId
+        ]);
 
-    /**
-     * Plagiarism Checker (requires API key)
-     *
-     * @param string $text
-     * @return array
-     * @throws LocalizedException
-     */
-    public function plagiarismChecker(string $text): array
-    {
-        return $this->makeApiRequestWithApiKey('/api/v1/plagiarism-checker/check', 'POST', ['text' => $text]);
+        try {
+            $this->curl->get($url);
+            $responseCode = $this->curl->getStatus();
+            $responseBody = $this->curl->getBody();
+
+            $this->logger->info('SquadexaAI API: Job download response', [
+                'status' => $responseCode,
+                'response_size' => strlen($responseBody)
+            ]);
+
+            if ($responseCode >= 200 && $responseCode < 300) {
+                // Return CSV content as string
+                return $responseBody;
+            } else {
+                $errorMessage = $this->getErrorMessage($responseCode, $responseBody);
+                $this->logger->error('SquadexaAI API: Job download failed', [
+                    'status' => $responseCode,
+                    'error' => $errorMessage
+                ]);
+                throw new LocalizedException(__('Failed to download job results: %1', $errorMessage));
+            }
+        } catch (\Exception $e) {
+            $this->logger->error('SquadexaAI API: Exception downloading job results', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw new LocalizedException(__('Failed to download job results: %1', $e->getMessage()));
+        }
     }
 
     /**
@@ -1124,5 +1210,53 @@ class SquadexaApiService
             default:
                 return "HTTP Error {$statusCode}";
         }
+    }
+
+    // ==========================================
+    // BILLING & SUBSCRIPTION METHODS
+    // ==========================================
+
+    /**
+     * Get available subscription plans (no auth required)
+     *
+     * @return array
+     * @throws LocalizedException
+     */
+    public function getBillingPlans(): array
+    {
+        return $this->makeApiRequestWithoutAuth(self::API_ENDPOINTS['billing_plans'], 'GET');
+    }
+
+    /**
+     * Get current subscription details
+     *
+     * @return array
+     * @throws LocalizedException
+     */
+    public function getCurrentSubscription(): array
+    {
+        return $this->makeApiRequestWithApiKey(self::API_ENDPOINTS['billing_subscription'], 'GET');
+    }
+
+    /**
+     * Get billing history
+     *
+     * @return array
+     * @throws LocalizedException
+     */
+    public function getBillingHistory(): array
+    {
+        return $this->makeApiRequestWithApiKey(self::API_ENDPOINTS['billing_history'], 'GET');
+    }
+
+    /**
+     * Get billing configuration (no auth required)
+     *
+     * @return array
+     * @throws LocalizedException
+     */
+    public function getBillingConfig(): array
+    {
+        return $this->makeApiRequestWithoutAuth(self::API_ENDPOINTS['billing_config'], 'GET');
     }
 }

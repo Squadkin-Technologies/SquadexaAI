@@ -1,0 +1,96 @@
+<?xml version="1.0" ?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+	<argument name="data" xsi:type="array">
+		<item name="js_config" xsi:type="array">
+			<item name="provider" xsi:type="string">squadkin_squadexaai_generatedcsv_simple_listing.squadkin_squadexaai_generatedcsv_simple_listing_data_source</item>
+		</item>
+	</argument>
+	<settings>
+		<spinner>squadkin_squadexaai_generatedcsv_simple_columns</spinner>
+		<deps>
+			<dep>squadkin_squadexaai_generatedcsv_simple_listing.squadkin_squadexaai_generatedcsv_simple_listing_data_source</dep>
+		</deps>
+	</settings>
+	<dataSource name="squadkin_squadexaai_generatedcsv_simple_listing_data_source" component="Magento_Ui/js/grid/provider">
+		<settings>
+			<storageConfig>
+				<param name="indexField" xsi:type="string">generatedcsv_id</param>
+			</storageConfig>
+			<updateUrl path="mui/index/render"/>
+		</settings>
+		<aclResource>Squadkin_SquadexaAI::GeneratedCsv</aclResource>
+		<dataProvider name="squadkin_squadexaai_generatedcsv_simple_listing_data_source" class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+			<settings>
+				<requestFieldName>id</requestFieldName>
+				<primaryFieldName>generatedcsv_id</primaryFieldName>
+			</settings>
+		</dataProvider>
+	</dataSource>
+	<listingToolbar name="listing_top">
+		<settings>
+			<sticky>true</sticky>
+		</settings>
+		<bookmark name="bookmarks"/>
+		<columnsControls name="columns_controls"/>
+		<filters name="listing_filters"/>
+		<paging name="listing_paging"/>
+	</listingToolbar>
+	<columns name="squadkin_squadexaai_generatedcsv_simple_columns">
+		<column name="generatedcsv_id">
+			<settings>
+				<filter>text</filter>
+				<sorting>desc</sorting>
+				<label translate="true">ID</label>
+			</settings>
+		</column>
+		<column name="input_file_name">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Input File Name</label>
+			</settings>
+		</column>
+		<actionsColumn name="input_file_download" class="Squadkin\SquadexaAI\Ui\Component\Listing\Column\InputFileActions">
+			<settings>
+				<label translate="true">Input File Download</label>
+				<sortable>false</sortable>
+			</settings>
+		</actionsColumn>
+		<column name="response_file_name">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Response File Name</label>
+			</settings>
+		</column>
+		<actionsColumn name="response_file_download" class="Squadkin\SquadexaAI\Ui\Component\Listing\Column\OutputFileActions">
+			<settings>
+				<label translate="true">Response File Download</label>
+				<sortable>false</sortable>
+			</settings>
+		</actionsColumn>
+		<column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+			<settings>
+				<filter>dateRange</filter>
+				<dataType>date</dataType>
+				<label translate="true">Created Date</label>
+			</settings>
+		</column>
+		<column name="generation_type" component="Magento_Ui/js/grid/columns/select">
+			<settings>
+				<filter>select</filter>
+				<dataType>select</dataType>
+				<label translate="true">Generation Type</label>
+				<options>
+					<option name="single" xsi:type="array">
+						<item name="value" xsi:type="string">single</item>
+						<item name="label" xsi:type="string" translate="true">Single Product</item>
+					</option>
+					<option name="csv" xsi:type="array">
+						<item name="value" xsi:type="string">csv</item>
+						<item name="label" xsi:type="string" translate="true">CSV Upload</item>
+					</option>
+				</options>
+			</settings>
+		</column>
+	</columns>
+</listing>
+

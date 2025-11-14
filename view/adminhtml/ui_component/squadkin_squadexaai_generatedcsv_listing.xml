@@ -33,6 +33,19 @@
 		<bookmark name="bookmarks"/>
 		<columnsControls name="columns_controls"/>
 		<filters name="listing_filters"/>
+		<massaction name="listing_massaction">
+			<action name="delete">
+				<settings>
+					<confirm>
+						<message translate="true">Are you sure you want to delete selected item(s) and their associated files?</message>
+						<title translate="true">Delete items</title>
+					</confirm>
+					<url path="squadkin_squadexaai/generatedcsv/massDelete"/>
+					<type>delete</type>
+					<label translate="true">Delete</label>
+				</settings>
+			</action>
+		</massaction>
 		<paging name="listing_paging"/>
 	</listingToolbar>
 	<columns name="squadkin_squadexaai_generatedcsv_columns">
@@ -72,14 +85,6 @@
 				<sortable>false</sortable>
 			</settings>
 		</actionsColumn>
-		<column name="import_status">
-			<settings>
-				<filter>select</filter>
-				<options class="Squadkin\SquadexaAI\Model\Config\Source\ImportStatus"/>
-				<dataType>select</dataType>
-				<label translate="true">Import Status</label>
-			</settings>
-		</column>
 		<column name="generation_type" component="Magento_Ui/js/grid/columns/select">
 			<settings>
 				<filter>select</filter>
@@ -97,25 +102,6 @@
 				</options>
 			</settings>
 		</column>
-		<column name="imported_products_count">
-			<settings>
-				<filter>textRange</filter>
-				<label translate="true">Imported Products</label>
-			</settings>
-		</column>
-		<column name="imported_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
-			<settings>
-				<filter>dateRange</filter>
-				<dataType>date</dataType>
-				<label translate="true">Import Date</label>
-			</settings>
-		</column>
-		<actionsColumn name="product_actions" class="Squadkin\SquadexaAI\Ui\Component\Listing\Column\ProductCreateActions">
-			<settings>
-				<label translate="true">Product Actions</label>
-				<sortable>false</sortable>
-			</settings>
-		</actionsColumn>
 		<column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
 			<settings>
 				<filter>dateRange</filter>
@@ -123,5 +109,44 @@
 				<label translate="true">Created At</label>
 			</settings>
 		</column>
+		<column name="job_id">
+			<settings>
+				<visible>false</visible>
+				<filter>text</filter>
+				<label translate="true">Job ID</label>
+			</settings>
+		</column>
+		<column name="import_status" component="Magento_Ui/js/grid/columns/select">
+			<settings>
+				<filter>select</filter>
+				<dataType>select</dataType>
+				<label translate="true">Status</label>
+				<options>
+					<option name="pending" xsi:type="array">
+						<item name="value" xsi:type="string">pending</item>
+						<item name="label" xsi:type="string" translate="true">Pending</item>
+					</option>
+					<option name="processing" xsi:type="array">
+						<item name="value" xsi:type="string">processing</item>
+						<item name="label" xsi:type="string" translate="true">Processing</item>
+					</option>
+					<option name="completed" xsi:type="array">
+						<item name="value" xsi:type="string">completed</item>
+						<item name="label" xsi:type="string" translate="true">Completed</item>
+					</option>
+					<option name="failed" xsi:type="array">
+						<item name="value" xsi:type="string">failed</item>
+						<item name="label" xsi:type="string" translate="true">Failed</item>
+					</option>
+				</options>
+			</settings>
+		</column>
+		<actionsColumn name="actions" class="Squadkin\SquadexaAI\Ui\Component\Listing\Column\GeneratedCsvActions">
+			<settings>
+				<indexField>generatedcsv_id</indexField>
+				<resizeEnabled>false</resizeEnabled>
+				<resizeDefaultWidth>107</resizeDefaultWidth>
+			</settings>
+		</actionsColumn>
 	</columns>
 </listing>

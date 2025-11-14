@@ -53,12 +53,11 @@ class AccountStatus extends Field
         try {
             $html = '<div id="squadexa-account-status">';
             
-            // Check if any authentication is configured
-            $accessToken = $this->apiService->getAccessToken();
+            // Check if API key is configured
             $apiKey = $this->apiService->getApiKey();
             
-            if (empty($accessToken) && empty($apiKey)) {
-                $html .= $this->renderError('No authentication configured. Please enter your username/password and click "Generate API Key" to authenticate.');
+            if (empty($apiKey)) {
+                $html .= $this->renderError('No API key configured. Please enter your username/password and click "Generate API Key" to authenticate.');
             } else {
                 try {
                     // Test health check first
@@ -188,16 +187,16 @@ class AccountStatus extends Field
         $html .= '<span class="activity-label">Product Descriptions Today</span>';
         $html .= '</div>';
         $html .= '<div class="activity-item">';
-        $html .= '<span class="activity-count">' . ($usageStats['ai_humanizer_today'] ?? 0) . '</span>';
-        $html .= '<span class="activity-label">AI Humanizer Today</span>';
+        $html .= '<span class="activity-count">' . ($usageStats['descriptions_this_week'] ?? 0) . '</span>';
+        $html .= '<span class="activity-label">Descriptions This Week</span>';
         $html .= '</div>';
         $html .= '<div class="activity-item">';
-        $html .= '<span class="activity-count">' . ($usageStats['ai_detector_today'] ?? 0) . '</span>';
-        $html .= '<span class="activity-label">AI Detector Today</span>';
+        $html .= '<span class="activity-count">' . ($usageStats['total_products'] ?? 0) . '</span>';
+        $html .= '<span class="activity-label">Total Products Generated</span>';
         $html .= '</div>';
         $html .= '<div class="activity-item">';
-        $html .= '<span class="activity-count">' . ($usageStats['ai_tools_this_week'] ?? 0) . '</span>';
-        $html .= '<span class="activity-label">AI Tools This Week</span>';
+        $html .= '<span class="activity-count">' . ($usageStats['batch_jobs'] ?? 0) . '</span>';
+        $html .= '<span class="activity-label">Batch Jobs Created</span>';
         $html .= '</div>';
         $html .= '</div>';
         $html .= '</div>';
@@ -308,11 +307,8 @@ class AccountStatus extends Field
             $html .= '<p><strong>Debug Info:</strong></p>';
             $html .= '<ul>';
             $html .= '<li>API Base URL: ' . htmlspecialchars($this->apiService->getApiBaseUrl()) . '</li>';
-            $html .= '<li>Access Token Length: ' . strlen($this->apiService->getAccessToken()) . '</li>';
-            $html .= '<li>Access Token Prefix: ' . htmlspecialchars(substr($this->apiService->getAccessToken(), 0, 10)) . '...</li>';
             $html .= '<li>API Key Length: ' . strlen($this->apiService->getApiKey()) . '</li>';
             $html .= '<li>API Key Prefix: ' . htmlspecialchars(substr($this->apiService->getApiKey(), 0, 10)) . '...</li>';
-            $html .= '<li>Token Created: ' . htmlspecialchars($this->apiService->getTokenCreated()) . '</li>';
             $html .= '</ul>';
             $html .= '</div>';
             $html .= '</div>';

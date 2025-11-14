@@ -14,6 +14,7 @@ use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Squadkin\SquadexaAI\Helper\FileManager;
+use Psr\Log\LoggerInterface;
 
 class Download extends Action
 {
@@ -28,20 +29,28 @@ class Download extends Action
     private $fileManager;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Download constructor.
      *
      * @param Context $context
      * @param FileFactory $fileFactory
      * @param FileManager $fileManager
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
         FileFactory $fileFactory,
-        FileManager $fileManager
+        FileManager $fileManager,
+        LoggerInterface $logger
     ) {
         parent::__construct($context);
         $this->fileFactory = $fileFactory;
         $this->fileManager = $fileManager;
+        $this->logger = $logger;
     }
 
     /**
@@ -54,7 +63,13 @@ class Download extends Action
         $fileName = $this->getRequest()->getParam('file');
         $type = $this->getRequest()->getParam('type'); // 'input' or 'output'
 
+        $this->logger->info('SquadexaAI Download: Download request received', [
+            'file_name' => $fileName,
+            'type' => $type
+        ]);
+
         if (!$fileName || !$type) {
+            $this->logger->error('SquadexaAI Download: Invalid parameters');
             $this->messageManager->addErrorMessage(__('Invalid download parameters.'));
             /** @var Redirect $resultRedirect */
             $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
@@ -62,8 +77,19 @@ class Download extends Action
         }
 
         try {
+            // Get absolute file path for debugging
+            $absolutePath = $this->fileManager->getAbsoluteFilePath($fileName, $type);
+            $this->logger->info('SquadexaAI Download: Looking for file', [
+                'absolute_path' => $absolutePath,
+                'file_exists' => file_exists($absolutePath)
+            ]);
+
             // Get file content
             $fileContent = $this->fileManager->getFileContent($fileName, $type);
+            
+            $this->logger->info('SquadexaAI Download: File content retrieved', [
+                'content_length' => strlen($fileContent)
+            ]);
             
             // Determine content type based on file extension
             $contentType = $this->getContentType($fileName);
@@ -77,8 +103,19 @@ class Download extends Action
             );
 
         } catch (LocalizedException $e) {
+            $this->logger->error('SquadexaAI Download: LocalizedException', [
+                'error' => $e->getMessage(),
+                'file_name' => $fileName,
+                'type' => $type
+            ]);
             $this->messageManager->addErrorMessage($e->getMessage());
         } catch (\Exception $e) {
+            $this->logger->error('SquadexaAI Download: Exception', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'file_name' => $fileName,
+                'type' => $type
+            ]);
             $this->messageManager->addErrorMessage(
                 __('An error occurred while downloading the file: %1', $e->getMessage())
             );

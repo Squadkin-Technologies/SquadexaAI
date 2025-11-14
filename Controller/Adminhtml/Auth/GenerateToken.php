@@ -112,24 +112,21 @@ class GenerateToken extends Action
                     'api_key_length' => strlen($apiKeyData['api_key'])
                 ]);
 
-                // Save access token, API key, and token_created timestamp to database
-                $tokenCreated = date('Y-m-d H:i:s');
-                $this->configWriter->save('squadexaiproductcreator/authentication/access_token', $accessToken);
+                // Save ONLY the API key (not the access token as it expires in 30 minutes)
+                $apiKeyCreated = date('Y-m-d H:i:s');
                 $this->configWriter->save('squadexaiproductcreator/authentication/api_key', $apiKeyData['api_key']);
-                $this->configWriter->save('squadexaiproductcreator/authentication/token_created', $tokenCreated);
+                $this->configWriter->save('squadexaiproductcreator/authentication/api_key_created', $apiKeyCreated);
                 
-                $this->logger->info('SquadexaAI: Authentication tokens saved to database', [
-                    'access_token_length' => strlen($accessToken),
+                $this->logger->info('SquadexaAI: API key saved to database (access token NOT saved as it expires)', [
                     'api_key_length' => strlen($apiKeyData['api_key']),
-                    'token_created' => $tokenCreated
+                    'api_key_created' => $apiKeyCreated
                 ]);
 
                 return $result->setData([
                     'success' => true,
-                    'message' => __('API key generated successfully! Temporary access token expires in 30 minutes, but your permanent API key is ready to use.'),
+                    'message' => __('API key generated successfully! Your permanent API key has been saved and is ready to use.'),
                     'api_key' => $apiKeyData['api_key'],
-                    'access_token' => $accessToken,
-                    'token_created' => $tokenCreated
+                    'api_key_created' => $apiKeyCreated
                 ]);
             } else {
                 $this->logger->warning('SquadexaAI: API key generation response missing api_key', [

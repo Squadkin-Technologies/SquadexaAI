@@ -1,0 +1,25 @@
+<?php
+/**
+ * Copyright ©  All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<div id="create-product-from-ai-modal" style="display: none;" data-bind="scope: 'createProductFromAiModal'">
+    <!-- ko template: getTemplate() --><!-- /ko -->
+</div>
+
+<script type="text/x-magento-init">
+{
+    "#create-product-from-ai-modal": {
+        "Magento_Ui/js/core/app": {
+            "components": {
+                "createProductFromAiModal": {
+                    "component": "Squadkin_SquadexaAI/js/create-product-modal",
+                    "template": "Squadkin_SquadexaAI/create-product-modal"
+                }
+            }
+        }
+    }
+}
+</script>
+

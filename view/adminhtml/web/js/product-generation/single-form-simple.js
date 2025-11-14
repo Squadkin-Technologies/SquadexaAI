@@ -70,38 +70,23 @@ define([
                     console.log('API Response:', response);
                     
                     if (response.success) {
-                        // Display result
-                        var html = '<div class="message message-success success">' +
-                            '<div><strong>' + $t('Product Generated Successfully!') + '</strong></div>' +
-                            '<div class="product-preview">';
-                        
-                        if (response.data && response.data.name) {
-                            html += '<p><strong>' + $t('Name:') + '</strong> ' + response.data.name + '</p>';
-                        }
-                        if (response.data && response.data.sku) {
-                            html += '<p><strong>' + $t('SKU:') + '</strong> ' + response.data.sku + '</p>';
-                        }
-                        if (response.data && response.data.price) {
-                            html += '<p><strong>' + $t('Price:') + '</strong> $' + response.data.price + '</p>';
-                        }
-                        
-                        html += '</div></div>';
-                        $resultContainer.html(html);
-                        
                         // Show success message
                         alert({
                             title: $t('Success'),
                             content: response.message
                         });
                         
-                        // Trigger grid refresh
-                        var provider = registry.get('squadkin_squadexaai_generatedcsv_listing.squadkin_squadexaai_generatedcsv_listing_data_source');
-                        if (provider && provider.reload) {
-                            provider.reload();
+                        // Redirect to Generated CSV page after a short delay
+                        if (response.redirect_url) {
+                            setTimeout(function() {
+                                window.location.href = response.redirect_url;
+                            }, 1500);
+                        } else {
+                            // Fallback: redirect to Generated CSV page
+                            setTimeout(function() {
+                                window.location.href = config.generatedCsvUrl || 'squadkin_squadexaai/generatedcsv/index';
+                            }, 1500);
                         }
-                        
-                        // Reset form
-                        $form[0].reset();
                     } else {
                         alert({
                             title: $t('Error'),

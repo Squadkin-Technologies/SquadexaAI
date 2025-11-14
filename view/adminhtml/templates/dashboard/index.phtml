@@ -1,0 +1,267 @@
+<?php
+/**
+ * @var $block \Squadkin\SquadexaAI\Block\Adminhtml\Dashboard
+ */
+$apiKey = $block->getApiKey();
+$data = $block->getDashboardData();
+?>
+
+<div class="squadexa-dashboard-page">
+    <?php if (empty($apiKey)): ?>
+        <div class="dashboard-no-key">
+            <div class="no-key-icon">🔐</div>
+            <h2><?= __('No API Key Generated') ?></h2>
+            <p><?= __('Please configure your API key first to view the dashboard.') ?></p>
+            <a href="<?= $block->getUrl('adminhtml/system_config/edit/section/squadexaiproductcreator') ?>" class="action-primary">
+                <?= __('Go to Configuration') ?>
+            </a>
+        </div>
+    <?php else: ?>
+        <!-- Welcome Header -->
+        <div class="dashboard-header">
+            <h1><?= __('Welcome back') ?><?php if (!empty($data['usage_stats']['user_email'])): ?>, <span class="highlight"><?= $block->escapeHtml($data['usage_stats']['user_email']) ?></span><?php endif; ?></h1>
+            <p class="subtitle"><?= __('Your AI-powered content creation workspace') ?></p>
+            <div class="header-meta">
+                <span class="date">📅 <?= date('F d, Y') ?></span>
+                <?php if (!empty($data['usage_stats']['plan_info']['current_plan'])): ?>
+                <span class="plan-badge"><?= $block->escapeHtml(ucfirst($data['usage_stats']['plan_info']['current_plan'])) ?> Plan</span>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Plan Status Banner -->
+        <?php if ($block->shouldShowSection($data, 'plan_status')): 
+            $planInfo = $data['usage_stats']['plan_info'] ?? [];
+            $planLimits = $data['usage_stats']['plan_limits'] ?? [];
+            $planName = ucfirst($planInfo['current_plan'] ?? 'free') . ' Plan';
+            $planStatus = $planInfo['subscription_status'] ?? 'active';
+            $isTrial = $planInfo['is_free_trial'] ?? false;
+            $monthlyLimit = $planLimits['monthly_word_limit'] ?? 30000;
+            $dailyLimit = $planLimits['daily_word_limit'] ?? 1000;
+        ?>
+        <div class="plan-status-banner">
+            <div class="plan-info">
+                <div class="plan-icon">✨</div>
+                <div class="plan-details">
+                    <h3><?= $block->escapeHtml($planName) ?></h3>
+                    <p><?= $isTrial ? __('Free trial access') : __('Standard access with daily limits') ?></p>
+                    <span class="status-badge status-<?= strtolower($planStatus) ?>"><?= strtoupper($planStatus) ?></span>
+                </div>
+            </div>
+            <div class="plan-limit">
+                <div class="limit-label"><?= __('Monthly Limit') ?></div>
+                <div class="limit-value"><?= number_format($monthlyLimit) ?> <?= __('words') ?></div>
+                <div class="limit-sublabel"><?= __('Daily: %1 words', number_format($dailyLimit)) ?></div>
+                <button class="upgrade-button" onclick="window.open('https://squadexa.ai//pricing', '_blank')">
+                    👑 <?= __('Upgrade Now') ?>
+                </button>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- Usage Statistics Cards -->
+        <?php if ($block->shouldShowSection($data, 'usage_cards')): 
+            $overallUsage = $data['usage_stats']['overall_usage'] ?? [];
+            $wordsUsed = $overallUsage['words_used'] ?? 0;
+            $wordsRemaining = $overallUsage['words_remaining'] ?? 0;
+            $wordsLimit = $overallUsage['monthly_word_limit'] ?? 30000;
+            $usagePercentage = $overallUsage['usage_percentage'] ?? 0;
+        ?>
+        <div class="usage-cards-grid">
+            <?php if (isset($wordsUsed)): ?>
+            <div class="usage-card">
+                <div class="card-icon card-icon-blue">📝</div>
+                <div class="card-content">
+                    <div class="card-label"><?= __('Words Used') ?></div>
+                    <div class="card-value"><?= number_format($wordsUsed) ?></div>
+                    <div class="card-subtitle"><?= __('this month') ?></div>
+                </div>
+                <div class="card-trend">📈</div>
+            </div>
+            <?php endif; ?>
+
+            <?php if (isset($wordsRemaining)): ?>
+            <div class="usage-card">
+                <div class="card-icon card-icon-green">⚡</div>
+                <div class="card-content">
+                    <div class="card-label"><?= __('Words Remaining') ?></div>
+                    <div class="card-value"><?= number_format($wordsRemaining) ?></div>
+                    <div class="card-subtitle"><?= __('of %1', number_format($wordsLimit)) ?></div>
+                </div>
+                <div class="card-trend">🌟</div>
+            </div>
+            <?php endif; ?>
+
+            <?php if (isset($usagePercentage)): ?>
+            <div class="usage-card">
+                <div class="card-icon card-icon-purple">📊</div>
+                <div class="card-content">
+                    <div class="card-label"><?= __('Usage This Month') ?></div>
+                    <div class="card-value"><?= number_format($usagePercentage, 1) ?>%</div>
+                    <div class="card-subtitle"><?= __('capacity used') ?></div>
+                </div>
+                <div class="card-trend">⏰</div>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+
+        <!-- Monthly Progress -->
+        <?php if ($block->shouldShowSection($data, 'monthly_progress')): 
+            $overallUsage = $data['usage_stats']['overall_usage'] ?? [];
+            $wordsUsed = $overallUsage['words_used'] ?? 0;
+            $wordsLimit = $overallUsage['monthly_word_limit'] ?? 30000;
+            $percentage = $overallUsage['usage_percentage'] ?? ($wordsLimit > 0 ? ($wordsUsed / $wordsLimit) * 100 : 0);
+        ?>
+        <div class="monthly-progress-section">
+            <div class="section-header">
+                <h3><?= __('Monthly Progress') ?></h3>
+                <p><?= __('Track your content generation journey') ?></p>
+            </div>
+            <div class="progress-content">
+                <div class="progress-bar-wrapper">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: <?= $percentage ?>%"></div>
+                    </div>
+                    <div class="progress-labels">
+                        <span><?= number_format($wordsUsed) ?></span>
+                        <span class="progress-center"><?= number_format($wordsUsed) ?> <?= __('words used') ?></span>
+                        <span><?= number_format($wordsLimit) ?></span>
+                    </div>
+                </div>
+                <div class="progress-percentage">
+                    <div class="percentage-value"><?= number_format($percentage, 1) ?>%</div>
+                    <div class="percentage-label"><?= __('completed') ?></div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- Recent Activity -->
+        <?php if ($block->shouldShowSection($data, 'recent_activity')): ?>
+        <div class="recent-activity-section">
+            <div class="section-header">
+                <h3><?= __('Recent Activity') ?></h3>
+                <p><?= __('Your latest AI tool usage and activity') ?></p>
+            </div>
+            <div class="activity-list">
+                <?php foreach ($data['recent_activities'] as $activity): 
+                    $toolType = $activity['tool_type'] ?? 'product_generator';
+                    $toolName = ucwords(str_replace('_', ' ', $toolType));
+                    $totalWords = $activity['total_words'] ?? 0;
+                    $timestamp = $activity['created_at'] ?? date('Y-m-d H:i:s');
+                    $success = $activity['success'] ?? true;
+                    $processingTime = isset($activity['processing_time_ms']) ? round($activity['processing_time_ms'] / 1000, 2) . 's' : 'N/A';
+                ?>
+                <div class="activity-item">
+                    <div class="activity-icon"><?= $success ? '🟢' : '🔴' ?></div>
+                    <div class="activity-details">
+                        <div class="activity-title"><?= $block->escapeHtml($toolName) ?></div>
+                        <div class="activity-type"><?= __('Endpoint: %1', $block->escapeHtml($activity['endpoint'] ?? '/api/v1/' . $toolType)) ?></div>
+                    </div>
+                    <div class="activity-meta">
+                        <div class="activity-words"><?= number_format($totalWords) ?> <?= __('words') ?></div>
+                        <div class="activity-time"><?= $block->escapeHtml(date('d/m/Y, H:i', strtotime($timestamp))) ?></div>
+                        <div class="activity-processing"><?= __('Processing: %1', $processingTime) ?></div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- Account Status and API Key -->
+        <div class="account-api-grid">
+            <!-- Account Status Card -->
+            <?php if ($block->shouldShowSection($data, 'account_status')): 
+                $userEmail = $data['usage_stats']['user_email'] ?? '';
+                $planInfo = $data['usage_stats']['plan_info'] ?? [];
+                $accountStatus = $planInfo['subscription_status'] ?? 'active';
+                $billingCycle = $data['usage_stats']['billing_cycle'] ?? [];
+                $nextReset = $billingCycle['next_reset'] ?? '';
+            ?>
+            <div class="info-card">
+                <div class="card-header">
+                    <span class="card-icon-header">✓</span>
+                    <h4><?= __('Account Status') ?></h4>
+                </div>
+                <div class="info-list">
+                    <?php if (!empty($userEmail)): ?>
+                    <div class="info-item">
+                        <span class="info-icon">●</span>
+                        <span class="info-label"><?= __('Email') ?></span>
+                        <span class="info-value"><?= $block->escapeHtml($userEmail) ?></span>
+                    </div>
+                    <?php endif; ?>
+                    <?php if (isset($accountStatus)): ?>
+                    <div class="info-item">
+                        <span class="info-icon">●</span>
+                        <span class="info-label"><?= __('Status') ?></span>
+                        <span class="info-value status-active-text"><?= strtoupper($accountStatus) ?></span>
+                    </div>
+                    <?php endif; ?>
+                    <?php if (!empty($nextReset)): ?>
+                    <div class="info-item">
+                        <span class="info-icon">●</span>
+                        <span class="info-label"><?= __('Next Reset') ?></span>
+                        <span class="info-value"><?= $block->escapeHtml(date('M d, Y', strtotime($nextReset))) ?></span>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- API Key Card -->
+            <div class="info-card">
+                <div class="card-header">
+                    <span class="card-icon-header">🔗</span>
+                    <h4><?= __('API Key') ?></h4>
+                    <span class="status-badge-small status-active"><?= __('Active') ?></span>
+                </div>
+                <div class="api-key-box">
+                    <div class="api-key-label"><?= __('Your API Key') ?></div>
+                    <div class="api-key-value">
+                        <code><?= $block->escapeHtml(substr($apiKey, 0, 20) . '...') ?></code>
+                        <button class="copy-button" onclick="copyApiKey()">📋 <?= __('Copy') ?></button>
+                    </div>
+                    <div class="api-key-note"><?= __('Use this key to authenticate your API requests. Keep it secure and don\'t share it publicly.') ?></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Data Message -->
+        <?php if (!$data['has_data']): ?>
+        <div class="dashboard-no-data">
+            <div class="no-data-icon">📊</div>
+            <h2><?= __('No Dashboard Data Available') ?></h2>
+            <p><?= __('Unable to fetch dashboard data from the API. Please check:') ?></p>
+            <ul>
+                <li><?= __('Your API key is valid and active') ?></li>
+                <li><?= __('You have an active subscription') ?></li>
+                <li><?= __('The API service is accessible') ?></li>
+            </ul>
+            <a href="<?= $block->getUrl('adminhtml/system_config/edit/section/squadexaiproductcreator') ?>" class="action-primary">
+                <?= __('Check Configuration') ?>
+            </a>
+        </div>
+        <?php endif; ?>
+    <?php endif; ?>
+</div>
+
+<style>
+<?= file_get_contents(__DIR__ . '/../css/dashboard.css') ?>
+</style>
+
+<script>
+function copyApiKey() {
+    const apiKey = '<?= $block->escapeJs($apiKey) ?>';
+    navigator.clipboard.writeText(apiKey).then(function() {
+        const button = event.target;
+        button.textContent = '✓ <?= __('Copied') ?>';
+        setTimeout(function() {
+            button.textContent = '📋 <?= __('Copy') ?>';
+        }, 2000);
+    });
+}
+</script>
+

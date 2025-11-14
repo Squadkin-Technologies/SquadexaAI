@@ -11,27 +11,27 @@ interface AiProductInterface
 {
     const AIPRODUCT_ID = 'aiproduct_id';
     const GENERATEDCSV_ID = 'generatedcsv_id';
-    const SKU = 'sku';
-    const NAME = 'name';
-    const DESCRIPTION = 'description';
-    const SHORT_DESCRIPTION = 'short_description';
-    const PRICE = 'price';
-    const SPECIAL_PRICE = 'special_price';
-    const WEIGHT = 'weight';
-    const QTY = 'qty';
-    const CATEGORY = 'category';
-    const STATUS = 'status';
-    const VISIBILITY = 'visibility';
-    const TYPE = 'type';
-    const ATTRIBUTE_SET = 'attribute_set';
-    const TAX_CLASS = 'tax_class';
+    const PRODUCT_NAME = 'product_name';
     const META_TITLE = 'meta_title';
     const META_DESCRIPTION = 'meta_description';
-    const META_KEYWORDS = 'meta_keywords';
-    const URL_KEY = 'url_key';
+    const SHORT_DESCRIPTION = 'short_description';
+    const DESCRIPTION = 'description';
+    const KEY_FEATURES = 'key_features';
+    const HOW_TO_USE = 'how_to_use';
+    const INGREDIENTS = 'ingredients';
+    const UPC = 'upc';
+    const KEYWORDS = 'keywords';
+    const PRICING_USD_MIN = 'pricing_usd_min';
+    const PRICING_USD_MAX = 'pricing_usd_max';
+    const PRICING_CAD_MIN = 'pricing_cad_min';
+    const PRICING_CAD_MAX = 'pricing_cad_max';
+    const ADDITIONAL_INFORMATION = 'additional_information';
     const MAGENTO_PRODUCT_ID = 'magento_product_id';
     const IS_CREATED_IN_MAGENTO = 'is_created_in_magento';
-    const ADDITIONAL_DATA = 'additional_data';
+    const GENERATION_TYPE = 'generation_type';
+    const PRIMARY_KEYWORDS = 'primary_keywords';
+    const SECONDARY_KEYWORDS = 'secondary_keywords';
+    const AI_RESPONSE = 'ai_response';
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
@@ -62,30 +62,30 @@ interface AiProductInterface
     public function setGeneratedcsvId($generatedcsvId);
 
     /**
-     * Get sku
+     * Get product_name
      * @return string|null
      */
-    public function getSku();
+    public function getProductName();
 
     /**
-     * Set sku
-     * @param string $sku
+     * Set product_name
+     * @param string $productName
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
-    public function setSku($sku);
+    public function setProductName($productName);
 
     /**
-     * Get name
+     * Get additional_information
      * @return string|null
      */
-    public function getName();
+    public function getAdditionalInformation();
 
     /**
-     * Set name
-     * @param string $name
+     * Set additional_information
+     * @param string $additionalInformation
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
-    public function setName($name);
+    public function setAdditionalInformation($additionalInformation);
 
     /**
      * Get description
@@ -387,4 +387,121 @@ interface AiProductInterface
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setUpdatedAt($updatedAt);
+
+    /**
+     * Get key_features
+     * @return string|null
+     */
+    public function getKeyFeatures();
+
+    /**
+     * Set key_features
+     * @param string $keyFeatures
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
+     */
+    public function setKeyFeatures($keyFeatures);
+
+    /**
+     * Get how_to_use
+     * @return string|null
+     */
+    public function getHowToUse();
+
+    /**
+     * Set how_to_use
+     * @param string $howToUse
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
+     */
+    public function setHowToUse($howToUse);
+
+    /**
+     * Get ingredients
+     * @return string|null
+     */
+    public function getIngredients();
+
+    /**
+     * Set ingredients
+     * @param string $ingredients
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
+     */
+    public function setIngredients($ingredients);
+
+    /**
+     * Get upc
+     * @return string|null
+     */
+    public function getUpc();
+
+    /**
+     * Set upc
+     * @param string $upc
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
+     */
+    public function setUpc($upc);
+
+    /**
+     * Get keywords
+     * @return string|null
+     */
+    public function getKeywords();
+
+    /**
+     * Set keywords
+     * @param string $keywords
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
+     */
+    public function setKeywords($keywords);
+
+    /**
+     * Get pricing_usd_min
+     * @return float|null
+     */
+    public function getPricingUsdMin();
+
+    /**
+     * Set pricing_usd_min
+     * @param float $pricingUsdMin
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
+     */
+    public function setPricingUsdMin($pricingUsdMin);
+
+    /**
+     * Get pricing_usd_max
+     * @return float|null
+     */
+    public function getPricingUsdMax();
+
+    /**
+     * Set pricing_usd_max
+     * @param float $pricingUsdMax
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
+     */
+    public function setPricingUsdMax($pricingUsdMax);
+
+    /**
+     * Get pricing_cad_min
+     * @return float|null
+     */
+    public function getPricingCadMin();
+
+    /**
+     * Set pricing_cad_min
+     * @param float $pricingCadMin
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
+     */
+    public function setPricingCadMin($pricingCadMin);
+
+    /**
+     * Get pricing_cad_max
+     * @return float|null
+     */
+    public function getPricingCadMax();
+
+    /**
+     * Set pricing_cad_max
+     * @param float $pricingCadMax
+     * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
+     */
+    public function setPricingCadMax($pricingCadMax);
 } 

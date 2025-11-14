@@ -81,33 +81,33 @@ class AiProduct extends AbstractModel implements AiProductInterface
     /**
      * @inheritDoc
      */
-    public function getSku()
+    public function getProductName()
     {
-        return $this->getData(self::SKU);
+        return $this->getData(self::PRODUCT_NAME);
     }
 
     /**
      * @inheritDoc
      */
-    public function setSku($sku)
+    public function setProductName($productName)
     {
-        return $this->setData(self::SKU, $sku);
+        return $this->setData(self::PRODUCT_NAME, $productName);
     }
 
     /**
      * @inheritDoc
      */
-    public function getName()
+    public function getAdditionalInformation()
     {
-        return $this->getData(self::NAME);
+        return $this->getData(self::ADDITIONAL_INFORMATION);
     }
 
     /**
      * @inheritDoc
      */
-    public function setName($name)
+    public function setAdditionalInformation($additionalInformation)
     {
-        return $this->setData(self::NAME, $name);
+        return $this->setData(self::ADDITIONAL_INFORMATION, $additionalInformation);
     }
 
     /**
@@ -403,7 +403,7 @@ class AiProduct extends AbstractModel implements AiProductInterface
      */
     public function getAdditionalData()
     {
-        return $this->getData(self::ADDITIONAL_DATA);
+        return $this->getData(self::ADDITIONAL_INFORMATION);
     }
 
     /**
@@ -411,7 +411,7 @@ class AiProduct extends AbstractModel implements AiProductInterface
      */
     public function setAdditionalData($additionalData)
     {
-        return $this->setData(self::ADDITIONAL_DATA, $additionalData);
+        return $this->setData(self::ADDITIONAL_INFORMATION, $additionalData);
     }
 
     /**
@@ -494,5 +494,149 @@ class AiProduct extends AbstractModel implements AiProductInterface
     public function setUpdatedAt($updatedAt)
     {
         return $this->setData(self::UPDATED_AT, $updatedAt);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getKeyFeatures()
+    {
+        return $this->getData(self::KEY_FEATURES);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setKeyFeatures($keyFeatures)
+    {
+        return $this->setData(self::KEY_FEATURES, $keyFeatures);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getHowToUse()
+    {
+        return $this->getData(self::HOW_TO_USE);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setHowToUse($howToUse)
+    {
+        return $this->setData(self::HOW_TO_USE, $howToUse);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getIngredients()
+    {
+        return $this->getData(self::INGREDIENTS);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setIngredients($ingredients)
+    {
+        return $this->setData(self::INGREDIENTS, $ingredients);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getUpc()
+    {
+        return $this->getData(self::UPC);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setUpc($upc)
+    {
+        return $this->setData(self::UPC, $upc);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getKeywords()
+    {
+        return $this->getData(self::KEYWORDS);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setKeywords($keywords)
+    {
+        return $this->setData(self::KEYWORDS, $keywords);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPricingUsdMin()
+    {
+        return $this->getData(self::PRICING_USD_MIN);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setPricingUsdMin($pricingUsdMin)
+    {
+        return $this->setData(self::PRICING_USD_MIN, $pricingUsdMin);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPricingUsdMax()
+    {
+        return $this->getData(self::PRICING_USD_MAX);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setPricingUsdMax($pricingUsdMax)
+    {
+        return $this->setData(self::PRICING_USD_MAX, $pricingUsdMax);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPricingCadMin()
+    {
+        return $this->getData(self::PRICING_CAD_MIN);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setPricingCadMin($pricingCadMin)
+    {
+        return $this->setData(self::PRICING_CAD_MIN, $pricingCadMin);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPricingCadMax()
+    {
+        return $this->getData(self::PRICING_CAD_MAX);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setPricingCadMax($pricingCadMax)
+    {
+        return $this->setData(self::PRICING_CAD_MAX, $pricingCadMax);
     }
 } 

@@ -79,42 +79,33 @@
                 <label translate="true">ID</label>
             </settings>
         </column>
-        <column name="sku">
-            <settings>
-                <filter>text</filter>
-                <label translate="true">SKU</label>
-            </settings>
-        </column>
-        <column name="name">
+        <column name="product_name">
             <settings>
                 <filter>text</filter>
                 <label translate="true">Product Name</label>
             </settings>
         </column>
-        <column name="price" class="Magento\Catalog\Ui\Component\Listing\Columns\Price">
-            <settings>
-                <filter>textRange</filter>
-                <label translate="true">Price</label>
-            </settings>
-        </column>
-        <column name="qty">
-            <settings>
-                <filter>textRange</filter>
-                <label translate="true">Quantity</label>
-            </settings>
-        </column>
-        <column name="category">
+        <column name="meta_title">
             <settings>
                 <filter>text</filter>
-                <label translate="true">Category</label>
+                <label translate="true">Meta Title</label>
             </settings>
         </column>
-        <column name="status">
+        <column name="generation_type">
             <settings>
                 <filter>select</filter>
-                <options class="Magento\Catalog\Model\Product\Attribute\Source\Status"/>
                 <dataType>select</dataType>
-                <label translate="true">Status</label>
+                <label translate="true">Generation Type</label>
+                <options>
+                    <option name="single" xsi:type="array">
+                        <item name="value" xsi:type="string">single</item>
+                        <item name="label" xsi:type="string" translate="true">Single</item>
+                    </option>
+                    <option name="csv" xsi:type="array">
+                        <item name="value" xsi:type="string">csv</item>
+                        <item name="label" xsi:type="string" translate="true">CSV</item>
+                    </option>
+                </options>
             </settings>
         </column>
         <column name="is_created_in_magento" component="Magento_Ui/js/grid/columns/select">

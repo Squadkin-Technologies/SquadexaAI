@@ -141,12 +141,21 @@ class Generate extends Action
                 'response_data' => $apiResponse
             ]);
 
-            // Step 1: Save to GeneratedCsv table
+            // Step 1: Create input reference CSV file for single product
+            $inputFileName = 'input_single_' . time() . '_' . preg_replace('/[^a-z0-9]/i', '_', $productName) . '.csv';
+            $inputFilePath = $this->fileManager->createSingleProductInputFile([
+                'product_name' => $productName,
+                'primary_keywords' => $primaryKeywords,
+                'secondary_keywords' => $secondaryKeywords,
+                'include_pricing' => $includePricing
+            ], $inputFileName);
+            
+            // Step 2: Save to GeneratedCsv table (will update with response file later)
             $generatedCsv = $this->generatedCsvFactory->create();
-            $generatedCsv->setInputFileName('Single Product: ' . $productName);
-            $generatedCsv->setInputFilePath('N/A - Single Product Generation');
-            $generatedCsv->setResponseFileName('N/A - API Response');
-            $generatedCsv->setResponseFilePath('N/A - Stored in aiproduct table');
+            $generatedCsv->setInputFileName($inputFileName);
+            $generatedCsv->setInputFilePath($inputFilePath);
+            $generatedCsv->setResponseFileName(''); // Will be set after creating response file
+            $generatedCsv->setResponseFilePath('');
             $generatedCsv->setTotalProductsCount(1);
             $generatedCsv->setGenerationType('single');
             $generatedCsv->setImportStatus('pending');
@@ -154,17 +163,34 @@ class Generate extends Action
             $this->generatedCsvRepository->save($generatedCsv);
             $generatedCsvId = $generatedCsv->getGeneratedcsvId();
 
-            // Step 2: Save to AiProduct table using FileManager
-            $productArray = [[
-                'sku' => $apiResponse['sku'] ?? 'AUTO-' . time(),
-                'name' => $apiResponse['name'] ?? $productName,
-                'description' => $apiResponse['description'] ?? '',
-                'short_description' => $apiResponse['short_description'] ?? '',
-                'price' => $apiResponse['price'] ?? 0,
-                'primary_keywords' => $primaryKeywords,
-                'secondary_keywords' => $secondaryKeywords,
-                'ai_response' => $this->jsonSerializer->serialize($apiResponse)
-            ]];
+            // Step 3: Create response/output CSV file
+            $responseFileName = 'response_single_' . time() . '_' . preg_replace('/[^a-z0-9]/i', '_', $productName) . '.csv';
+            $responseFilePath = $this->fileManager->createSingleProductResponseFile($apiResponse, $responseFileName);
+            
+            // Step 4: Update GeneratedCsv with response file info
+            $generatedCsv->setResponseFileName($responseFileName);
+            $generatedCsv->setResponseFilePath($responseFilePath);
+            $this->generatedCsvRepository->save($generatedCsv);
+            
+            // Step 5: Save to AiProduct table using FileManager
+            // Pass full API response - FileManager will extract all fields
+            $productArray = [$apiResponse];
+            
+            // Always set product_name from form data (required field, API response doesn't include it)
+            $productArray[0]['product_name'] = $productName;
+            
+            // Also check for 'name' field as fallback if product_name is empty
+            if (empty($productArray[0]['product_name']) && isset($productArray[0]['name'])) {
+                $productArray[0]['product_name'] = $productArray[0]['name'];
+            }
+            
+            // Add keywords from form if not in response
+            if (!isset($productArray[0]['primary_keywords']) || empty($productArray[0]['primary_keywords'])) {
+                $productArray[0]['primary_keywords'] = $primaryKeywords;
+            }
+            if (!isset($productArray[0]['secondary_keywords']) || empty($productArray[0]['secondary_keywords'])) {
+                $productArray[0]['secondary_keywords'] = $secondaryKeywords;
+            }
             
             $this->fileManager->saveAiProductData($productArray, $generatedCsvId, 'single');
 
@@ -172,7 +198,8 @@ class Generate extends Action
                 'success' => true,
                 'message' => __('Product generated successfully! Saved to database with ID: %1', $generatedCsvId),
                 'data' => $apiResponse,
-                'csv_id' => $generatedCsvId
+                'csv_id' => $generatedCsvId,
+                'redirect_url' => $this->getUrl('squadkin_squadexaai/generatedcsv/index')
             ]);
 
         } catch (LocalizedException $e) {

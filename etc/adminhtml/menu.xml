@@ -7,6 +7,13 @@
 			sortOrder="9999" 
 			parent="Squadkin::top_level"
 			resource="Squadkin_SquadexaAI::squadexaiproductcreator_main_menu"/>
+		<add id="Squadkin_SquadexaAI::squadexa_dashboard" 
+			title="Dashboard" 
+			module="Squadkin_SquadexaAI" 
+			sortOrder="5" 
+			resource="Squadkin_SquadexaAI::dashboard" 
+			parent="Squadkin_SquadexaAI::squadexaiproductcreator_main_menu" 
+			action="squadkin_squadexaai/dashboard/index"/>
         <add id="Squadkin_SquadexaAI::squadkin_squadexaai_product_generation"
              title="Product Generation"
              module="Squadkin_SquadexaAI"
@@ -14,6 +21,13 @@
              resource="Squadkin_SquadexaAI::squadexaiproductcreator_main_menu"
              parent="Squadkin_SquadexaAI::squadexaiproductcreator_main_menu"
              action="squadkin_squadexaai/productgeneration/single"/>
+		<add id="Squadkin_SquadexaAI::squadkin_squadexaai_generatedcsv" 
+		    title="Generated Files" 
+			module="Squadkin_SquadexaAI" 
+			sortOrder="20" 
+			resource="Squadkin_SquadexaAI::squadexaiproductcreator_main_menu" 
+			parent="Squadkin_SquadexaAI::squadexaiproductcreator_main_menu" 
+			action="squadkin_squadexaai/generatedcsv/index"/>
 		<add id="Squadkin_SquadexaAI::squadkin_squadexaai_aiproduct" 
 		    title="AI Generated Products" 
 			module="Squadkin_SquadexaAI" 
@@ -24,7 +38,7 @@
 		<add id="Squadkin_SquadexaAI::squadkin_squadexaai_config" 
 			title="Configuration" 
 			module="Squadkin_SquadexaAI" 
-			sortOrder="30" 
+			sortOrder="40" 
 			resource="Squadkin_SquadexaAI::squadexaiproductcreator_main_menu" 
 			parent="Squadkin_SquadexaAI::squadexaiproductcreator_main_menu" 
 			action="adminhtml/system_config/edit/section/squadexaiproductcreator"/>

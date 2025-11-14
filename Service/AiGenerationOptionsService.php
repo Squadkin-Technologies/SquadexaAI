@@ -129,11 +129,26 @@ class AiGenerationOptionsService
     {
         $filteredData = [];
 
+        // Define input fields that should always be preserved
+        $inputFields = [
+            'product_name',
+            'primary_keywords',
+            'secondary_keywords',
+            'include_pricing'
+        ];
+
         foreach ($aiResponseData as $productData) {
             $filteredProduct = [];
             
+            // Always include input fields (from CSV upload)
+            foreach ($inputFields as $field) {
+                if (isset($productData[$field])) {
+                    $filteredProduct[$field] = $productData[$field];
+                }
+            }
+            
             // Always include required base fields
-            $baseFields = ['sku'];
+            $baseFields = ['sku', 'price'];
             foreach ($baseFields as $field) {
                 if (isset($productData[$field])) {
                     $filteredProduct[$field] = $productData[$field];
@@ -144,6 +159,14 @@ class AiGenerationOptionsService
             foreach ($selectedOptions as $option) {
                 if (isset($productData[$option])) {
                     $filteredProduct[$option] = $productData[$option];
+                }
+            }
+            
+            // Include any other fields that might be in the original data but not explicitly listed
+            // This ensures backward compatibility and doesn't lose data
+            foreach ($productData as $key => $value) {
+                if (!isset($filteredProduct[$key])) {
+                    $filteredProduct[$key] = $value;
                 }
             }
             

@@ -12,11 +12,13 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Filesystem\DirectoryList;
 use Psr\Log\LoggerInterface;
 use Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface;
 use Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterfaceFactory;
 use Squadkin\SquadexaAI\Helper\FileManager;
 use Squadkin\SquadexaAI\Service\AiGenerationOptionsService;
+use Squadkin\SquadexaAI\Service\SquadexaApiService;
 
 class Upload extends Action
 {
@@ -46,6 +48,16 @@ class Upload extends Action
     private $logger;
 
     /**
+     * @var SquadexaApiService
+     */
+    private $apiService;
+
+    /**
+     * @var DirectoryList
+     */
+    private $directoryList;
+
+    /**
      * Upload constructor.
      *
      * @param Context $context
@@ -54,6 +66,8 @@ class Upload extends Action
      * @param FileManager $fileManager
      * @param AiGenerationOptionsService $aiOptionsService
      * @param LoggerInterface $logger
+     * @param SquadexaApiService $apiService
+     * @param DirectoryList $directoryList
      */
     public function __construct(
         Context $context,
@@ -61,7 +75,9 @@ class Upload extends Action
         GeneratedCsvInterfaceFactory $generatedCsvFactory,
         FileManager $fileManager,
         AiGenerationOptionsService $aiOptionsService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        SquadexaApiService $apiService,
+        DirectoryList $directoryList
     ) {
         parent::__construct($context);
         $this->generatedCsvRepository = $generatedCsvRepository;
@@ -69,6 +85,8 @@ class Upload extends Action
         $this->fileManager = $fileManager;
         $this->aiOptionsService = $aiOptionsService;
         $this->logger = $logger;
+        $this->apiService = $apiService;
+        $this->directoryList = $directoryList;
     }
 
     /**
@@ -123,51 +141,53 @@ class Upload extends Action
             $this->fileManager->validateUploadedFile($fileData);
             $this->logger->info('SquadexaAI Upload: File validation passed');
 
-            // Save input file
+            // Save input file first
             $inputFileName = $this->fileManager->saveInputFile($fileData);
-            $inputFilePath = '/var/AIProductCreator/Input/' . $inputFileName;
+            $varDirectory = $this->directoryList->getPath('var');
+            $inputFilePath = $varDirectory . '/AIProductCreator/Input/' . $inputFileName;
+            $fullInputFilePath = $inputFilePath;
+            
             $this->logger->info('SquadexaAI Upload: File saved as - ' . $inputFileName);
+            $this->logger->info('SquadexaAI Upload: Full file path - ' . $fullInputFilePath);
 
-            // Process file with AI API
-            $this->messageManager->addNoticeMessage(__('Processing file with AI API...'));
-            $this->logger->info('SquadexaAI Upload: Starting AI processing');
-            $aiResponse = $this->fileManager->processWithAI($inputFileName, $validatedOptions);
-            $this->logger->info('SquadexaAI Upload: AI processing completed. Response count: ' . count($aiResponse));
+            // Create batch job via API
+            $this->messageManager->addNoticeMessage(__('Creating batch job with AI API...'));
+            $this->logger->info('SquadexaAI Upload: Creating batch job');
+            
+            $batchJobResponse = $this->apiService->createBatchJobWithFile($fullInputFilePath);
+            
+            $jobId = $batchJobResponse['job_id'] ?? null;
+            $totalItems = $batchJobResponse['total_items'] ?? 0;
+            $jobStatus = $batchJobResponse['status'] ?? 'pending';
+            
+            if (!$jobId) {
+                throw new LocalizedException(__('Failed to create batch job: No job ID received from API.'));
+            }
 
-            // Filter AI response based on selected options
-            $filteredAiResponse = $this->aiOptionsService->filterAiResponseBySelectedOptions($aiResponse, $validatedOptions);
-            $this->logger->info('SquadexaAI Upload: Filtered response count: ' . count($filteredAiResponse));
+            $this->logger->info('SquadexaAI Upload: Batch job created successfully', [
+                'job_id' => $jobId,
+                'total_items' => $totalItems,
+                'status' => $jobStatus
+            ]);
 
-            // Save AI response as output CSV
-            $outputFileName = $this->fileManager->saveOutputFile($filteredAiResponse, $inputFileName);
-            $outputFilePath = '/var/AIProductCreator/Output/' . $outputFileName;
-            $this->logger->info('SquadexaAI Upload: Output file saved as - ' . $outputFileName);
-
-            // Save record to database
+            // Save record to database with job_id
             $generatedCsv = $this->generatedCsvFactory->create();
             $generatedCsv->setInputFileName($inputFileName);
-            $generatedCsv->setInputFilePath($inputFilePath);
-            $generatedCsv->setResponseFileName($outputFileName);
-            $generatedCsv->setResponseFilePath($outputFilePath);
-            $generatedCsv->setTotalProductsCount(count($filteredAiResponse));
+            $generatedCsv->setInputFilePath('/var/AIProductCreator/Input/' . $inputFileName);
+            $generatedCsv->setResponseFileName(''); // Will be set when job completes
+            $generatedCsv->setResponseFilePath(''); // Will be set when job completes
+            $generatedCsv->setTotalProductsCount($totalItems);
             $generatedCsv->setGenerationType('csv');
+            $generatedCsv->setJobId($jobId);
+            $generatedCsv->setImportStatus('pending'); // Status will be updated during polling
 
             $this->generatedCsvRepository->save($generatedCsv);
-            $this->logger->info('SquadexaAI Upload: Database record saved with ID - ' . $generatedCsv->getGeneratedcsvId());
+            $this->logger->info('SquadexaAI Upload: Database record saved with ID - ' . $generatedCsv->getGeneratedcsvId() . ', Job ID: ' . $jobId);
 
-            // Save AI product data to database
-            $this->fileManager->saveAiProductData($filteredAiResponse, (int)$generatedCsv->getGeneratedcsvId());
-            $this->logger->info('SquadexaAI Upload: AI product data saved to database');
-
-            $selectedOptionsLabels = $this->aiOptionsService->getSelectedOptionsWithLabels($validatedOptions);
-            $successMessage = __('File processed successfully! Input file: %1, Output file: %2. %3 products saved to database with AI-generated fields: %4', 
-                   $inputFileName, 
-                   $outputFileName,
-                   count($filteredAiResponse),
-                   implode(', ', array_values($selectedOptionsLabels))
-                );
+            // Success message with job ID
+            $successMessage = __('Batch job created successfully! Job ID: %1. The response will be ready soon. Please check the Generated Files page.', $jobId);
             $this->messageManager->addSuccessMessage($successMessage);
-            $this->logger->info('SquadexaAI Upload: Process completed successfully - ' . $successMessage);
+            $this->logger->info('SquadexaAI Upload: Batch job created - ' . $successMessage);
 
         } catch (LocalizedException $e) {
             $this->logger->error('SquadexaAI Upload: LocalizedException - ' . $e->getMessage());

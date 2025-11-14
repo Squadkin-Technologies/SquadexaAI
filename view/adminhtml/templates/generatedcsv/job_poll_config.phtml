@@ -1,0 +1,23 @@
+<?php
+/**
+ * Copyright © 2024 Squadkin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Magento\Backend\Block\Template $block */
+
+$pollUrl = $block->getUrl('squadkin_squadexaai/generatedcsv/jobstatuspoll');
+$formKey = $block->getFormKey();
+?>
+
+<script type="text/x-magento-init">
+{
+    "*": {
+        "Squadkin_SquadexaAI/js/job-status-poll": {
+            "pollUrl": "<?= $block->escapeJs($pollUrl) ?>",
+            "formKey": "<?= $block->escapeJs($formKey) ?>"
+        }
+    }
+}
+</script>
+
