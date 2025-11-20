@@ -55,26 +55,6 @@
             "SQUADKIN_AIPRODUCT_GENERATEDCSV_ID": true,
             "SQUADKIN_AIPRODUCT_MAGENTO_PRODUCT_ID": true
         }
-    },
-    "squadkin_squadexaai_field_mapping": {
-        "column": {
-            "mapping_id": true,
-            "profile_name": true,
-            "is_default": true,
-            "product_type": true,
-            "attribute_set_id": true,
-            "mapping_rules": true,
-            "description": true,
-            "created_at": true,
-            "updated_at": true
-        },
-        "constraint": {
-            "PRIMARY": true
-        },
-        "index": {
-            "SQUADKIN_FIELD_MAPPING_PROFILE_NAME": true,
-            "SQUADKIN_FIELD_MAPPING_IS_DEFAULT": true
-        }
     }
 }
 

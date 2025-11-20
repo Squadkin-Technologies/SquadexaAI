@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Squadkin\SquadexaAI\Model\AiProduct;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Squadkin\SquadexaAI\Model\ResourceModel\AiProduct\CollectionFactory;
@@ -36,6 +37,11 @@ class DataProvider extends AbstractDataProvider
     private $jsonSerializer;
 
     /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -43,6 +49,7 @@ class DataProvider extends AbstractDataProvider
      * @param DataPersistorInterface $dataPersistor
      * @param CustomAttributeProcessor $customAttributeProcessor
      * @param Json $jsonSerializer
+     * @param RequestInterface $request
      * @param array $meta
      * @param array $data
      */
@@ -54,6 +61,7 @@ class DataProvider extends AbstractDataProvider
         DataPersistorInterface $dataPersistor,
         CustomAttributeProcessor $customAttributeProcessor,
         Json $jsonSerializer,
+        RequestInterface $request,
         array $meta = [],
         array $data = []
     ) {
@@ -61,6 +69,7 @@ class DataProvider extends AbstractDataProvider
         $this->dataPersistor = $dataPersistor;
         $this->customAttributeProcessor = $customAttributeProcessor;
         $this->jsonSerializer = $jsonSerializer;
+        $this->request = $request;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
@@ -119,6 +128,40 @@ class DataProvider extends AbstractDataProvider
         }
         
         return $this->loadedData;
+    }
+
+    /**
+     * Get meta
+     *
+     * @return array
+     */
+    public function getMeta()
+    {
+        $meta = parent::getMeta();
+        
+        // Check if current product is created in Magento
+        $aiproductId = $this->request->getParam('aiproduct_id');
+        
+        if ($aiproductId) {
+            $item = $this->collection->getItemById($aiproductId);
+            if ($item && $item->getIsCreatedInMagento()) {
+                // Product is created in Magento - make all fields read-only
+                $fieldsets = ['general', 'seo', 'product_details', 'pricing'];
+                
+                foreach ($fieldsets as $fieldset) {
+                    if (isset($meta[$fieldset]['children'])) {
+                        foreach ($meta[$fieldset]['children'] as $fieldName => &$fieldConfig) {
+                            if (isset($fieldConfig['arguments']['data']['config'])) {
+                                $fieldConfig['arguments']['data']['config']['disabled'] = true;
+                                $fieldConfig['arguments']['data']['config']['readonly'] = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return $meta;
     }
 
     /**

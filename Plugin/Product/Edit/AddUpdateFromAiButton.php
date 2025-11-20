@@ -30,6 +30,19 @@ class AddUpdateFromAiButton
             $product = $subject->getProduct();
             if ($product && $product->getId()) {
                 $productId = $product->getId();
+                
+                // Add "Generate/Edit AI Data" button
+                $result['squadexa_ai_generate'] = [
+                    'label' => __('Generate/Edit AI Data'),
+                    'class' => 'action-secondary',
+                    'on_click' => 'window.squadexaAiGenerator && window.squadexaAiGenerator.openModal()',
+                    'sort_order' => 45,
+                    'data_attribute' => [
+                        'ui-id' => 'squadexa-ai-generate-button'
+                    ]
+                ];
+                
+                // Keep existing "Update from AI" button for backward compatibility
                 $result['update_from_ai'] = [
                     'label' => __('Update from AI'),
                     'class' => 'action-secondary',

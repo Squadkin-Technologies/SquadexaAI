@@ -1,25 +1,36 @@
 <?php
 /**
- * Copyright ©  All rights reserved.
+ * Copyright © 2024 Squadkin. All rights reserved.
  * See COPYING.txt for license details.
  */
 ?>
-<div id="create-product-from-ai-modal" style="display: none;" data-bind="scope: 'createProductFromAiModal'">
-    <!-- ko template: getTemplate() --><!-- /ko -->
+<div id="create-product-from-ai-modal" style="display: none;">
+    <form id="create-product-form" class="admin__scope-old">
+        <fieldset class="admin__fieldset">
+            <div class="admin__field required">
+                <label class="admin__field-label" for="product-type-select">
+                    <span><?= $block->escapeHtml(__('Product Type')) ?></span>
+                </label>
+                <div class="admin__field-control">
+                    <select id="product-type-select" class="admin__control-select" data-validate="{required:true}">
+                        <option value=""><?= $block->escapeHtml(__('-- Please Select --')) ?></option>
+                    </select>
+                </div>
+            </div>
+        </fieldset>
+    </form>
 </div>
 
-<script type="text/x-magento-init">
-{
-    "#create-product-from-ai-modal": {
-        "Magento_Ui/js/core/app": {
-            "components": {
-                "createProductFromAiModal": {
-                    "component": "Squadkin_SquadexaAI/js/create-product-modal",
-                    "template": "Squadkin_SquadexaAI/create-product-modal"
-                }
-            }
+<script>
+require(['jquery', 'Squadkin_SquadexaAI/js/create-product-modal'], function ($, CreateProductModal) {
+    // Ensure it's available globally immediately
+    window.createProductFromAiModal = CreateProductModal;
+    
+    // Initialize the modal on page load
+    $(document).ready(function() {
+        if (typeof CreateProductModal.init === 'function') {
+            CreateProductModal.init();
         }
-    }
-}
+    });
+});
 </script>
-

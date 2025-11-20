@@ -21,7 +21,9 @@ class CreateProductButton extends GenericButton implements ButtonProviderInterfa
     {
         $data = [];
         $aiproductId = $this->getAiProductId();
-        if ($aiproductId) {
+        
+        // Don't show button if product is already created in Magento
+        if ($aiproductId && !$this->isCreatedInMagento()) {
             $data = [
                 'label' => __('Create Product from AI'),
                 'class' => 'primary',

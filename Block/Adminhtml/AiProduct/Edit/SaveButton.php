@@ -16,6 +16,11 @@ class SaveButton extends GenericButton implements ButtonProviderInterface
      */
     public function getButtonData()
     {
+        // Don't show Save button if product is already created in Magento
+        if ($this->isCreatedInMagento()) {
+            return [];
+        }
+        
         return [
             'label' => __('Save'),
             'class' => 'save primary',

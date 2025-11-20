@@ -62,4 +62,23 @@ class GenericButton
     {
         return $this->context->getUrlBuilder()->getUrl($route, $params);
     }
+
+    /**
+     * Check if AI product is created in Magento
+     *
+     * @return bool
+     */
+    public function isCreatedInMagento(): bool
+    {
+        try {
+            $aiproductId = $this->context->getRequest()->getParam('aiproduct_id');
+            if ($aiproductId) {
+                $aiProduct = $this->aiProductRepository->get($aiproductId);
+                return (bool)$aiProduct->getIsCreatedInMagento();
+            }
+        } catch (NoSuchEntityException $e) {
+            // Product not found, return false
+        }
+        return false;
+    }
 } 

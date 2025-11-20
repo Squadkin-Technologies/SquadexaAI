@@ -17,8 +17,8 @@ use Squadkin\SquadexaAI\Logger\Logger as SquadexaLogger;
 
 class SquadexaApiService
 {
-    const API_BASE_URL = 'https://squadexa.ai/';
-    const REDIRECT_URL = 'https://squadexa.ai/';
+    const API_BASE_URL = 'https://www.squadexa.ai/';
+    const REDIRECT_URL = 'https://www.squadexa.ai/';
     const API_KEY_CONFIG = 'squadexaiproductcreator/authentication/api_key';
     
     const API_ENDPOINTS = [
@@ -904,6 +904,13 @@ class SquadexaApiService
     private function executeApiRequest(string $url, string $method, array $data): array
     {
         try {
+            // Enable redirect following for CURL client
+            // Magento's CURL client supports setOption method
+            if (method_exists($this->curl, 'setOption')) {
+                $this->curl->setOption(CURLOPT_FOLLOWLOCATION, true);
+                $this->curl->setOption(CURLOPT_MAXREDIRS, 5);
+            }
+            
             if ($method === 'GET') {
                 $this->curl->get($url);
             } else {
@@ -912,6 +919,41 @@ class SquadexaApiService
 
             $responseCode = $this->curl->getStatus();
             $responseBody = $this->curl->getBody();
+            
+            // Handle 301 redirect manually if CURL didn't follow it
+            if ($responseCode == 301 || $responseCode == 302) {
+                $headers = $this->curl->getHeaders();
+                $location = null;
+                
+                // Extract Location header
+                if (is_array($headers)) {
+                    foreach ($headers as $header) {
+                        if (stripos($header, 'Location:') === 0) {
+                            $location = trim(substr($header, 9));
+                            break;
+                        }
+                    }
+                }
+                
+                // If we got a redirect and have a location, retry with the new URL
+                if ($location) {
+                    $this->logger->info('SquadexaAI API Redirect detected', [
+                        'original_url' => $url,
+                        'redirect_url' => $location,
+                        'status' => $responseCode
+                    ]);
+                    
+                    // Retry with the redirect URL
+                    if ($method === 'GET') {
+                        $this->curl->get($location);
+                    } else {
+                        $this->curl->post($location, $this->jsonSerializer->serialize($data));
+                    }
+                    
+                    $responseCode = $this->curl->getStatus();
+                    $responseBody = $this->curl->getBody();
+                }
+            }
 
             $this->logger->info('SquadexaAI API Response', [
                 'url' => $url,

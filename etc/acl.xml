@@ -24,11 +24,6 @@
 						<resource id="Squadkin_SquadexaAI::squadkin_squadexaai_aiproduct_view" title="View AI Generated Products" sortOrder="40"/>
 						<resource id="Squadkin_SquadexaAI::squadkin_squadexaai_aiproduct_create" title="Create Magento Products from AI Data" sortOrder="50"/>
 					</resource>
-					<resource id="Squadkin_SquadexaAI::field_mapping" title="Field Mapping Management" sortOrder="40">
-						<resource id="Squadkin_SquadexaAI::field_mapping_view" title="View Field Mappings" sortOrder="10"/>
-						<resource id="Squadkin_SquadexaAI::field_mapping_save" title="Save Field Mappings" sortOrder="20"/>
-						<resource id="Squadkin_SquadexaAI::field_mapping_delete" title="Delete Field Mappings" sortOrder="30"/>
-					</resource>
 					<resource id="Squadkin_SquadexaAI::squadkin_squadexaai_auth" title="Authentication" sortOrder="30">
 						<resource id="Squadkin_SquadexaAI::squadkin_squadexaai_auth_validate" title="Validate API Key" sortOrder="10"/>
 						<resource id="Squadkin_SquadexaAI::squadkin_squadexaai_auth_dashboard" title="View Dashboard" sortOrder="20"/>

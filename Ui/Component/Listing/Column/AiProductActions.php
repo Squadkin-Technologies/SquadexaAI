@@ -53,7 +53,7 @@ class AiProductActions extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
                 if (isset($item['aiproduct_id'])) {
-                    $item[$this->getData('name')] = [
+                    $actions = [
                         'edit' => [
                             'href' => $this->urlBuilder->getUrl(
                                 static::URL_PATH_EDIT,
@@ -62,11 +62,6 @@ class AiProductActions extends Column
                                 ]
                             ),
                             'label' => __('Edit')
-                        ],
-                        'create_product' => [
-                            'href' => '#',
-                            'label' => __('Create Product from AI'),
-                            'onclick' => 'window.createProductFromAiModal && window.createProductFromAiModal.open(' . $item['aiproduct_id'] . '); return false;'
                         ],
                         'delete' => [
                             'href' => $this->urlBuilder->getUrl(
@@ -82,6 +77,20 @@ class AiProductActions extends Column
                             ]
                         ]
                     ];
+                    
+                    // Only add "Create Product from AI" action if product is NOT created in Magento
+                    $isCreatedInMagento = isset($item['is_created_in_magento']) && 
+                                         ($item['is_created_in_magento'] == 1 || $item['is_created_in_magento'] === true || $item['is_created_in_magento'] === '1');
+                    
+                    if (!$isCreatedInMagento) {
+                        $actions['create_product'] = [
+                            'href' => '',
+                            'label' => __('Create Product from AI'),
+                            'callback' => true
+                        ];
+                    }
+                    
+                    $item[$this->getData('name')] = $actions;
                 }
             }
         }

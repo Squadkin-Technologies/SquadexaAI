@@ -194,12 +194,22 @@ class Generate extends Action
             
             $this->fileManager->saveAiProductData($productArray, $generatedCsvId, 'single');
 
+            // Determine redirect URL based on generation type
+            $generationType = $generatedCsv->getGenerationType();
+            if ($generationType === 'single') {
+                // Redirect to AI Generated Products grid for single product generation
+                $redirectUrl = $this->getUrl('squadkin_squadexaai/aiproduct/index');
+            } else {
+                // Redirect to Generated Files grid for CSV generation
+                $redirectUrl = $this->getUrl('squadkin_squadexaai/generatedcsv/index');
+            }
+
             return $result->setData([
                 'success' => true,
                 'message' => __('Product generated successfully! Saved to database with ID: %1', $generatedCsvId),
                 'data' => $apiResponse,
                 'csv_id' => $generatedCsvId,
-                'redirect_url' => $this->getUrl('squadkin_squadexaai/generatedcsv/index')
+                'redirect_url' => $redirectUrl
             ]);
 
         } catch (LocalizedException $e) {

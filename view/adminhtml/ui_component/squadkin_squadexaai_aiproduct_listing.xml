@@ -10,13 +10,6 @@
         <deps>
             <dep>squadkin_squadexaai_aiproduct_listing.squadkin_squadexaai_aiproduct_listing_data_source</dep>
         </deps>
-        <buttons>
-            <button name="add">
-                <url path="*/*/edit"/>
-                <class>primary</class>
-                <label translate="true">Add New AI Product</label>
-            </button>
-        </buttons>
     </settings>
     <dataSource name="squadkin_squadexaai_aiproduct_listing_data_source" component="Magento_Ui/js/grid/provider">
         <settings>

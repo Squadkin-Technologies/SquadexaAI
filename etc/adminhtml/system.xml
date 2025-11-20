@@ -80,39 +80,18 @@
         <group id="field_mapping" sortOrder="30" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
             <label>Field Mapping Configuration</label>
             <comment><![CDATA[Configure how AI-generated fields map to Magento product attributes.<br/>
-            <strong>Default Mapping:</strong> Used when no specific mapping profile is selected.<br/>
-            <strong>Format:</strong> JSON object with "map" key containing field mappings.<br/>
+            <strong>Instructions:</strong><br/>
+            1. Select a Magento product attribute for each AI-generated field<br/>
+            2. Each AI field can be mapped to only one Magento attribute<br/>
+            3. Click "Test" button to verify a specific mapping<br/>
+            4. Click "Save Mapping" to save your configuration<br/>
+            5. Click "Save Config" at the top to apply changes<br/>
             <br/>
-            <strong>Example:</strong><br/>
-            {<br/>
-            &nbsp;&nbsp;"map": {<br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;"product_name": "name",<br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;"meta_title": "meta_title",<br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;"description": "description",<br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;"upc": "sku"<br/>
-            &nbsp;&nbsp;}<br/>
-            }]]></comment>
-            <field id="default_mapping_rules" type="textarea" sortOrder="10" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
-                <label>Default Mapping Rules (JSON)</label>
-                <comment>Default field mapping rules in JSON format. This will be used when creating products from AI data if no specific mapping profile is selected.</comment>
-                <frontend_class>textarea</frontend_class>
-                <rows>10</rows>
-                <depends>
-                    <field id="is_enable">1</field>
-                </depends>
-            </field>
-            <field id="default_product_type" type="select" sortOrder="20" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
-                <label>Default Product Type</label>
-                <comment>Default product type to use when creating products from AI data</comment>
-                <source_model>Magento\Catalog\Model\Product\Type</source_model>
-                <depends>
-                    <field id="is_enable">1</field>
-                </depends>
-            </field>
-            <field id="auto_generate_sku" type="select" sortOrder="30" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
-                <label>Auto Generate SKU</label>
-                <comment>Automatically generate SKU if not provided in AI data</comment>
-                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <strong>Supported Attribute Types:</strong> Text, Textarea, Dropdown, Multiselect, Price]]></comment>
+            <field id="default_mapping_rules" type="text" sortOrder="10" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
+                <label>AI Field to Magento Attribute Mapping</label>
+                <comment>Map AI-generated fields to Magento product attributes. This mapping will be used when creating products from AI data.</comment>
+                <frontend_model>Squadkin\SquadexaAI\Block\Adminhtml\System\Config\FieldMapping</frontend_model>
                 <depends>
                     <field id="is_enable">1</field>
                 </depends>

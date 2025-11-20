@@ -6,9 +6,6 @@
 	<preference for="Squadkin\SquadexaAI\Api\AiProductRepositoryInterface" type="Squadkin\SquadexaAI\Model\AiProductRepository"/>
 	<preference for="Squadkin\SquadexaAI\Api\Data\AiProductInterface" type="Squadkin\SquadexaAI\Model\AiProduct"/>
 	<preference for="Squadkin\SquadexaAI\Api\Data\AiProductSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
-	<preference for="Squadkin\SquadexaAI\Api\FieldMappingRepositoryInterface" type="Squadkin\SquadexaAI\Model\FieldMappingRepository"/>
-	<preference for="Squadkin\SquadexaAI\Api\Data\FieldMappingInterface" type="Squadkin\SquadexaAI\Model\FieldMapping"/>
-	<preference for="Squadkin\SquadexaAI\Api\Data\FieldMappingSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
 	<virtualType name="Squadkin\SquadexaAI\Model\ResourceModel\GeneratedCsv\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
 		<arguments>
 			<argument name="mainTable" xsi:type="string">squadkin_squadexaai_generatedcsv</argument>
@@ -50,4 +47,31 @@
 	<type name="Magento\Catalog\Block\Adminhtml\Product\Edit\Button\Generic">
 		<plugin name="add_update_from_ai_button" type="Squadkin\SquadexaAI\Plugin\Product\Edit\AddUpdateFromAiButton" sortOrder="10"/>
 	</type>
+	
+	<!-- Plugin to pre-fill product form with AI data -->
+	<type name="Magento\Catalog\Controller\Adminhtml\Product\Builder">
+		<plugin name="prefill_product_with_ai_data" type="Squadkin\SquadexaAI\Plugin\Catalog\Controller\Adminhtml\Product\BuilderPlugin" sortOrder="10"/>
+	</type>
+	
+	<!-- Plugin to capture AI product ID before product save (stores in product object for observer) -->
+	<type name="Magento\Catalog\Api\ProductRepositoryInterface">
+		<plugin name="capture_ai_product_id_before_save" type="Squadkin\SquadexaAI\Plugin\Catalog\Api\ProductRepositoryPlugin" sortOrder="10"/>
+	</type>
+	
+	<!-- Plugin to redirect to AI Generated Products grid after saving product created from AI -->
+	<type name="Magento\Catalog\Controller\Adminhtml\Product\Save">
+		<plugin name="redirect_to_ai_products_after_save" type="Squadkin\SquadexaAI\Plugin\Catalog\Controller\Adminhtml\Product\SavePlugin" sortOrder="10"/>
+	</type>
+	
+	<!-- Data modifier to inject AI data into product form -->
+	<virtualType name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Pool">
+		<arguments>
+			<argument name="modifiers" xsi:type="array">
+				<item name="ai_data" xsi:type="array">
+					<item name="class" xsi:type="string">Squadkin\SquadexaAI\Ui\DataProvider\Product\Form\Modifier\AiDataModifier</item>
+					<item name="sortOrder" xsi:type="number">5</item>
+				</item>
+			</argument>
+		</arguments>
+	</virtualType>
 </config>

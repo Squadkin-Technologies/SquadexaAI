@@ -1,10 +1,14 @@
 <?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2024 Squadkin. All rights reserved.
+ */
+-->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-    <update handle="styles"/>
     <body>
         <referenceContainer name="content">
-            <uiComponent name="squadkin_squadexaai_aiproduct_listing"/>
-            <block class="Magento\Backend\Block\Template" name="create.product.modal" template="Squadkin_SquadexaAI::create-product-modal.phtml" after="-"/>
+            <block class="Magento\Framework\View\Element\Template" name="ai.data.loader.init" template="Squadkin_SquadexaAI::product-form-ai-data-loader-init.phtml" after="-"/>
         </referenceContainer>
     </body>
-</page> 
+</page>
+
