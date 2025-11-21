@@ -1,0 +1,55 @@
+/**
+ * Copyright © 2024 Squadkin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/* Ensure the grid container is properly contained and scrolls internally */
+.admin__data-grid-wrap-static {
+    overflow-x: auto;
+    overflow-y: visible;
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+}
+
+/* Ensure the grid wrapper is contained */
+.admin__data-grid-wrap-static .admin__data-grid-wrap {
+    overflow-x: auto;
+    overflow-y: visible;
+    width: 100%;
+}
+
+/* Ensure the grid table scrolls within its container */
+.admin__data-grid-wrap-static .data-grid {
+    width: 100%;
+    min-width: 100%;
+    table-layout: auto;
+}
+
+/* Ensure sticky toolbar stays within container */
+.admin__data-grid-wrap-static .data-grid-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #fff;
+}
+
+/* Ensure the listing toolbar is contained */
+.admin__data-grid-wrap-static .admin__data-grid-header {
+    position: relative;
+}
+
+/* Prevent page-level horizontal scroll */
+body.adminhtml-squadkin-squadexaai-generatedcsv-index {
+    overflow-x: hidden;
+}
+
+body.adminhtml-squadkin-squadexaai-generatedcsv-index .page-content {
+    overflow-x: hidden;
+}
+
+/* Ensure content container doesn't overflow */
+body.adminhtml-squadkin-squadexaai-generatedcsv-index .page-content-inner {
+    overflow-x: hidden;
+}
+

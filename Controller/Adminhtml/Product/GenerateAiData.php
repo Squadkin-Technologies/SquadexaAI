@@ -124,38 +124,8 @@ class GenerateAiData extends Action
             // Call API to generate product
             $apiResponse = $this->apiService->generateProduct($productData);
 
-            // Create input reference CSV file
-            $inputFileName = 'input_edit_' . time() . '_' . preg_replace('/[^a-z0-9]/i', '_', $productName) . '.csv';
-            $inputFilePath = $this->fileManager->createSingleProductInputFile([
-                'product_name' => $productName,
-                'primary_keywords' => $primaryKeywords,
-                'secondary_keywords' => $secondaryKeywords,
-                'include_pricing' => $includePricing
-            ], $inputFileName);
-
-            // Save to GeneratedCsv table
-            $generatedCsv = $this->generatedCsvFactory->create();
-            $generatedCsv->setInputFileName($inputFileName);
-            $generatedCsv->setInputFilePath($inputFilePath);
-            $generatedCsv->setResponseFileName('');
-            $generatedCsv->setResponseFilePath('');
-            $generatedCsv->setTotalProductsCount(1);
-            $generatedCsv->setGenerationType('single');
-            $generatedCsv->setImportStatus('pending');
-
-            $this->generatedCsvRepository->save($generatedCsv);
-            $generatedCsvId = $generatedCsv->getGeneratedcsvId();
-
-            // Create response CSV file
-            $responseFileName = 'response_edit_' . time() . '_' . preg_replace('/[^a-z0-9]/i', '_', $productName) . '.csv';
-            $responseFilePath = $this->fileManager->createSingleProductResponseFile($apiResponse, $responseFileName);
-
-            // Update GeneratedCsv with response file info
-            $generatedCsv->setResponseFileName($responseFileName);
-            $generatedCsv->setResponseFilePath($responseFilePath);
-            $this->generatedCsvRepository->save($generatedCsv);
-
-            // Save to AiProduct table
+            // For single product generation, skip CSV file creation and GeneratedCsv table entry
+            // Save directly to AiProduct table
             $productArray = [$apiResponse];
             $productArray[0]['product_name'] = $productName;
             if (!isset($productArray[0]['primary_keywords']) || empty($productArray[0]['primary_keywords'])) {
@@ -165,15 +135,17 @@ class GenerateAiData extends Action
                 $productArray[0]['secondary_keywords'] = $secondaryKeywords;
             }
 
-            $this->fileManager->saveAiProductData($productArray, $generatedCsvId, 'single');
+            // Save to AiProduct table with null generatedCsvId for single products
+            $this->fileManager->saveAiProductData($productArray, null, 'single');
 
             // Get the saved AI product ID
             $aiProductId = null;
             if (!empty($productArray)) {
-                // Find the AI product we just created
+                // Find the AI product we just created (by product_name and generation_type, not generatedcsv_id)
                 $aiProductCollection = $this->aiProductCollectionFactory->create();
                 $aiProductCollection->addFieldToFilter('product_name', $productName)
-                    ->addFieldToFilter('generatedcsv_id', $generatedCsvId)
+                    ->addFieldToFilter('generation_type', 'single')
+                    ->setOrder('created_at', 'DESC')
                     ->setPageSize(1);
                 
                 if ($aiProductCollection->getSize() > 0) {

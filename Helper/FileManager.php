@@ -556,7 +556,44 @@ class FileManager extends AbstractHelper
         $timestamp = date('Y-m-d_H-i-s');
         $randomString = substr(md5(uniqid()), 0, 8);
         
-        return $pathInfo['filename'] . '_' . $timestamp . '_' . $randomString . '.' . $pathInfo['extension'];
+        // Sanitize filename: remove invalid characters and replace spaces/special chars with underscores
+        $sanitizedFilename = $this->sanitizeFileName($pathInfo['filename']);
+        $sanitizedExtension = isset($pathInfo['extension']) ? strtolower($pathInfo['extension']) : 'csv';
+        
+        return $sanitizedFilename . '_' . $timestamp . '_' . $randomString . '.' . $sanitizedExtension;
+    }
+
+    /**
+     * Sanitize filename by removing invalid characters
+     *
+     * @param string $filename
+     * @return string
+     */
+    private function sanitizeFileName(string $filename): string
+    {
+        // Remove invalid characters: < > : " / \ | ? * and control characters
+        $filename = preg_replace('/[<>:"\/\\\|?*\x00-\x1F]/', '', $filename);
+        
+        // Replace spaces and other problematic characters with underscores
+        $filename = preg_replace('/[\s\(\)\[\]{}]+/', '_', $filename);
+        
+        // Remove multiple consecutive underscores
+        $filename = preg_replace('/_+/', '_', $filename);
+        
+        // Remove leading/trailing underscores and dots
+        $filename = trim($filename, '_.');
+        
+        // If filename is empty after sanitization, use a default name
+        if (empty($filename)) {
+            $filename = 'uploaded_file';
+        }
+        
+        // Limit filename length to 200 characters to avoid filesystem issues
+        if (strlen($filename) > 200) {
+            $filename = substr($filename, 0, 200);
+        }
+        
+        return $filename;
     }
 
     /**
@@ -568,7 +605,8 @@ class FileManager extends AbstractHelper
     private function generateOutputFileName(string $inputFileName): string
     {
         $pathInfo = pathinfo($inputFileName);
-        return 'ai_generated_' . $pathInfo['filename'] . '.csv';
+        $sanitizedFilename = $this->sanitizeFileName($pathInfo['filename']);
+        return 'ai_generated_' . $sanitizedFilename . '.csv';
     }
 
     /**
@@ -760,7 +798,10 @@ class FileManager extends AbstractHelper
                 }
                 
                 // Set required fields
-                $aiProduct->setGeneratedcsvId($generatedCsvId);
+                // For single product generation, generatedCsvId can be null
+                if ($generatedCsvId !== null) {
+                    $aiProduct->setGeneratedcsvId($generatedCsvId);
+                }
                 $aiProduct->setGenerationType($generationType);
                 $aiProduct->setProductName($productName);
                 

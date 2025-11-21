@@ -53,6 +53,10 @@ class AiProductActions extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
                 if (isset($item['aiproduct_id'])) {
+                    // Check if product is created in Magento
+                    $isCreatedInMagento = isset($item['is_created_in_magento']) && 
+                                         ($item['is_created_in_magento'] == 1 || $item['is_created_in_magento'] === true || $item['is_created_in_magento'] === '1');
+                    
                     $actions = [
                         'edit' => [
                             'href' => $this->urlBuilder->getUrl(
@@ -61,7 +65,7 @@ class AiProductActions extends Column
                                     'aiproduct_id' => $item['aiproduct_id']
                                 ]
                             ),
-                            'label' => __('Edit')
+                            'label' => $isCreatedInMagento ? __('View') : __('Edit')
                         ],
                         'delete' => [
                             'href' => $this->urlBuilder->getUrl(
@@ -79,9 +83,6 @@ class AiProductActions extends Column
                     ];
                     
                     // Only add "Create Product from AI" action if product is NOT created in Magento
-                    $isCreatedInMagento = isset($item['is_created_in_magento']) && 
-                                         ($item['is_created_in_magento'] == 1 || $item['is_created_in_magento'] === true || $item['is_created_in_magento'] === '1');
-                    
                     if (!$isCreatedInMagento) {
                         $actions['create_product'] = [
                             'href' => '',

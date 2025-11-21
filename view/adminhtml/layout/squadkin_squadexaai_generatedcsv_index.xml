@@ -3,11 +3,14 @@
 	<update handle="styles"/>
 	<head>
 		<css src="Squadkin_SquadexaAI::css/product-create-modal.css"/>
+		<css src="Squadkin_SquadexaAI::css/generatedcsv-grid.css"/>
 		<script src="Squadkin_SquadexaAI::js/job-status-poll.js"/>
 	</head>
 	<body>
 		<referenceContainer name="content">
-			<uiComponent name="squadkin_squadexaai_generatedcsv_listing"/>
+			<container name="generatedcsv.grid.container" htmlTag="div" htmlClass="admin__data-grid-wrap admin__data-grid-wrap-static">
+				<uiComponent name="squadkin_squadexaai_generatedcsv_listing"/>
+			</container>
 			<block class="Magento\Backend\Block\Template" name="job.status.poll.config" template="Squadkin_SquadexaAI::generatedcsv/job_poll_config.phtml" after="-"/>
 		</referenceContainer>
 	</body>

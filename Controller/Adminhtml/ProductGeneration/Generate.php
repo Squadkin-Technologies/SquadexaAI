@@ -141,39 +141,8 @@ class Generate extends Action
                 'response_data' => $apiResponse
             ]);
 
-            // Step 1: Create input reference CSV file for single product
-            $inputFileName = 'input_single_' . time() . '_' . preg_replace('/[^a-z0-9]/i', '_', $productName) . '.csv';
-            $inputFilePath = $this->fileManager->createSingleProductInputFile([
-                'product_name' => $productName,
-                'primary_keywords' => $primaryKeywords,
-                'secondary_keywords' => $secondaryKeywords,
-                'include_pricing' => $includePricing
-            ], $inputFileName);
-            
-            // Step 2: Save to GeneratedCsv table (will update with response file later)
-            $generatedCsv = $this->generatedCsvFactory->create();
-            $generatedCsv->setInputFileName($inputFileName);
-            $generatedCsv->setInputFilePath($inputFilePath);
-            $generatedCsv->setResponseFileName(''); // Will be set after creating response file
-            $generatedCsv->setResponseFilePath('');
-            $generatedCsv->setTotalProductsCount(1);
-            $generatedCsv->setGenerationType('single');
-            $generatedCsv->setImportStatus('pending');
-            
-            $this->generatedCsvRepository->save($generatedCsv);
-            $generatedCsvId = $generatedCsv->getGeneratedcsvId();
-
-            // Step 3: Create response/output CSV file
-            $responseFileName = 'response_single_' . time() . '_' . preg_replace('/[^a-z0-9]/i', '_', $productName) . '.csv';
-            $responseFilePath = $this->fileManager->createSingleProductResponseFile($apiResponse, $responseFileName);
-            
-            // Step 4: Update GeneratedCsv with response file info
-            $generatedCsv->setResponseFileName($responseFileName);
-            $generatedCsv->setResponseFilePath($responseFilePath);
-            $this->generatedCsvRepository->save($generatedCsv);
-            
-            // Step 5: Save to AiProduct table using FileManager
-            // Pass full API response - FileManager will extract all fields
+            // For single product generation, skip CSV file creation and GeneratedCsv table entry
+            // Save directly to AiProduct table
             $productArray = [$apiResponse];
             
             // Always set product_name from form data (required field, API response doesn't include it)
@@ -192,23 +161,16 @@ class Generate extends Action
                 $productArray[0]['secondary_keywords'] = $secondaryKeywords;
             }
             
-            $this->fileManager->saveAiProductData($productArray, $generatedCsvId, 'single');
+            // Save to AiProduct table with null generatedCsvId for single products
+            $this->fileManager->saveAiProductData($productArray, null, 'single');
 
-            // Determine redirect URL based on generation type
-            $generationType = $generatedCsv->getGenerationType();
-            if ($generationType === 'single') {
-                // Redirect to AI Generated Products grid for single product generation
-                $redirectUrl = $this->getUrl('squadkin_squadexaai/aiproduct/index');
-            } else {
-                // Redirect to Generated Files grid for CSV generation
-                $redirectUrl = $this->getUrl('squadkin_squadexaai/generatedcsv/index');
-            }
+            // Redirect to AI Generated Products grid for single product generation
+            $redirectUrl = $this->getUrl('squadkin_squadexaai/aiproduct/index');
 
             return $result->setData([
                 'success' => true,
-                'message' => __('Product generated successfully! Saved to database with ID: %1', $generatedCsvId),
+                'message' => __('Product generated successfully!'),
                 'data' => $apiResponse,
-                'csv_id' => $generatedCsvId,
                 'redirect_url' => $redirectUrl
             ]);
 

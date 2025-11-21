@@ -180,38 +180,33 @@ class Single extends Action
                 'response_data' => $apiResponse
             ]);
 
-            // Step 1: Save to GeneratedCsv table
-            $generatedCsv = $this->generatedCsvFactory->create();
-            $generatedCsv->setInputFileName('Single Product: ' . $productName);
-            $generatedCsv->setInputFilePath('N/A - Single Product Generation');
-            $generatedCsv->setResponseFileName('N/A - API Response');
-            $generatedCsv->setResponseFilePath('N/A - Stored in aiproduct table');
-            $generatedCsv->setTotalProductsCount(1);
-            $generatedCsv->setGenerationType('single');
-            $generatedCsv->setImportStatus('pending');
+            // For single product generation, skip CSV file creation and GeneratedCsv table entry
+            // Save directly to AiProduct table
+            $productArray = [$apiResponse];
             
-            $this->generatedCsvRepository->save($generatedCsv);
-            $generatedCsvId = $generatedCsv->getGeneratedcsvId();
-
-            // Step 2: Save to AiProduct table using FileManager
-            $productArray = [[
-                'sku' => $apiResponse['sku'] ?? 'AUTO-' . time(),
-                'name' => $apiResponse['name'] ?? $productName,
-                'description' => $apiResponse['description'] ?? '',
-                'short_description' => $apiResponse['short_description'] ?? '',
-                'price' => $apiResponse['price'] ?? 0,
-                'primary_keywords' => $primaryKeywords,
-                'secondary_keywords' => $secondaryKeywords,
-                'ai_response' => $this->jsonSerializer->serialize($apiResponse)
-            ]];
+            // Always set product_name from form data (required field, API response doesn't include it)
+            $productArray[0]['product_name'] = $productName;
             
-            $this->fileManager->saveAiProductData($productArray, $generatedCsvId, 'single');
+            // Also check for 'name' field as fallback if product_name is empty
+            if (empty($productArray[0]['product_name']) && isset($productArray[0]['name'])) {
+                $productArray[0]['product_name'] = $productArray[0]['name'];
+            }
+            
+            // Add keywords from form if not in response
+            if (!isset($productArray[0]['primary_keywords']) || empty($productArray[0]['primary_keywords'])) {
+                $productArray[0]['primary_keywords'] = $primaryKeywords;
+            }
+            if (!isset($productArray[0]['secondary_keywords']) || empty($productArray[0]['secondary_keywords'])) {
+                $productArray[0]['secondary_keywords'] = $secondaryKeywords;
+            }
+            
+            // Save to AiProduct table with null generatedCsvId for single products
+            $this->fileManager->saveAiProductData($productArray, null, 'single');
 
             return $result->setData([
                 'success' => true,
-                'message' => __('Product generated successfully! Saved to database with ID: %1', $generatedCsvId),
-                'data' => $apiResponse,
-                'csv_id' => $generatedCsvId
+                'message' => __('Product generated successfully!'),
+                'data' => $apiResponse
             ]);
 
         } catch (LocalizedException $e) {
