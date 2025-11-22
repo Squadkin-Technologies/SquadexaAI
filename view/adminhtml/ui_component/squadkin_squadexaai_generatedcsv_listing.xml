@@ -85,23 +85,6 @@
 				<sortable>false</sortable>
 			</settings>
 		</actionsColumn>
-		<column name="generation_type" component="Magento_Ui/js/grid/columns/select">
-			<settings>
-				<filter>select</filter>
-				<dataType>select</dataType>
-				<label translate="true">Generation Type</label>
-				<options>
-					<option name="single" xsi:type="array">
-						<item name="value" xsi:type="string">single</item>
-						<item name="label" xsi:type="string" translate="true">Single Product</item>
-					</option>
-					<option name="csv" xsi:type="array">
-						<item name="value" xsi:type="string">csv</item>
-						<item name="label" xsi:type="string" translate="true">CSV Upload</item>
-					</option>
-				</options>
-			</settings>
-		</column>
 		<column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
 			<settings>
 				<filter>dateRange</filter>

@@ -14,6 +14,7 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\Data\ProductInterfaceFactory;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\UrlInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -53,12 +54,18 @@ class AiFieldMappingService
     private $logger;
 
     /**
+     * @var UrlInterface
+     */
+    private $urlBuilder;
+
+    /**
      * @param FieldMappingHelper $fieldMappingHelper
      * @param AiProductRepositoryInterface $aiProductRepository
      * @param ProductRepositoryInterface $productRepository
      * @param ProductInterfaceFactory $productFactory
      * @param Json $jsonSerializer
      * @param LoggerInterface $logger
+     * @param UrlInterface $urlBuilder
      */
     public function __construct(
         FieldMappingHelper $fieldMappingHelper,
@@ -66,7 +73,8 @@ class AiFieldMappingService
         ProductRepositoryInterface $productRepository,
         ProductInterfaceFactory $productFactory,
         Json $jsonSerializer,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        UrlInterface $urlBuilder
     ) {
         $this->fieldMappingHelper = $fieldMappingHelper;
         $this->aiProductRepository = $aiProductRepository;
@@ -74,6 +82,7 @@ class AiFieldMappingService
         $this->productFactory = $productFactory;
         $this->jsonSerializer = $jsonSerializer;
         $this->logger = $logger;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -93,6 +102,21 @@ class AiFieldMappingService
         ?int $mappingId = null
     ): array {
         try {
+            // Validate that field mappings are configured
+            $fieldMappings = $this->fieldMappingHelper->getFieldMappings();
+            if (empty($fieldMappings)) {
+                $configUrl = $this->urlBuilder->getUrl(
+                    'adminhtml/system_config/edit/section/squadexaiproductcreator',
+                    ['_fragment' => 'squadexaiproductcreator_field_mapping-link']
+                );
+                throw new LocalizedException(__(
+                    'Field mapping configuration is required before creating products from AI data. ' .
+                    'Please configure field mappings in <a href="%1" target="_blank">System Configuration → Field Mapping</a>. ' .
+                    'Field mappings tell the system which Magento product attributes to use for each AI-generated field.',
+                    $configUrl
+                ));
+            }
+
             // Get AI Product
             $aiProduct = $this->aiProductRepository->get($aiProductId);
 
@@ -151,6 +175,21 @@ class AiFieldMappingService
         ?int $mappingId = null
     ): ProductInterface {
         try {
+            // Validate that field mappings are configured
+            $fieldMappings = $this->fieldMappingHelper->getFieldMappings();
+            if (empty($fieldMappings)) {
+                $configUrl = $this->urlBuilder->getUrl(
+                    'adminhtml/system_config/edit/section/squadexaiproductcreator',
+                    ['_fragment' => 'squadexaiproductcreator_field_mapping-link']
+                );
+                throw new LocalizedException(__(
+                    'Field mapping configuration is required before updating products from AI data. ' .
+                    'Please configure field mappings in <a href="%1" target="_blank">System Configuration → Field Mapping</a>. ' .
+                    'Field mappings tell the system which Magento product attributes to use for each AI-generated field.',
+                    $configUrl
+                ));
+            }
+
             // Get existing product
             $product = $this->productRepository->getById($productId);
 

@@ -13,6 +13,7 @@ use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem\DirectoryList;
+use Magento\Framework\Session\SessionManagerInterface;
 use Psr\Log\LoggerInterface;
 use Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface;
 use Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterfaceFactory;
@@ -58,6 +59,11 @@ class Upload extends Action
     private $directoryList;
 
     /**
+     * @var SessionManagerInterface
+     */
+    private $session;
+
+    /**
      * Upload constructor.
      *
      * @param Context $context
@@ -68,6 +74,7 @@ class Upload extends Action
      * @param LoggerInterface $logger
      * @param SquadexaApiService $apiService
      * @param DirectoryList $directoryList
+     * @param SessionManagerInterface $session
      */
     public function __construct(
         Context $context,
@@ -77,7 +84,8 @@ class Upload extends Action
         AiGenerationOptionsService $aiOptionsService,
         LoggerInterface $logger,
         SquadexaApiService $apiService,
-        DirectoryList $directoryList
+        DirectoryList $directoryList,
+        SessionManagerInterface $session
     ) {
         parent::__construct($context);
         $this->generatedCsvRepository = $generatedCsvRepository;
@@ -87,6 +95,7 @@ class Upload extends Action
         $this->logger = $logger;
         $this->apiService = $apiService;
         $this->directoryList = $directoryList;
+        $this->session = $session;
     }
 
     /**
@@ -184,10 +193,32 @@ class Upload extends Action
             $this->generatedCsvRepository->save($generatedCsv);
             $this->logger->info('SquadexaAI Upload: Database record saved with ID - ' . $generatedCsv->getGeneratedcsvId() . ', Job ID: ' . $jobId);
 
-            // Success message with job ID
-            $successMessage = __('Batch job created successfully! Job ID: %1. The response will be ready soon. Please check the Generated Files page.', $jobId);
-            $this->messageManager->addSuccessMessage($successMessage);
-            $this->logger->info('SquadexaAI Upload: Batch job created - ' . $successMessage);
+            // Build URLs for guidance links
+            $aiProductGridUrl = $this->getUrl('squadkin_squadexaai/aiproduct/index');
+            $magentoImportUrl = $this->getUrl('adminhtml/import/index');
+            
+            // Create comprehensive success message with step-by-step guidance
+            $successMessage = '<strong>Batch job created successfully!</strong><br/>' .
+                '<p style="margin-top: 10px; margin-bottom: 5px;"><strong>What\'s Next?</strong></p>' .
+                '<p style="margin-bottom: 5px;">✓ The response will be ready soon. Once the response is ready, you can:</p>' .
+                '<ul style="margin-left: 20px; margin-top: 5px; margin-bottom: 10px;">' .
+                '<li>View and edit each AI-generated product response</li>' .
+                '<li>Create products one by one from the <a href="' . $aiProductGridUrl . '" target="_blank"><strong>Squadexa AI - Products Data</strong></a> page</li>' .
+                '</ul>' .
+                '<p style="margin-bottom: 5px;"><strong>Bulk Import Option:</strong></p>' .
+                '<p style="margin-bottom: 5px;">If you want to import products in bulk:</p>' .
+                '<ul style="margin-left: 20px; margin-top: 5px;">' .
+                '<li>Download the Output CSV file from this page once it\'s ready</li>' .
+                '<li>Update it according to Magento\'s import standard format</li>' .
+                '<li>Import it using Magento\'s <a href="' . $magentoImportUrl . '" target="_blank"><strong>Import Products</strong></a> page</li>' .
+                '</ul>';
+            
+            // Store HTML message in session to be displayed via block
+            $this->session->setData('squadexa_html_success_message', $successMessage);
+            
+            // Also add a simple text message for compatibility
+            $this->messageManager->addSuccessMessage(__('Batch job created successfully! Job ID: %1', $jobId));
+            $this->logger->info('SquadexaAI Upload: Batch job created - Job ID: ' . $jobId);
 
         } catch (LocalizedException $e) {
             $this->logger->error('SquadexaAI Upload: LocalizedException - ' . $e->getMessage());

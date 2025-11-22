@@ -4,9 +4,10 @@
 define([
     'jquery',
     'Magento_Ui/js/modal/modal',
+    'Magento_Ui/js/modal/alert',
     'mage/url',
     'mage/translate'
-], function ($, modal, urlBuilder, $t) {
+], function ($, modal, alert, urlBuilder, $t) {
     'use strict';
 
     var CreateProductModal = {
@@ -34,7 +35,7 @@ define([
                 type: 'popup',
                 responsive: true,
                 innerScroll: true,
-                title: $t('Create Product from AI'),
+                title: $t('Create Product from AI Data'),
                 buttons: [{
                     text: $t('Cancel'),
                     class: 'action-secondary',
@@ -232,7 +233,11 @@ define([
                     } else {
                         var errorMsg = response && response.message ? response.message : $t('An error occurred while creating the product');
                         console.error('[Create Product Modal] Error in response:', response);
-                        alert(errorMsg);
+                        alert({
+                            title: $t('Error'),
+                            content: errorMsg,
+                            modalClass: 'alert'
+                        });
                     }
                 },
                 error: function (xhr, status, error) {
@@ -248,9 +253,21 @@ define([
                     } else if (xhr.status === 403) {
                         errorMsg += ' (403 - Access denied)';
                     } else if (xhr.status === 500) {
-                        errorMsg += ' (500 - Server error)';
+                        // Try to parse error message from response
+                        try {
+                            var responseData = JSON.parse(xhr.responseText);
+                            if (responseData && responseData.message) {
+                                errorMsg = responseData.message;
+                            }
+                        } catch (e) {
+                            errorMsg += ' (500 - Server error)';
+                        }
                     }
-                    alert(errorMsg);
+                    alert({
+                        title: $t('Error'),
+                        content: errorMsg,
+                        modalClass: 'alert'
+                    });
                 }
             });
         }

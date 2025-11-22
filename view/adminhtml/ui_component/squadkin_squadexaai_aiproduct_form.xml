@@ -11,6 +11,7 @@
         <buttons>
             <button name="save" class="Squadkin\SquadexaAI\Block\Adminhtml\AiProduct\Edit\SaveButton"/>
             <button name="create_product" class="Squadkin\SquadexaAI\Block\Adminhtml\AiProduct\Edit\CreateProductButton"/>
+            <button name="update_product" class="Squadkin\SquadexaAI\Block\Adminhtml\AiProduct\Edit\UpdateProductButton"/>
             <button name="delete" class="Squadkin\SquadexaAI\Block\Adminhtml\AiProduct\Edit\DeleteButton"/>
             <button name="back" class="Squadkin\SquadexaAI\Block\Adminhtml\AiProduct\Edit\BackButton"/>
         </buttons>

@@ -8,6 +8,10 @@
 	</head>
 	<body>
 		<referenceContainer name="content">
+			<block class="Squadkin\SquadexaAI\Block\Adminhtml\Messages\HtmlSuccessMessage" 
+				   name="squadexa.html.success.message" 
+				   template="Squadkin_SquadexaAI::messages/html-success-message.phtml" 
+				   before="-"/>
 			<container name="generatedcsv.grid.container" htmlTag="div" htmlClass="admin__data-grid-wrap admin__data-grid-wrap-static">
 				<uiComponent name="squadkin_squadexaai_generatedcsv_listing"/>
 			</container>

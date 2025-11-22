@@ -212,7 +212,13 @@ class JobStatusPoll extends Action
                         $generatedCsv->setTotalProductsCount(count($products));
                         
                         // Save products to AI Product table
-                        $this->fileManager->saveAiProductData($products, $generatedCsvId, 'csv');
+                        $saveResult = $this->fileManager->saveAiProductData($products, $generatedCsvId, 'csv');
+                        // Log update statistics for CSV processing
+                        $this->logger->info('SquadexaAI JobStatusPoll: Products saved', [
+                            'total' => $saveResult['total_saved'],
+                            'created' => $saveResult['created_count'],
+                            'updated' => $saveResult['updated_count']
+                        ]);
                         
                     } catch (\Exception $e) {
                         $this->logger->error('SquadexaAI JobStatusPoll: Error downloading job results', [

@@ -67,7 +67,8 @@ class AiProduct extends AbstractModel implements AiProductInterface
      */
     public function getGeneratedcsvId()
     {
-        return (int)$this->getData(self::GENERATEDCSV_ID);
+        $value = $this->getData(self::GENERATEDCSV_ID);
+        return $value !== null ? (int)$value : null;
     }
 
     /**
@@ -75,6 +76,10 @@ class AiProduct extends AbstractModel implements AiProductInterface
      */
     public function setGeneratedcsvId($generatedcsvId)
     {
+        // Explicitly set to null if null is passed, otherwise set the value
+        if ($generatedcsvId === null) {
+            return $this->setData(self::GENERATEDCSV_ID, null);
+        }
         return $this->setData(self::GENERATEDCSV_ID, $generatedcsvId);
     }
 
@@ -638,5 +643,110 @@ class AiProduct extends AbstractModel implements AiProductInterface
     public function setPricingCadMax($pricingCadMax)
     {
         return $this->setData(self::PRICING_CAD_MAX, $pricingCadMax);
+    }
+
+    /**
+     * Get AI response
+     *
+     * @return string|null
+     */
+    public function getAiResponse()
+    {
+        return $this->getData(self::AI_RESPONSE);
+    }
+
+    /**
+     * Set AI response
+     *
+     * @param string|null $aiResponse
+     * @return $this
+     */
+    public function setAiResponse($aiResponse)
+    {
+        return $this->setData(self::AI_RESPONSE, $aiResponse);
+    }
+
+    /**
+     * Get generation type
+     *
+     * @return string|null
+     */
+    public function getGenerationType()
+    {
+        return $this->getData(self::GENERATION_TYPE);
+    }
+
+    /**
+     * Set generation type
+     *
+     * @param string $generationType
+     * @return $this
+     */
+    public function setGenerationType($generationType)
+    {
+        return $this->setData(self::GENERATION_TYPE, $generationType);
+    }
+
+    /**
+     * Get primary keywords
+     *
+     * @return string|null
+     */
+    public function getPrimaryKeywords()
+    {
+        return $this->getData(self::PRIMARY_KEYWORDS);
+    }
+
+    /**
+     * Set primary keywords
+     *
+     * @param string|null $primaryKeywords
+     * @return $this
+     */
+    public function setPrimaryKeywords($primaryKeywords)
+    {
+        return $this->setData(self::PRIMARY_KEYWORDS, $primaryKeywords);
+    }
+
+    /**
+     * Get secondary keywords
+     *
+     * @return string|null
+     */
+    public function getSecondaryKeywords()
+    {
+        return $this->getData(self::SECONDARY_KEYWORDS);
+    }
+
+    /**
+     * Set secondary keywords
+     *
+     * @param string|null $secondaryKeywords
+     * @return $this
+     */
+    public function setSecondaryKeywords($secondaryKeywords)
+    {
+        return $this->setData(self::SECONDARY_KEYWORDS, $secondaryKeywords);
+    }
+
+    /**
+     * Get regeneration count
+     *
+     * @return int
+     */
+    public function getRegenerationCount()
+    {
+        return (int)($this->getData('regeneration_count') ?? 0);
+    }
+
+    /**
+     * Set regeneration count
+     *
+     * @param int $count
+     * @return $this
+     */
+    public function setRegenerationCount($count)
+    {
+        return $this->setData('regeneration_count', (int)$count);
     }
 } 

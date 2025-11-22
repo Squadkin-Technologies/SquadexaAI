@@ -48,8 +48,8 @@ This feature allows creating and updating Magento products directly from AI-gene
 ### 4. UI Components
 
 #### Buttons
-- **AI Product Grid**: "Create Product from AI" button in actions column
-- **AI Product Edit Form**: "Create Product from AI" button in button section
+- **AI Product Grid**: "Create Product from AI Data" button in actions column
+- **AI Product Edit Form**: "Create Product from AI Data" button in button section
 - **Magento Product Edit**: "Update from AI" button (via plugin)
 
 #### JavaScript Components
@@ -99,8 +99,8 @@ Example mapping rules JSON:
 
 ### Creating a Product from AI Data
 
-1. Navigate to **AI Generated Products** grid
-2. Click **Actions** → **Create Product from AI** on any AI product
+1. Navigate to **Squadexa AI - Products Data** grid
+2. Click **Actions** → **Create Product from AI Data** on any AI product
 3. Select:
    - Product Type (Simple, Configurable, etc.)
    - Attribute Set

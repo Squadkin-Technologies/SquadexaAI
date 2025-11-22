@@ -54,9 +54,14 @@ class Edit extends Action
         if ($id) {
             try {
                 $aiProduct = $this->aiProductRepository->get($id);
-                $resultPage->getConfig()->getTitle()->prepend(__('Edit AI Product: %1', $aiProduct->getName()));
-            } catch (\Exception $e) {
+                $productName = $aiProduct->getProductName() ?: __('AI Product');
+                $resultPage->getConfig()->getTitle()->prepend(__('Edit AI Product: %1', $productName));
+            } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
                 $this->messageManager->addErrorMessage(__('This AI product no longer exists.'));
+                $resultRedirect = $this->resultRedirectFactory->create();
+                return $resultRedirect->setPath('*/*/');
+            } catch (\Exception $e) {
+                $this->messageManager->addErrorMessage(__('An error occurred while loading the AI product: %1', $e->getMessage()));
                 $resultRedirect = $this->resultRedirectFactory->create();
                 return $resultRedirect->setPath('*/*/');
             }

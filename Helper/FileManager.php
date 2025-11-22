@@ -633,7 +633,7 @@ class FileManager extends AbstractHelper
             fputcsv($output, $headers, ',', '"', '\\');
             
             // Add data rows with values in header order
-            foreach ($data as $row) {
+        foreach ($data as $row) {
                 $normalizedRow = [];
                 foreach ($headers as $header) {
                     $value = $row[$header] ?? '';
@@ -655,7 +655,7 @@ class FileManager extends AbstractHelper
         
         return $csvContent;
     }
-    
+
     /**
      * Normalize a single value for CSV output
      *
@@ -742,16 +742,22 @@ class FileManager extends AbstractHelper
      * Save AI product data to database
      *
      * @param array $aiProductData
-     * @param int $generatedCsvId
-     * @return void
+     * @param int|null $generatedCsvId Null for single product generation (no CSV file)
+     * @param string $generationType
+     * @return array Returns array with 'updated_count' and 'created_count' keys
      * @throws LocalizedException
      */
-    public function saveAiProductData(array $aiProductData, int $generatedCsvId, string $generationType = 'csv'): void
+    public function saveAiProductData(array $aiProductData, ?int $generatedCsvId, string $generationType = 'csv'): array
     {
-        $this->logger->info('FileManager saveAiProductData: Starting to save ' . count($aiProductData) . ' products for CSV ID: ' . $generatedCsvId . ', Type: ' . $generationType);
+        $csvIdLog = $generatedCsvId !== null ? (string)$generatedCsvId : 'null (single product, no CSV)';
+        $this->logger->info('FileManager saveAiProductData: Starting to save ' . count($aiProductData) . ' products for CSV ID: ' . $csvIdLog . ', Type: ' . $generationType);
         
         try {
             $savedCount = 0;
+            $updatedCount = 0;
+            $createdCount = 0;
+            $isUpdate = false;
+            
             foreach ($aiProductData as $productData) {
                 $this->logger->info('FileManager saveAiProductData: Processing product', [
                     'product_data_keys' => array_keys($productData)
@@ -764,26 +770,36 @@ class FileManager extends AbstractHelper
                     continue;
                 }
                 
-                // For single product generation, check if a product with the same name already exists
-                // If it does, update it instead of creating a duplicate to avoid unique constraint violation
+                // Check if a product with the same name and generation type already exists
+                // This applies to both single and CSV generation types
                 $aiProduct = null;
-                if ($generationType === 'single' && $productName) {
+                $isUpdate = false;
+                if ($productName) {
                     $existingCollection = $this->aiProductCollectionFactory->create();
                     $existingCollection->addFieldToFilter('product_name', $productName)
-                        ->addFieldToFilter('generation_type', 'single')
-                        ->setPageSize(1);
+                        ->addFieldToFilter('generation_type', $generationType);
+                    
+                    // For CSV generation, also filter by generatedcsv_id if provided
+                    if ($generationType === 'csv' && $generatedCsvId !== null) {
+                        $existingCollection->addFieldToFilter('generatedcsv_id', $generatedCsvId);
+                    }
+                    
+                    $existingCollection->setPageSize(1);
                     
                     $this->logger->info('FileManager saveAiProductData: Checking for existing product', [
                         'product_name' => $productName,
                         'generation_type' => $generationType,
+                        'generatedcsv_id' => $generatedCsvId,
                         'collection_size' => $existingCollection->getSize()
                     ]);
                     
                     if ($existingCollection->getSize() > 0) {
                         $aiProduct = $existingCollection->getFirstItem();
+                        $isUpdate = true;
                         $this->logger->info('FileManager saveAiProductData: Found existing product, updating instead of creating new', [
                             'aiproduct_id' => $aiProduct->getAiproductId(),
-                            'product_name' => $productName
+                            'product_name' => $productName,
+                            'current_regeneration_count' => $aiProduct->getData('regeneration_count') ?? 0
                         ]);
                     } else {
                         $this->logger->info('FileManager saveAiProductData: No existing product found, will create new one', [
@@ -794,16 +810,33 @@ class FileManager extends AbstractHelper
                 
                 // If no existing product found, create a new one
                 if (!$aiProduct) {
-                    $aiProduct = $this->aiProductFactory->create();
+                $aiProduct = $this->aiProductFactory->create();
                 }
                 
                 // Set required fields
                 // For single product generation, generatedCsvId can be null
-                if ($generatedCsvId !== null) {
-                    $aiProduct->setGeneratedcsvId($generatedCsvId);
-                }
+                // Explicitly set to null if not provided (important for database foreign key constraint)
+                $aiProduct->setGeneratedcsvId($generatedCsvId);
                 $aiProduct->setGenerationType($generationType);
                 $aiProduct->setProductName($productName);
+                
+                // Increment regeneration_count if updating existing product
+                if ($isUpdate) {
+                    $currentCount = (int)($aiProduct->getData('regeneration_count') ?? 0);
+                    $aiProduct->setData('regeneration_count', $currentCount + 1);
+                    
+                    // Explicitly set updated_at to current timestamp when updating
+                    // Magento's ORM doesn't automatically update this field even with on_update="true"
+                    $aiProduct->setUpdatedAt((new \DateTime())->format('Y-m-d H:i:s'));
+                    
+                    $this->logger->info('FileManager saveAiProductData: Incrementing regeneration count and updating timestamp', [
+                        'old_count' => $currentCount,
+                        'new_count' => $currentCount + 1
+                    ]);
+                } else {
+                    // New product, set regeneration_count to 0
+                    $aiProduct->setData('regeneration_count', 0);
+                }
                 
                 // Set SKU if the column exists (for backward compatibility with old schema)
                 // Generate a unique SKU based on product name and timestamp if not set
@@ -936,22 +969,73 @@ class FileManager extends AbstractHelper
                     $aiProduct->setSecondaryKeywords($secondaryKeywords);
                 }
                 
-                // Magento product creation status (always start as not created)
+                // When updating, preserve Magento product creation status and ID
+                // Only reset if this is a new product
+                if (!$isUpdate) {
+                    // Magento product creation status (always start as not created for new products)
                 $aiProduct->setIsCreatedInMagento(false);
                 $aiProduct->setMagentoProductId(null);
+                }
+                // For updates, keep existing is_created_in_magento and magento_product_id values
+                
+                // Validate required fields before saving
+                if (empty($aiProduct->getProductName())) {
+                    $this->logger->error('FileManager saveAiProductData: Cannot save - product_name is empty', [
+                        'product_data_keys' => array_keys($productData)
+                    ]);
+                    throw new LocalizedException(__('Cannot save AI product: product_name is required but was empty.'));
+                }
+                
+                if (empty($aiProduct->getGenerationType())) {
+                    $this->logger->error('FileManager saveAiProductData: Cannot save - generation_type is empty');
+                    throw new LocalizedException(__('Cannot save AI product: generation_type is required but was empty.'));
+                }
                 
                 // Save the AI product
+                try {
                 $this->aiProductRepository->save($aiProduct);
                 $savedCount++;
-                
-                $this->logger->info('FileManager saveAiProductData: Saved AI product', [
-                    'aiproduct_id' => $aiProduct->getAiproductId(),
-                    'generatedcsv_id' => $aiProduct->getGeneratedcsvId(),
-                    'product_name' => $aiProduct->getProductName()
-                ]);
+                    
+                    if ($isUpdate) {
+                        $updatedCount++;
+                    } else {
+                        $createdCount++;
+                    }
+                    
+                    // Log the raw data value to see if it's actually null
+                    $rawGeneratedCsvId = $aiProduct->getData('generatedcsv_id');
+                    $this->logger->info('FileManager saveAiProductData: Saved AI product', [
+                        'aiproduct_id' => $aiProduct->getAiproductId(),
+                        'generatedcsv_id' => $aiProduct->getGeneratedcsvId(),
+                        'generatedcsv_id_raw' => $rawGeneratedCsvId,
+                        'generatedcsv_id_is_null' => ($rawGeneratedCsvId === null),
+                        'product_name' => $aiProduct->getProductName(),
+                        'generation_type' => $aiProduct->getGenerationType(),
+                        'is_update' => $isUpdate,
+                        'regeneration_count' => $aiProduct->getData('regeneration_count')
+                    ]);
+                } catch (\Exception $saveException) {
+                    $this->logger->error('FileManager saveAiProductData: Failed to save AI product', [
+                        'error' => $saveException->getMessage(),
+                        'trace' => $saveException->getTraceAsString(),
+                        'product_name' => $aiProduct->getProductName(),
+                        'generation_type' => $aiProduct->getGenerationType(),
+                        'generatedcsv_id' => $aiProduct->getGeneratedcsvId()
+                    ]);
+                    throw new LocalizedException(__('Failed to save AI product: %1', $saveException->getMessage()), $saveException);
+                }
             }
             
-            $this->logger->info('FileManager saveAiProductData: Successfully saved ' . $savedCount . ' out of ' . count($aiProductData) . ' products');
+            $this->logger->info('FileManager saveAiProductData: Successfully saved ' . $savedCount . ' out of ' . count($aiProductData) . ' products', [
+                'created' => $createdCount,
+                'updated' => $updatedCount
+            ]);
+            
+            return [
+                'total_saved' => $savedCount,
+                'created_count' => $createdCount,
+                'updated_count' => $updatedCount
+            ];
             
         } catch (\Exception $e) {
             $this->logger->error('Error saving AI product data: ' . $e->getMessage());

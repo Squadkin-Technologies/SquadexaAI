@@ -136,7 +136,8 @@ class GenerateAiData extends Action
             }
 
             // Save to AiProduct table with null generatedCsvId for single products
-            $this->fileManager->saveAiProductData($productArray, null, 'single');
+            $saveResult = $this->fileManager->saveAiProductData($productArray, null, 'single');
+            // Note: Update notification not needed here as this is used by the old flow
 
             // Get the saved AI product ID
             $aiProductId = null;

@@ -15,7 +15,7 @@ use Magento\Framework\Message\ManagerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Plugin to redirect to AI Generated Products grid after saving product created from AI
+ * Plugin to redirect to Squadexa AI - Products Data grid after saving product created from AI
  */
 class SavePlugin
 {
@@ -63,7 +63,7 @@ class SavePlugin
     }
 
     /**
-     * Check if product was created from AI and redirect to AI Generated Products grid
+     * Check if product was created from AI and redirect to Squadexa AI - Products Data grid
      *
      * @param Save $subject
      * @param Redirect $result
@@ -133,17 +133,17 @@ class SavePlugin
 
             $aiProductId = $aiProductId ? (int)$aiProductId : null;
 
-            // If AI product ID found, redirect to AI Generated Products grid
+            // If AI product ID found, redirect to Squadexa AI - Products Data grid
             if ($aiProductId && $aiProductId > 0) {
                 $this->messageManager->addSuccessMessage(
                     __('Squadexa AI generated product has been saved.')
                 );
-                $this->logger->info('SavePlugin: Redirecting to AI Generated Products grid', [
+                $this->logger->info('SavePlugin: Redirecting to Squadexa AI - Products Data grid', [
                     'ai_product_id' => $aiProductId,
                     'source' => $source
                 ]);
                 
-                // Redirect to AI Generated Products grid
+                // Redirect to Squadexa AI - Products Data grid
                 $result->setPath('squadkin_squadexaai/aiproduct/index');
                 return $result;
             }

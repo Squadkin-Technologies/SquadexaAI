@@ -684,12 +684,13 @@ define([
                             dataSource.trigger('data.update');
                         }
                         
-                        // Update description and short_description via DOM as fallback
+                        // Update description using new working logic (with dataSource and MutationObserver)
                         if (mappedData.description) {
                             self.descriptionUpdateStatus.attempted = true;
-                            if (self.updateDescriptionContent(mappedData.description)) {
-                                self.descriptionUpdateStatus.updated = true;
-                            }
+                            // Pass dataSource and productId to use the new working logic
+                            self.updateDescriptionContent(mappedData.description, dataSource, productId);
+                            // Note: updateDescriptionContent now uses async MutationObserver, so we can't rely on immediate return
+                            // We'll verify after a longer delay to allow Page Builder to initialize
                         }
                         
                         if (mappedData.short_description) {
@@ -697,15 +698,18 @@ define([
                         }
                         
                         // Double check if description is actually applied
+                        // Wait longer (5 seconds) to allow MutationObserver to find and update Page Builder
                         if (mappedData.description) {
                             setTimeout(function () {
                                 var isDescriptionApplied = self.verifyDescriptionApplied(mappedData.description, dataSource, productId);
                                 
                                 if (!isDescriptionApplied) {
-                                    // Description not applied - show manual copy view
+                                    // Description not applied - show manual copy view as fallback
+                                    console.log('[AI Generator] Description not applied after new logic attempt. Showing manual copy popup.');
                                     self.showDescriptionManualCopyView(mappedData.description);
                                 } else {
                                     // All fields applied successfully
+                                    console.log('[AI Generator] Description successfully applied!');
                                     self.showMessage(
                                         $t('AI data has been applied to the product form successfully!'),
                                         'success'
@@ -715,7 +719,7 @@ define([
                                         $('#squadexa-ai-generator-modal').modal('closeModal');
                                     }, 1500);
                                 }
-                            }, 1000); // Wait 1 second after DOM updates to verify
+                            }, 5000); // Wait 5 seconds to allow MutationObserver to work
                         } else {
                             // No description to verify - close normally
                             self.showMessage(
@@ -743,9 +747,60 @@ define([
 
         /**
          * Update description content for textarea/WYSIWYG/Page Builder
+         * Uses the same working logic as product-form-ai-data-loader.js
+         * Sets data in dataSource first, then uses MutationObserver to detect Page Builder
          */
-        updateDescriptionContent: function (value) {
-            var updated = false;
+        updateDescriptionContent: function (value, dataSource, productId) {
+            var self = this;
+            
+            // Get dataSource and productId if not provided
+            if (!dataSource || !productId) {
+                require(['uiRegistry'], function (registry) {
+                    registry.get('product_form.product_form_data_source', function (ds) {
+                        if (ds && ds.data) {
+                            var keys = Object.keys(ds.data);
+                            productId = keys.length > 0 ? keys[0] : 'product';
+                            dataSource = ds;
+                            self._updateDescriptionWithDataSource(value, dataSource, productId);
+                        }
+                    });
+                });
+                return false; // Will be updated asynchronously
+            }
+            
+            return this._updateDescriptionWithDataSource(value, dataSource, productId);
+        },
+
+        /**
+         * Internal method to update description using dataSource and MutationObserver
+         */
+        _updateDescriptionWithDataSource: function (value, dataSource, productId) {
+            var self = this;
+            
+            console.log('[AI Generator] Setting description in dataSource and waiting for Page Builder to initialize...');
+            
+            // First, set description in dataSource immediately (before Page Builder initializes)
+            if (dataSource && dataSource.data) {
+                if (!dataSource.data[productId]) {
+                    dataSource.data[productId] = {};
+                }
+                if (!dataSource.data[productId].product) {
+                    dataSource.data[productId].product = {};
+                }
+                dataSource.data[productId].product.description = value;
+                
+                // Also set via dataSource.set() to trigger change detection
+                if (dataSource.set) {
+                    try {
+                        dataSource.set(productId + '.product.description', value);
+                        dataSource.set('data.' + productId + '.product.description', value);
+                    } catch (e) {
+                        console.warn('[AI Generator] Error setting description via dataSource.set():', e);
+                    }
+                }
+            }
+            
+            // Also try immediate DOM updates (for non-Page Builder cases)
             var selectors = [
                 '#description',
                 'textarea[name="product[description]"]',
@@ -755,8 +810,7 @@ define([
             selectors.forEach(function (selector) {
                 var $field = $(selector);
                 if ($field.length) {
-                    $field.val(value).trigger('change');
-                    updated = true;
+                    $field.val(value).trigger('change').trigger('input');
                 }
             });
 
@@ -764,11 +818,107 @@ define([
                 var editor = window.tinyMCE.get('description');
                 if (editor) {
                     editor.setContent(value);
-                    updated = true;
                 }
             }
-
-            return updated;
+            
+            // Use MutationObserver to detect when Page Builder initializes in DOM
+            var pageBuilderFound = false;
+            var observerAttempts = 0;
+            var maxObserverAttempts = 60; // 30 seconds total (60 * 500ms)
+            
+            // Function to try updating Page Builder when found
+            var tryUpdatePageBuilder = function() {
+                if (pageBuilderFound) {
+                    return; // Already updated
+                }
+                
+                observerAttempts++;
+                
+                // Look for Page Builder elements in DOM
+                var $descriptionContainer = $('.admin__field[data-index="description"]');
+                if (!$descriptionContainer.length) {
+                    $descriptionContainer = $('#description').closest('.admin__field-control').closest('.admin__field');
+                }
+                
+                if ($descriptionContainer.length) {
+                    // Check for Page Builder stage, iframe, or source textarea
+                    var $pageBuilderStage = $descriptionContainer.find('[data-role="pagebuilder-stage"]');
+                    var $pageBuilderIframe = $descriptionContainer.find('iframe');
+                    var $pageBuilderTextarea = $descriptionContainer.find('textarea[data-role="source"]');
+                    
+                    if ($pageBuilderStage.length || $pageBuilderIframe.length || $pageBuilderTextarea.length) {
+                        console.log('[AI Generator] Page Builder found! Updating description...');
+                        pageBuilderFound = true;
+                        
+                        // Get description value from dataSource
+                        var descriptionValue = value;
+                        if (dataSource && dataSource.data && dataSource.data[productId]) {
+                            descriptionValue = dataSource.data[productId].product.description || value;
+                        }
+                        
+                        // Update Page Builder source textarea if available
+                        if ($pageBuilderTextarea.length) {
+                            $pageBuilderTextarea.val(descriptionValue);
+                            $pageBuilderTextarea.trigger('change').trigger('input').trigger('keyup');
+                        }
+                        
+                        // Force dataSource update and trigger Page Builder to read it
+                        if (dataSource && dataSource.set) {
+                            dataSource.set(productId + '.product.description', descriptionValue);
+                            if (dataSource.trigger) {
+                                dataSource.trigger('data.update');
+                                dataSource.trigger('update');
+                            }
+                        }
+                        
+                        // Try UI Registry to update the field
+                        require(['uiRegistry'], function (registry) {
+                            registry.get('product_form.description', function (field) {
+                                if (field && field.setValue) {
+                                    field.setValue(descriptionValue);
+                                    if (field.trigger) {
+                                        field.trigger('value');
+                                        field.trigger('update');
+                                    }
+                                }
+                            });
+                        });
+                        
+                        console.log('[AI Generator] Description updated in Page Builder!');
+                        
+                        // Mark as updated for verification
+                        self.descriptionUpdateStatus.updated = true;
+                    }
+                }
+                
+                // Continue checking if not found yet
+                if (!pageBuilderFound && observerAttempts < maxObserverAttempts) {
+                    setTimeout(tryUpdatePageBuilder, 500);
+                } else if (!pageBuilderFound) {
+                    console.log('[AI Generator] Page Builder not found. Description is in dataSource.');
+                }
+            };
+            
+            // Use MutationObserver to watch for Page Builder elements
+            if (window.MutationObserver) {
+                var observer = new MutationObserver(function(mutations) {
+                    if (!pageBuilderFound) {
+                        tryUpdatePageBuilder();
+                    }
+                });
+                
+                // Observe the document body for changes
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true,
+                    attributes: false
+                });
+            }
+            
+            // Start checking after a short delay
+            setTimeout(tryUpdatePageBuilder, 2000);
+            
+            return true; // Return true to indicate we're trying
         },
 
         updateShortDescriptionContent: function (value) {

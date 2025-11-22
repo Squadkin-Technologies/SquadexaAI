@@ -2,7 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
 	<menu>
 		<add id="Squadkin_SquadexaAI::squadexaiproductcreator_main_menu" 
-			title="SquadexaAI" 
+			title="Squadexa AI" 
 			module="Squadkin_SquadexaAI" 
 			sortOrder="9999" 
 			parent="Squadkin::top_level"
@@ -22,14 +22,14 @@
              parent="Squadkin_SquadexaAI::squadexaiproductcreator_main_menu"
              action="squadkin_squadexaai/productgeneration/single"/>
 		<add id="Squadkin_SquadexaAI::squadkin_squadexaai_generatedcsv" 
-		    title="Generated Files" 
+		    title="Generated CSV Files" 
 			module="Squadkin_SquadexaAI" 
 			sortOrder="20" 
 			resource="Squadkin_SquadexaAI::squadexaiproductcreator_main_menu" 
 			parent="Squadkin_SquadexaAI::squadexaiproductcreator_main_menu" 
 			action="squadkin_squadexaai/generatedcsv/index"/>
 		<add id="Squadkin_SquadexaAI::squadkin_squadexaai_aiproduct" 
-		    title="AI Generated Products" 
+		    title="Products Data" 
 			module="Squadkin_SquadexaAI" 
 			sortOrder="30" 
 			resource="Squadkin_SquadexaAI::squadexaiproductcreator_main_menu" 

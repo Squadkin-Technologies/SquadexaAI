@@ -58,7 +58,7 @@
 		<plugin name="capture_ai_product_id_before_save" type="Squadkin\SquadexaAI\Plugin\Catalog\Api\ProductRepositoryPlugin" sortOrder="10"/>
 	</type>
 	
-	<!-- Plugin to redirect to AI Generated Products grid after saving product created from AI -->
+	<!-- Plugin to redirect to Squadexa AI - Products Data grid after saving product created from AI -->
 	<type name="Magento\Catalog\Controller\Adminhtml\Product\Save">
 		<plugin name="redirect_to_ai_products_after_save" type="Squadkin\SquadexaAI\Plugin\Catalog\Controller\Adminhtml\Product\SavePlugin" sortOrder="10"/>
 	</type>

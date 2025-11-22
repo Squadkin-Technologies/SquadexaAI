@@ -1,0 +1,43 @@
+<?php
+/**
+ * Copyright © 2024 Squadkin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Squadkin\SquadexaAI\Block\Adminhtml\AiProduct\FieldMappingGuide $block */
+?>
+<?php if (!$block->hasFieldMappings()): ?>
+<div class="message message-warning warning" style="margin-bottom: 20px;">
+    <div>
+        <strong><?= $block->escapeHtml(__('Field Mapping Configuration Required')) ?></strong>
+    </div>
+    <div style="margin-top: 10px;">
+        <p style="margin-bottom: 10px;">
+            <?= $block->escapeHtml(__('Before creating products from AI-generated data, you need to configure field mappings.')) ?>
+        </p>
+        <p style="margin-bottom: 10px;">
+            <strong><?= $block->escapeHtml(__('What are Field Mappings?')) ?></strong><br/>
+            <?= $block->escapeHtml(__('Field mappings tell the system which Magento product attributes to use for each AI-generated field (like description, meta title, etc.).')) ?>
+        </p>
+        <p style="margin-bottom: 10px;">
+            <strong><?= $block->escapeHtml(__('How to Configure:')) ?></strong>
+        </p>
+        <ol style="margin-left: 20px; margin-bottom: 10px;">
+            <li><?= $block->escapeHtml(__('Go to System Configuration')) ?></li>
+            <li><?= $block->escapeHtml(__('Navigate to: Stores → Configuration → Squadkin → Squadexa AI Product Creator')) ?></li>
+            <li><?= $block->escapeHtml(__('Open the "Field Mapping Configuration" section')) ?></li>
+            <li><?= $block->escapeHtml(__('Map each AI field to the corresponding Magento product attribute')) ?></li>
+            <li><?= $block->escapeHtml(__('Click "Save Config" to apply your changes')) ?></li>
+        </ol>
+        <p>
+            <a href="<?= $block->escapeUrl($block->getFieldMappingConfigUrl()) ?>" 
+               class="action-primary" 
+               target="_blank"
+               style="display: inline-block; padding: 8px 15px; background: #eb5202; color: #fff; text-decoration: none; border-radius: 3px;">
+                <?= $block->escapeHtml(__('Configure Field Mappings Now')) ?>
+            </a>
+        </p>
+    </div>
+</div>
+<?php endif; ?>
+

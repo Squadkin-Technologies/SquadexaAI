@@ -441,10 +441,73 @@ define([
                     }
                 });
 
-                // Wait a bit for async field operations
+                // Wait a bit for async field operations, then handle description/short_description specifically
+                var handleDescriptionFields = function () {
+                    // CRITICAL: Set description in dataSource FIRST, before Page Builder initializes
+                    // This way Page Builder will read it when it initializes
+                    var descriptionValue = self.aiData.description;
+                    var shortDescriptionValue = self.aiData.short_description;
+                    
+                    if (descriptionValue && dataSource) {
+                        console.log('[AI Data Loader] Setting description in dataSource FIRST (before Page Builder init)...');
+                        // Set in dataSource immediately so Page Builder reads it on init
+                        if (!dataSource.data[productId]) {
+                            dataSource.data[productId] = {};
+                        }
+                        if (!dataSource.data[productId].product) {
+                            dataSource.data[productId].product = {};
+                        }
+                        dataSource.data[productId].product.description = descriptionValue;
+                        
+                        // Also set via dataSource.set() to trigger change detection
+                        if (dataSource.set) {
+                            try {
+                                dataSource.set(productId + '.product.description', descriptionValue);
+                                dataSource.set('data.' + productId + '.product.description', descriptionValue);
+                            } catch (e) {
+                                console.warn('[AI Data Loader] Error setting description via dataSource.set():', e);
+                            }
+                        }
+                        console.log('[AI Data Loader] ✓ Description set in dataSource - Page Builder should read this on init');
+                    }
+                    
+                    // Trigger data update
+                    if (dataSource.trigger) {
+                        dataSource.trigger('data.update');
+                    }
+                    
+                    // Now update description and short_description via DOM as fallback (for Page Builder support)
+                    if (descriptionValue) {
+                        console.log('[AI Data Loader] Updating description field with Page Builder support...');
+                        self.updateDescriptionContent(descriptionValue, dataSource, productId);
+                    }
+                    
+                    if (shortDescriptionValue) {
+                        console.log('[AI Data Loader] Updating short_description field...');
+                        self.updateShortDescriptionContent(shortDescriptionValue);
+                    }
+                };
+                
                 if (pendingCount > 0) {
                     setTimeout(function () {
                         console.log('[AI Data Loader] Values set - Success: ' + successCount + ', Failed: ' + failCount);
+                        handleDescriptionFields();
+                        
+                        setTimeout(function () {
+                            if (failCount > 0 || successCount === 0) {
+                                console.warn('[AI Data Loader] Some values could not be set, showing popup for manual entry');
+                                self.showFallbackPopup();
+                            } else {
+                                console.log('[AI Data Loader] All values set successfully!');
+                                self.showSuccessMessage();
+                            }
+                        }, 1000);
+                    }, 2000);
+                } else {
+                    console.log('[AI Data Loader] Values set - Success: ' + successCount + ', Failed: ' + failCount);
+                    handleDescriptionFields();
+                    
+                    setTimeout(function () {
                         if (failCount > 0 || successCount === 0) {
                             console.warn('[AI Data Loader] Some values could not be set, showing popup for manual entry');
                             self.showFallbackPopup();
@@ -452,20 +515,282 @@ define([
                             console.log('[AI Data Loader] All values set successfully!');
                             self.showSuccessMessage();
                         }
-                    }, 2000);
-                } else {
-                    console.log('[AI Data Loader] Values set - Success: ' + successCount + ', Failed: ' + failCount);
-                    if (failCount > 0 || successCount === 0) {
-                        console.warn('[AI Data Loader] Some values could not be set, showing popup for manual entry');
-                        setTimeout(function () {
-                            self.showFallbackPopup();
-                        }, 1000);
-                    } else {
-                        console.log('[AI Data Loader] All values set successfully!');
-                        self.showSuccessMessage();
-                    }
+                    }, 1000);
                 }
             });
+        },
+
+        /**
+         * Update description content for textarea/WYSIWYG/Page Builder
+         * Uses MutationObserver to detect when Page Builder initializes
+         */
+        updateDescriptionContent: function (value, dataSource, productId) {
+            var self = this;
+            var descriptionApplied = false;
+            
+            console.log('[AI Data Loader] Setting description in dataSource and waiting for Page Builder to initialize...');
+            
+            // First, set description in dataSource immediately (before Page Builder initializes)
+            if (dataSource && dataSource.data) {
+                if (!dataSource.data[productId]) {
+                    dataSource.data[productId] = {};
+                }
+                if (!dataSource.data[productId].product) {
+                    dataSource.data[productId].product = {};
+                }
+                dataSource.data[productId].product.description = value;
+                
+                // Also set via dataSource.set() to trigger change detection
+                if (dataSource.set) {
+                    try {
+                        dataSource.set(productId + '.product.description', value);
+                        dataSource.set('data.' + productId + '.product.description', value);
+                    } catch (e) {
+                        console.warn('[AI Data Loader] Error setting description via dataSource.set():', e);
+                    }
+                }
+            }
+            
+            // Function to verify if description was actually applied
+            var verifyDescriptionApplied = function() {
+                if (descriptionApplied) {
+                    return true;
+                }
+                
+                // Check dataSource
+                if (dataSource && dataSource.data && dataSource.data[productId]) {
+                    var dataSourceValue = dataSource.data[productId].product.description || '';
+                    if (dataSourceValue && dataSourceValue.trim() === value.trim()) {
+                        // Check if Page Builder has it
+                        var $descriptionContainer = $('.admin__field[data-index="description"]');
+                        if (!$descriptionContainer.length) {
+                            $descriptionContainer = $('#description').closest('.admin__field-control').closest('.admin__field');
+                        }
+                        
+                        if ($descriptionContainer.length) {
+                            var $pageBuilderTextarea = $descriptionContainer.find('textarea[data-role="source"]');
+                            if ($pageBuilderTextarea.length) {
+                                var pbValue = $pageBuilderTextarea.val() || '';
+                                if (pbValue.trim() === value.trim() || pbValue.indexOf(value.trim()) !== -1) {
+                                    descriptionApplied = true;
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+                return false;
+            };
+            
+            // Use MutationObserver to detect when Page Builder initializes in DOM
+            var pageBuilderFound = false;
+            var observerAttempts = 0;
+            var maxObserverAttempts = 80; // 40 seconds total (80 * 500ms)
+            var updateAttempts = 0;
+            var maxUpdateAttempts = 10; // Try updating up to 10 times even after finding Page Builder
+            
+            // Function to try updating Page Builder when found
+            var tryUpdatePageBuilder = function() {
+                if (descriptionApplied && verifyDescriptionApplied()) {
+                    return; // Already applied and verified
+                }
+                
+                observerAttempts++;
+                
+                // Look for Page Builder elements in DOM
+                var $descriptionContainer = $('.admin__field[data-index="description"]');
+                if (!$descriptionContainer.length) {
+                    $descriptionContainer = $('#description').closest('.admin__field-control').closest('.admin__field');
+                }
+                
+                if ($descriptionContainer.length) {
+                    // Check for Page Builder stage, iframe, or source textarea
+                    var $pageBuilderStage = $descriptionContainer.find('[data-role="pagebuilder-stage"]');
+                    var $pageBuilderIframe = $descriptionContainer.find('iframe');
+                    var $pageBuilderTextarea = $descriptionContainer.find('textarea[data-role="source"]');
+                    
+                    if ($pageBuilderStage.length || $pageBuilderIframe.length || $pageBuilderTextarea.length) {
+                        if (!pageBuilderFound) {
+                            console.log('[AI Data Loader] Page Builder found! Updating description...');
+                            pageBuilderFound = true;
+                        }
+                        
+                        // Get description value from dataSource
+                        var descriptionValue = value;
+                        if (dataSource && dataSource.data && dataSource.data[productId]) {
+                            descriptionValue = dataSource.data[productId].product.description || value;
+                        }
+                        
+                        updateAttempts++;
+                        
+                        // Method 1: Update Page Builder source textarea if available
+                        if ($pageBuilderTextarea.length) {
+                            $pageBuilderTextarea.val(descriptionValue);
+                            $pageBuilderTextarea.trigger('change').trigger('input').trigger('keyup').trigger('blur');
+                            
+                            // Also try setting it multiple times to ensure it sticks
+                            setTimeout(function() {
+                                $pageBuilderTextarea.val(descriptionValue);
+                                $pageBuilderTextarea.trigger('change').trigger('input');
+                            }, 100);
+                        }
+                        
+                        // Method 2: Force dataSource update and trigger Page Builder to read it
+                        if (dataSource && dataSource.set) {
+                            dataSource.set(productId + '.product.description', descriptionValue);
+                            if (dataSource.trigger) {
+                                dataSource.trigger('data.update');
+                                dataSource.trigger('update');
+                                dataSource.trigger('reload');
+                            }
+                        }
+                        
+                        // Method 3: Try UI Registry to update the field
+                        require(['uiRegistry'], function (registry) {
+                            registry.get('product_form.description', function (field) {
+                                if (field) {
+                                    if (field.setValue) {
+                                        field.setValue(descriptionValue);
+                                    }
+                                    if (field.set) {
+                                        field.set('value', descriptionValue);
+                                    }
+                                    if (field.trigger) {
+                                        field.trigger('value');
+                                        field.trigger('update');
+                                        field.trigger('data');
+                                    }
+                                    
+                                    // Try to find Page Builder in the field
+                                    if (field.content_type && field.content_type.pagebuilder) {
+                                        var pb = field.content_type.pagebuilder;
+                                        if (pb.setValue) {
+                                            pb.setValue(descriptionValue);
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                        
+                        // Method 4: Try window.PageBuilder if available
+                        if (window.PageBuilder) {
+                            try {
+                                if (typeof window.PageBuilder.setContent === 'function') {
+                                    window.PageBuilder.setContent('description', descriptionValue);
+                                }
+                                if (typeof window.PageBuilder.updateContent === 'function') {
+                                    window.PageBuilder.updateContent('description', descriptionValue);
+                                }
+                            } catch (e) {
+                                // Ignore errors
+                            }
+                        }
+                        
+                        // Verify if it was applied
+                        setTimeout(function() {
+                            if (verifyDescriptionApplied()) {
+                                descriptionApplied = true;
+                                console.log('[AI Data Loader] ✓ Description successfully applied to Page Builder!');
+                            } else if (updateAttempts < maxUpdateAttempts) {
+                                // Try again
+                                setTimeout(tryUpdatePageBuilder, 1000);
+                            }
+                        }, 500);
+                    }
+                }
+                
+                // Continue checking if not found yet or not applied yet
+                if ((!pageBuilderFound || !descriptionApplied) && observerAttempts < maxObserverAttempts) {
+                    setTimeout(tryUpdatePageBuilder, 500);
+                } else if (!pageBuilderFound) {
+                    console.log('[AI Data Loader] Page Builder not found. Description is in dataSource and will show on page refresh.');
+                } else if (!descriptionApplied) {
+                    console.log('[AI Data Loader] Page Builder found but description not applied. It may appear after page refresh.');
+                }
+            };
+            
+            // Use MutationObserver to watch for Page Builder elements
+            if (window.MutationObserver) {
+                var observer = new MutationObserver(function(mutations) {
+                    if (!descriptionApplied) {
+                        tryUpdatePageBuilder();
+                    }
+                });
+                
+                // Observe the document body for changes
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true,
+                    attributes: false
+                });
+            }
+            
+            // Start checking immediately and periodically
+            setTimeout(tryUpdatePageBuilder, 1000);
+            setTimeout(tryUpdatePageBuilder, 3000);
+            setTimeout(tryUpdatePageBuilder, 5000);
+            setTimeout(tryUpdatePageBuilder, 8000);
+            
+            return true;
+        },
+
+        /**
+         * Update short description content
+         */
+        updateShortDescriptionContent: function (value) {
+            var updated = false;
+            var selectors = [
+                '#short_description',
+                'textarea[name="product[short_description]"]',
+                'textarea[name="product[product][short_description]"]'
+            ];
+
+            selectors.forEach(function (selector) {
+                var $field = $(selector);
+                if ($field.length) {
+                    $field.val(value).trigger('change').trigger('input');
+                    console.log('[AI Data Loader] Set short_description via DOM selector: ' + selector);
+                    updated = true;
+                }
+            });
+
+            if (window.tinyMCE && typeof window.tinyMCE.get === 'function') {
+                var editor = window.tinyMCE.get('short_description');
+                if (editor) {
+                    editor.setContent(value);
+                    console.log('[AI Data Loader] Set short_description via TinyMCE editor');
+                    updated = true;
+                }
+            }
+            
+            // Try to update via UI registry
+            setTimeout(function () {
+                require(['uiRegistry'], function (registry) {
+                    registry.get('product_form.short_description', function (field) {
+                        if (field) {
+                            try {
+                                if (field.setValue) {
+                                    field.setValue(value);
+                                } else if (field.value !== undefined) {
+                                    if (typeof field.value === 'function') {
+                                        field.value(value);
+                                    } else {
+                                        field.value = value;
+                                    }
+                                }
+                                
+                                if (field.trigger) {
+                                    field.trigger('value');
+                                }
+                            } catch (e) {
+                                console.warn('[AI Data Loader] Error setting short_description via field:', e);
+                            }
+                        }
+                    });
+                });
+            }, 500);
+
+            return updated;
         },
 
         /**
@@ -539,35 +864,67 @@ define([
             var self = this;
             var appliedCount = 0;
 
-            Object.keys(this.aiData).forEach(function (attributeCode) {
-                var value = self.aiData[attributeCode];
-                var fieldPath = self.formName + '.' + attributeCode;
+            // Get data source and product ID for description handling
+            registry.get(this.dataSourceName, function (dataSource) {
+                var productId = null;
+                if (dataSource && dataSource.data) {
+                    var keys = Object.keys(dataSource.data);
+                    if (keys.length > 0) {
+                        productId = keys[0];
+                    } else {
+                        productId = 'new';
+                    }
+                } else {
+                    productId = 'new';
+                }
 
-                registry.get(fieldPath, function (field) {
-                    if (field) {
-                        try {
-                            if (field.setValue) {
-                                field.setValue(value);
-                                appliedCount++;
-                            } else if (field.value) {
-                                field.value(value);
-                                appliedCount++;
-                            }
-                        } catch (e) {
-                            console.error('[AI Data Loader] Error applying ' + attributeCode + ':', e);
+                Object.keys(self.aiData).forEach(function (attributeCode) {
+                    var value = self.aiData[attributeCode];
+                    
+                    // Special handling for description and short_description
+                    if (attributeCode === 'description') {
+                        if (self.updateDescriptionContent(value, dataSource, productId)) {
+                            appliedCount++;
                         }
+                    } else if (attributeCode === 'short_description') {
+                        if (self.updateShortDescriptionContent(value)) {
+                            appliedCount++;
+                        }
+                    } else {
+                        // Regular field handling
+                        var fieldPath = self.formName + '.' + attributeCode;
+
+                        registry.get(fieldPath, function (field) {
+                            if (field) {
+                                try {
+                                    if (field.setValue) {
+                                        field.setValue(value);
+                                        appliedCount++;
+                                    } else if (field.value) {
+                                        if (typeof field.value === 'function') {
+                                            field.value(value);
+                                        } else {
+                                            field.value = value;
+                                        }
+                                        appliedCount++;
+                                    }
+                                } catch (e) {
+                                    console.error('[AI Data Loader] Error applying ' + attributeCode + ':', e);
+                                }
+                            }
+                        });
                     }
                 });
-            });
 
-            console.log('[AI Data Loader] Manually applied ' + appliedCount + ' fields');
-            
-            if (appliedCount > 0) {
-                $('body').notification('clear').notification('add', {
-                    message: $t('Applied AI data to ' + appliedCount + ' field(s).'),
-                    level: 'success'
-                });
-            }
+                console.log('[AI Data Loader] Manually applied ' + appliedCount + ' fields');
+                
+                if (appliedCount > 0) {
+                    $('body').notification('clear').notification('add', {
+                        message: $t('Applied AI data to ' + appliedCount + ' field(s).'),
+                        level: 'success'
+                    });
+                }
+            });
         }
     };
 

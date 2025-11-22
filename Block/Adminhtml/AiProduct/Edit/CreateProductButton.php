@@ -10,7 +10,7 @@ namespace Squadkin\SquadexaAI\Block\Adminhtml\AiProduct\Edit;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
 /**
- * Create Product from AI Button
+ * Create Product from AI Data Button
  */
 class CreateProductButton extends GenericButton implements ButtonProviderInterface
 {
@@ -25,7 +25,7 @@ class CreateProductButton extends GenericButton implements ButtonProviderInterfa
         // Don't show button if product is already created in Magento
         if ($aiproductId && !$this->isCreatedInMagento()) {
             $data = [
-                'label' => __('Create Product from AI'),
+                'label' => __('Create Product from AI Data'),
                 'class' => 'primary',
                 'on_click' => 'window.createProductFromAiModal && window.createProductFromAiModal.open(' . $aiproductId . ')',
                 'sort_order' => 20,

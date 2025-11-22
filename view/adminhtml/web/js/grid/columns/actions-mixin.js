@@ -48,6 +48,19 @@ define([
                     };
                 }
                 
+                // Handle our update_product action
+                if (action && action.index === 'update_product') {
+                    console.log('[AI Product Actions] Creating custom handler for update_product');
+                    var rowIndex = action.rowIndex;
+                    var self = this;
+                    
+                    return function() {
+                        console.log('[AI Product Actions] Custom handler executed for update_product');
+                        self.applyAction('update_product', rowIndex);
+                        return false;
+                    };
+                }
+                
                 // Use default behavior for other actions
                 var result = this._super(action);
                 console.log('[AI Product Actions] getActionHandler result:', result);
@@ -63,9 +76,9 @@ define([
              * @returns {Boolean}
              */
             isHandlerRequired: function (actionIndex, rowIndex) {
-                // Force handler for our create_product action
-                if (actionIndex === 'create_product') {
-                    console.log('[AI Product Actions] isHandlerRequired: true for create_product');
+                // Force handler for our create_product and update_product actions
+                if (actionIndex === 'create_product' || actionIndex === 'update_product') {
+                    console.log('[AI Product Actions] isHandlerRequired: true for', actionIndex);
                     return true;
                 }
                 
@@ -176,6 +189,97 @@ define([
                             console.error('[AI Product Actions] Failed to load modal module:', err);
                         });
                     }
+                    return this;
+                }
+                
+                // Handle our custom "update_product" action
+                // Reuse the same flow as "create product" - redirect to product edit page with ai_data parameter
+                if (actionIndex === 'update_product') {
+                    console.log('[AI Product Actions] Handling update_product action');
+                    
+                    var action = this.getAction(rowIndex, actionIndex);
+                    var recordId = null;
+                    var magentoProductId = null;
+                    
+                    // Try multiple ways to get the aiproduct_id and magento_product_id
+                    var rowData = null;
+                    if (this.rows && Array.isArray(this.rows) && this.rows[rowIndex]) {
+                        rowData = this.rows[rowIndex];
+                    } else if (this.source && this.source.data && this.source.data.items) {
+                        rowData = this.source.data.items[rowIndex];
+                    }
+                    
+                    if (rowData) {
+                        if (rowData.aiproduct_id) {
+                            recordId = rowData.aiproduct_id;
+                        }
+                        if (rowData.magento_product_id) {
+                            magentoProductId = rowData.magento_product_id;
+                        }
+                    }
+                    
+                    // Fallback: try action object
+                    if (!recordId && action && action.recordId) {
+                        recordId = action.recordId;
+                    }
+                    
+                    var aiproductId = parseInt(recordId, 10);
+                    magentoProductId = parseInt(magentoProductId, 10) || null;
+                    
+                    if (isNaN(aiproductId) || !aiproductId) {
+                        alert('Unable to determine AI Product ID. Please refresh the page and try again.');
+                        return this;
+                    }
+                    
+                    if (!magentoProductId || isNaN(magentoProductId)) {
+                        alert('Unable to determine Magento Product ID. This product may not have been created in Magento yet.');
+                        return this;
+                    }
+                    
+                    // Confirm update
+                    if (!confirm('You will be redirected to the product edit page where you can review and apply the latest AI-generated data. Continue?')) {
+                        return this;
+                    }
+                    
+                    // Redirect to product edit page with ai_data parameter (same as create flow)
+                    require(['mage/url'], function (urlBuilder) {
+                        // Extract base URL and secret key from current page
+                        var currentUrl = window.location.href;
+                        var baseUrlMatch = currentUrl.match(/^(https?:\/\/[^\/]+)/);
+                        var baseUrl = baseUrlMatch ? baseUrlMatch[1] : window.location.origin;
+                        
+                        // Extract secret key from current URL
+                        var keyMatch = currentUrl.match(/\/key\/([^\/\?]+)/);
+                        var secretKey = keyMatch ? keyMatch[1] : '';
+                        
+                        // Build absolute URL to product edit page
+                        var editUrl;
+                        if (secretKey) {
+                            editUrl = baseUrl + '/admin/catalog/product/edit/id/' + magentoProductId + '/key/' + secretKey + '/';
+                        } else {
+                            // Fallback: use urlBuilder (might be relative, but better than nothing)
+                            editUrl = urlBuilder.build('catalog/product/edit', {
+                                id: magentoProductId
+                            });
+                            // If it's relative, make it absolute
+                            if (editUrl.indexOf('http') !== 0) {
+                                editUrl = baseUrl + editUrl;
+                            }
+                        }
+                        
+                        // Add ai_data as query parameter
+                        var separator = editUrl.indexOf('?') !== -1 ? '&' : '?';
+                        var redirectUrl = editUrl + separator + 'ai_data=' + encodeURIComponent(aiproductId);
+                        
+                        console.log('[AI Product Actions] Redirecting to product edit page:', redirectUrl);
+                        console.log('[AI Product Actions] Magento Product ID:', magentoProductId);
+                        console.log('[AI Product Actions] AI Product ID:', aiproductId);
+                        
+                        // Redirect to product edit page
+                        // The existing product-form-ai-data-loader.js will automatically load the AI data
+                        window.location.href = redirectUrl;
+                    });
+                    
                     return this;
                 }
 

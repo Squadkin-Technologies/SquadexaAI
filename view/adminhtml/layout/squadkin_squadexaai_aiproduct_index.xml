@@ -3,6 +3,14 @@
     <update handle="styles"/>
     <body>
         <referenceContainer name="content">
+            <block class="Squadkin\SquadexaAI\Block\Adminhtml\Messages\HtmlSuccessMessage" 
+                   name="squadexa.html.success.message" 
+                   template="Squadkin_SquadexaAI::messages/html-success-message.phtml" 
+                   before="-"/>
+            <block class="Squadkin\SquadexaAI\Block\Adminhtml\AiProduct\FieldMappingGuide" 
+                   name="aiproduct.field.mapping.guide" 
+                   template="Squadkin_SquadexaAI::aiproduct/field-mapping-guide.phtml" 
+                   after="squadexa.html.success.message"/>
             <uiComponent name="squadkin_squadexaai_aiproduct_listing"/>
             <block class="Magento\Backend\Block\Template" name="create.product.modal" template="Squadkin_SquadexaAI::create-product-modal.phtml" after="-"/>
         </referenceContainer>

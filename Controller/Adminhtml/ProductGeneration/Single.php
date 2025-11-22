@@ -13,6 +13,7 @@ use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\Serializer\Json;
+use Magento\Framework\Session\SessionManagerInterface;
 use Squadkin\SquadexaAI\Service\SquadexaApiService;
 use Squadkin\SquadexaAI\Logger\Logger as SquadexaLogger;
 use Squadkin\SquadexaAI\Api\AiProductRepositoryInterface;
@@ -80,6 +81,11 @@ class Single extends Action
     protected $fileManager;
 
     /**
+     * @var SessionManagerInterface
+     */
+    protected $session;
+
+    /**
      * Constructor
      *
      * @param Context $context
@@ -94,6 +100,7 @@ class Single extends Action
      * @param GeneratedCsvInterfaceFactory $generatedCsvFactory
      * @param FileManager $fileManager
      * @param Json $jsonSerializer
+     * @param SessionManagerInterface $session
      */
     public function __construct(
         Context $context,
@@ -107,7 +114,8 @@ class Single extends Action
         GeneratedCsvRepositoryInterface $generatedCsvRepository,
         GeneratedCsvInterfaceFactory $generatedCsvFactory,
         FileManager $fileManager,
-        Json $jsonSerializer
+        Json $jsonSerializer,
+        SessionManagerInterface $session
     ) {
         $this->resultPageFactory = $resultPageFactory;
         $this->jsonFactory = $jsonFactory;
@@ -120,6 +128,7 @@ class Single extends Action
         $this->generatedCsvFactory = $generatedCsvFactory;
         $this->fileManager = $fileManager;
         $this->jsonSerializer = $jsonSerializer;
+        $this->session = $session;
         parent::__construct($context);
     }
 
@@ -201,7 +210,40 @@ class Single extends Action
             }
             
             // Save to AiProduct table with null generatedCsvId for single products
-            $this->fileManager->saveAiProductData($productArray, null, 'single');
+            $saveResult = $this->fileManager->saveAiProductData($productArray, null, 'single');
+            $isUpdate = $saveResult['updated_count'] > 0;
+
+            // Build URLs for guidance
+            $aiProductGridUrl = $this->getUrl('squadkin_squadexaai/aiproduct/index');
+            $fieldMappingConfigUrl = $this->getUrl('adminhtml/system_config/edit/section/squadexaiproductcreator', ['_fragment' => 'squadexaiproductcreator_field_mapping-link']);
+            
+            // Create comprehensive success message with step-by-step guidance
+            if ($isUpdate) {
+                $successMessage = '<strong>Product updated successfully!</strong><br/>' .
+                    '<p style="margin-top: 10px; margin-bottom: 5px;">An existing product with the same name was found and updated with the latest AI-generated data.</p>' .
+                    '<p style="margin-top: 10px; margin-bottom: 5px;"><strong>What\'s Next?</strong></p>' .
+                    '<p style="margin-bottom: 5px;">You can now view this product in the <a href="' . $aiProductGridUrl . '" target="_blank"><strong>Squadexa AI - Products Data</strong></a> grid. From there you can:</p>' .
+                    '<ul style="margin-left: 20px; margin-top: 5px; margin-bottom: 10px;">' .
+                    '<li>View and edit the updated AI-generated product response</li>' .
+                    '<li>If the product is already created in Magento, use "Update Product in Magento" to sync the latest changes</li>' .
+                    '<li>Or create a new product using the "Create Product from AI Data" action</li>' .
+                    '</ul>' .
+                    '<p style="margin-bottom: 5px;"><strong>Important:</strong> Before creating or updating products, make sure you have configured field mappings in <a href="' . $fieldMappingConfigUrl . '" target="_blank"><strong>System Configuration → Field Mapping</strong></a>.</p>';
+            } else {
+                $successMessage = '<strong>Product generated successfully!</strong><br/>' .
+                    '<p style="margin-top: 10px; margin-bottom: 5px;"><strong>What\'s Next?</strong></p>' .
+                    '<p style="margin-bottom: 5px;">You can now view this product in the <a href="' . $aiProductGridUrl . '" target="_blank"><strong>Squadexa AI - Products Data</strong></a> grid. From there you can:</p>' .
+                    '<ul style="margin-left: 20px; margin-top: 5px; margin-bottom: 10px;">' .
+                    '<li>View and edit the AI-generated product response</li>' .
+                    '<li>Create the product using the "Create Product from AI Data" action in the grid</li>' .
+                    '<li>Or edit the product and create it from the edit page</li>' .
+                    '</ul>' .
+                    '<p style="margin-bottom: 5px;"><strong>Important:</strong> Before creating the product, make sure you have configured field mappings in <a href="' . $fieldMappingConfigUrl . '" target="_blank"><strong>System Configuration → Field Mapping</strong></a>.</p>' .
+                    '<p style="margin-bottom: 5px;">Field mappings tell the system which Magento product attributes to use for each AI-generated field.</p>';
+            }
+            
+            // Store HTML message in session to be displayed on AI Product grid page after redirect
+            $this->session->setData('squadexa_html_success_message', $successMessage);
 
             return $result->setData([
                 'success' => true,

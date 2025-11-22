@@ -1,0 +1,16 @@
+<?php
+/**
+ * Copyright © 2024 Squadkin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Squadkin\SquadexaAI\Block\Adminhtml\Messages\HtmlSuccessMessage $block */
+?>
+<?php if ($block->hasMessage()): ?>
+<div class="message message-success success">
+    <div>
+        <?= /* @noEscape */ $block->getHtmlMessage() ?>
+    </div>
+</div>
+<?php endif; ?>
+
