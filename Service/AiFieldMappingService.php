@@ -103,19 +103,7 @@ class AiFieldMappingService
     ): array {
         try {
             // Validate that field mappings are configured
-            $fieldMappings = $this->fieldMappingHelper->getFieldMappings();
-            if (empty($fieldMappings)) {
-                $configUrl = $this->urlBuilder->getUrl(
-                    'adminhtml/system_config/edit/section/squadexaiproductcreator',
-                    ['_fragment' => 'squadexaiproductcreator_field_mapping-link']
-                );
-                throw new LocalizedException(__(
-                    'Field mapping configuration is required before creating products from AI data. ' .
-                    'Please configure field mappings in <a href="%1" target="_blank">System Configuration → Field Mapping</a>. ' .
-                    'Field mappings tell the system which Magento product attributes to use for each AI-generated field.',
-                    $configUrl
-                ));
-            }
+            $this->validateFieldMappings('creating products');
 
             // Get AI Product
             $aiProduct = $this->aiProductRepository->get($aiProductId);
@@ -176,19 +164,7 @@ class AiFieldMappingService
     ): ProductInterface {
         try {
             // Validate that field mappings are configured
-            $fieldMappings = $this->fieldMappingHelper->getFieldMappings();
-            if (empty($fieldMappings)) {
-                $configUrl = $this->urlBuilder->getUrl(
-                    'adminhtml/system_config/edit/section/squadexaiproductcreator',
-                    ['_fragment' => 'squadexaiproductcreator_field_mapping-link']
-                );
-                throw new LocalizedException(__(
-                    'Field mapping configuration is required before updating products from AI data. ' .
-                    'Please configure field mappings in <a href="%1" target="_blank">System Configuration → Field Mapping</a>. ' .
-                    'Field mappings tell the system which Magento product attributes to use for each AI-generated field.',
-                    $configUrl
-                ));
-            }
+            $this->validateFieldMappings('updating products');
 
             // Get existing product
             $product = $this->productRepository->getById($productId);
@@ -222,6 +198,31 @@ class AiFieldMappingService
                 'exception' => $e
             ]);
             throw new LocalizedException(__('Error updating product from AI: %1', $e->getMessage()), $e);
+        }
+    }
+
+    /**
+     * Validate that field mappings are configured
+     *
+     * @param string $action Description of the action (e.g., 'creating products', 'updating products')
+     * @return void
+     * @throws LocalizedException
+     */
+    private function validateFieldMappings(string $action): void
+    {
+        $fieldMappings = $this->fieldMappingHelper->getFieldMappings();
+        if (empty($fieldMappings)) {
+            $configUrl = $this->urlBuilder->getUrl(
+                'adminhtml/system_config/edit/section/squadexaiproductcreator',
+                ['_fragment' => 'squadexaiproductcreator_field_mapping-link']
+            );
+            throw new LocalizedException(__(
+                'Field mapping configuration is required before %1 from AI data. ' .
+                'Please configure field mappings in <a href="%2" target="_blank">System Configuration → Field Mapping</a>. ' .
+                'Field mappings tell the system which Magento product attributes to use for each AI-generated field.',
+                $action,
+                $configUrl
+            ));
         }
     }
 

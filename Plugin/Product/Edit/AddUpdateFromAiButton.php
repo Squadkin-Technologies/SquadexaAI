@@ -41,14 +41,6 @@ class AddUpdateFromAiButton
                         'ui-id' => 'squadexa-ai-generate-button'
                     ]
                 ];
-                
-                // Keep existing "Update from AI" button for backward compatibility
-                $result['update_from_ai'] = [
-                    'label' => __('Update from AI'),
-                    'class' => 'action-secondary',
-                    'on_click' => 'window.updateProductFromAiModal && window.updateProductFromAiModal.open(' . $productId . ')',
-                    'sort_order' => 50,
-                ];
             }
         } catch (\Exception $e) {
             // If getProduct() doesn't exist or fails, skip adding the button

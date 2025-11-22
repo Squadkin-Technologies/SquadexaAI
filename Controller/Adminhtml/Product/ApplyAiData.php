@@ -86,7 +86,7 @@ class ApplyAiData extends Action
             $product = $this->productRepository->getById($productId);
 
             // Map and apply AI data
-            $mappedData = $this->mappingService->mapAiProductToMagentoProduct($aiProductId, $product->getTypeId());
+            $mappedData = $this->mappingService->mapAiProductToMagento($aiProductId, $product->getTypeId());
 
             // Apply mapped data to product
             foreach ($mappedData as $attributeCode => $value) {
