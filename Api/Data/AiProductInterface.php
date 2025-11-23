@@ -9,499 +9,609 @@ namespace Squadkin\SquadexaAI\Api\Data;
 
 interface AiProductInterface
 {
-    const AIPRODUCT_ID = 'aiproduct_id';
-    const GENERATEDCSV_ID = 'generatedcsv_id';
-    const PRODUCT_NAME = 'product_name';
-    const META_TITLE = 'meta_title';
-    const META_DESCRIPTION = 'meta_description';
-    const SHORT_DESCRIPTION = 'short_description';
-    const DESCRIPTION = 'description';
-    const KEY_FEATURES = 'key_features';
-    const HOW_TO_USE = 'how_to_use';
-    const INGREDIENTS = 'ingredients';
-    const UPC = 'upc';
-    const KEYWORDS = 'keywords';
-    const PRICING_USD_MIN = 'pricing_usd_min';
-    const PRICING_USD_MAX = 'pricing_usd_max';
-    const PRICING_CAD_MIN = 'pricing_cad_min';
-    const PRICING_CAD_MAX = 'pricing_cad_max';
-    const ADDITIONAL_INFORMATION = 'additional_information';
-    const MAGENTO_PRODUCT_ID = 'magento_product_id';
-    const IS_CREATED_IN_MAGENTO = 'is_created_in_magento';
-    const GENERATION_TYPE = 'generation_type';
-    const PRIMARY_KEYWORDS = 'primary_keywords';
-    const SECONDARY_KEYWORDS = 'secondary_keywords';
-    const AI_RESPONSE = 'ai_response';
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
+    public const AIPRODUCT_ID = 'aiproduct_id';
+    public const GENERATEDCSV_ID = 'generatedcsv_id';
+    public const PRODUCT_NAME = 'product_name';
+    public const META_TITLE = 'meta_title';
+    public const META_DESCRIPTION = 'meta_description';
+    public const SHORT_DESCRIPTION = 'short_description';
+    public const DESCRIPTION = 'description';
+    public const KEY_FEATURES = 'key_features';
+    public const HOW_TO_USE = 'how_to_use';
+    public const INGREDIENTS = 'ingredients';
+    public const UPC = 'upc';
+    public const KEYWORDS = 'keywords';
+    public const PRICING_USD_MIN = 'pricing_usd_min';
+    public const PRICING_USD_MAX = 'pricing_usd_max';
+    public const PRICING_CAD_MIN = 'pricing_cad_min';
+    public const PRICING_CAD_MAX = 'pricing_cad_max';
+    public const ADDITIONAL_INFORMATION = 'additional_information';
+    public const MAGENTO_PRODUCT_ID = 'magento_product_id';
+    public const IS_CREATED_IN_MAGENTO = 'is_created_in_magento';
+    public const GENERATION_TYPE = 'generation_type';
+    public const PRIMARY_KEYWORDS = 'primary_keywords';
+    public const SECONDARY_KEYWORDS = 'secondary_keywords';
+    public const AI_RESPONSE = 'ai_response';
+    public const CREATED_AT = 'created_at';
+    public const UPDATED_AT = 'updated_at';
 
     /**
      * Get aiproduct_id
+     *
      * @return string|null
      */
     public function getAiproductId();
 
     /**
      * Set aiproduct_id
+     *
      * @param string $aiproductId
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setAiproductId($aiproductId);
 
     /**
      * Get generatedcsv_id
+     *
      * @return int|null
      */
     public function getGeneratedcsvId();
 
     /**
      * Set generatedcsv_id
+     *
      * @param int $generatedcsvId
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setGeneratedcsvId($generatedcsvId);
 
     /**
      * Get product_name
+     *
      * @return string|null
      */
     public function getProductName();
 
     /**
      * Set product_name
+     *
      * @param string $productName
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setProductName($productName);
 
     /**
      * Get additional_information
+     *
      * @return string|null
      */
     public function getAdditionalInformation();
 
     /**
      * Set additional_information
+     *
      * @param string $additionalInformation
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setAdditionalInformation($additionalInformation);
 
     /**
      * Get description
+     *
      * @return string|null
      */
     public function getDescription();
 
     /**
      * Set description
+     *
      * @param string $description
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setDescription($description);
 
     /**
      * Get short_description
+     *
      * @return string|null
      */
     public function getShortDescription();
 
     /**
      * Set short_description
+     *
      * @param string $shortDescription
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setShortDescription($shortDescription);
 
     /**
      * Get price
+     *
      * @return float|null
      */
     public function getPrice();
 
     /**
      * Set price
+     *
      * @param float $price
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setPrice($price);
 
     /**
      * Get special_price
+     *
      * @return float|null
      */
     public function getSpecialPrice();
 
     /**
      * Set special_price
+     *
      * @param float $specialPrice
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setSpecialPrice($specialPrice);
 
     /**
      * Get weight
+     *
      * @return float|null
      */
     public function getWeight();
 
     /**
      * Set weight
+     *
      * @param float $weight
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setWeight($weight);
 
     /**
      * Get qty
+     *
      * @return int|null
      */
     public function getQty();
 
     /**
      * Set qty
+     *
      * @param int $qty
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setQty($qty);
 
     /**
      * Get category
+     *
      * @return string|null
      */
     public function getCategory();
 
     /**
      * Set category
+     *
      * @param string $category
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setCategory($category);
 
     /**
      * Get status
+     *
      * @return string|null
      */
     public function getStatus();
 
     /**
      * Set status
+     *
      * @param string $status
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setStatus($status);
 
     /**
      * Get visibility
+     *
      * @return string|null
      */
     public function getVisibility();
 
     /**
      * Set visibility
+     *
      * @param string $visibility
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setVisibility($visibility);
 
     /**
      * Get type
+     *
      * @return string|null
      */
     public function getType();
 
     /**
      * Set type
+     *
      * @param string $type
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setType($type);
 
     /**
      * Get attribute_set
+     *
      * @return string|null
      */
     public function getAttributeSet();
 
     /**
      * Set attribute_set
+     *
      * @param string $attributeSet
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setAttributeSet($attributeSet);
 
     /**
      * Get tax_class
+     *
      * @return string|null
      */
     public function getTaxClass();
 
     /**
      * Set tax_class
+     *
      * @param string $taxClass
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setTaxClass($taxClass);
 
     /**
      * Get meta_title
+     *
      * @return string|null
      */
     public function getMetaTitle();
 
     /**
      * Set meta_title
+     *
      * @param string $metaTitle
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setMetaTitle($metaTitle);
 
     /**
      * Get meta_description
+     *
      * @return string|null
      */
     public function getMetaDescription();
 
     /**
      * Set meta_description
+     *
      * @param string $metaDescription
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setMetaDescription($metaDescription);
 
     /**
      * Get meta_keywords
+     *
      * @return string|null
      */
     public function getMetaKeywords();
 
     /**
      * Set meta_keywords
+     *
      * @param string $metaKeywords
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setMetaKeywords($metaKeywords);
 
     /**
      * Get url_key
+     *
      * @return string|null
      */
     public function getUrlKey();
 
     /**
      * Set url_key
+     *
      * @param string $urlKey
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setUrlKey($urlKey);
 
     /**
      * Get magento_product_id
+     *
      * @return int|null
      */
     public function getMagentoProductId();
 
     /**
      * Set magento_product_id
+     *
      * @param int $magentoProductId
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setMagentoProductId($magentoProductId);
 
     /**
      * Get is_created_in_magento
+     *
      * @return bool|null
      */
     public function getIsCreatedInMagento();
 
     /**
      * Set is_created_in_magento
+     *
      * @param bool $isCreatedInMagento
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setIsCreatedInMagento($isCreatedInMagento);
 
     /**
      * Get additional_data
+     *
      * @return string|null
      */
     public function getAdditionalData();
 
     /**
      * Set additional_data
+     *
      * @param string $additionalData
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setAdditionalData($additionalData);
 
     /**
      * Get custom attributes as array
+     *
      * @return array
      */
     public function getCustomAttributes();
 
     /**
      * Set custom attributes
+     *
      * @param array $customAttributes
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setCustomAttributes($customAttributes);
 
     /**
      * Get custom attribute value by code
+     *
      * @param string $attributeCode
+     *
      * @return mixed|null
      */
     public function getCustomAttribute($attributeCode);
 
     /**
      * Set custom attribute value
+     *
      * @param string $attributeCode
+     *
      * @param mixed $value
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setCustomAttribute($attributeCode, $value);
 
     /**
      * Get created_at
+     *
      * @return string|null
      */
     public function getCreatedAt();
 
     /**
      * Set created_at
+     *
      * @param string $createdAt
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setCreatedAt($createdAt);
 
     /**
      * Get updated_at
+     *
      * @return string|null
      */
     public function getUpdatedAt();
 
     /**
      * Set updated_at
+     *
      * @param string $updatedAt
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setUpdatedAt($updatedAt);
 
     /**
      * Get key_features
+     *
      * @return string|null
      */
     public function getKeyFeatures();
 
     /**
      * Set key_features
+     *
      * @param string $keyFeatures
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setKeyFeatures($keyFeatures);
 
     /**
      * Get how_to_use
+     *
      * @return string|null
      */
     public function getHowToUse();
 
     /**
      * Set how_to_use
+     *
      * @param string $howToUse
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setHowToUse($howToUse);
 
     /**
      * Get ingredients
+     *
      * @return string|null
      */
     public function getIngredients();
 
     /**
      * Set ingredients
+     *
      * @param string $ingredients
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setIngredients($ingredients);
 
     /**
      * Get upc
+     *
      * @return string|null
      */
     public function getUpc();
 
     /**
      * Set upc
+     *
      * @param string $upc
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setUpc($upc);
 
     /**
      * Get keywords
+     *
      * @return string|null
      */
     public function getKeywords();
 
     /**
      * Set keywords
+     *
      * @param string $keywords
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setKeywords($keywords);
 
     /**
      * Get pricing_usd_min
+     *
      * @return float|null
      */
     public function getPricingUsdMin();
 
     /**
      * Set pricing_usd_min
+     *
      * @param float $pricingUsdMin
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setPricingUsdMin($pricingUsdMin);
 
     /**
      * Get pricing_usd_max
+     *
      * @return float|null
      */
     public function getPricingUsdMax();
 
     /**
      * Set pricing_usd_max
+     *
      * @param float $pricingUsdMax
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setPricingUsdMax($pricingUsdMax);
 
     /**
      * Get pricing_cad_min
+     *
      * @return float|null
      */
     public function getPricingCadMin();
 
     /**
      * Set pricing_cad_min
+     *
      * @param float $pricingCadMin
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setPricingCadMin($pricingCadMin);
 
     /**
      * Get pricing_cad_max
+     *
      * @return float|null
      */
     public function getPricingCadMax();
 
     /**
      * Set pricing_cad_max
+     *
      * @param float $pricingCadMax
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setPricingCadMax($pricingCadMax);
-} 
+}

@@ -29,7 +29,7 @@ class CreateMagentoProduct extends Action implements HttpPostActionInterface, Cs
     /**
      * Authorization level of a basic admin session
      */
-    const ADMIN_RESOURCE = 'Squadkin_SquadexaAI::squadkin_squadexaai_aiproduct';
+    public const ADMIN_RESOURCE = 'Squadkin_SquadexaAI::squadkin_squadexaai_aiproduct';
 
     /**
      * @var JsonFactory
@@ -198,4 +198,3 @@ class CreateMagentoProduct extends Action implements HttpPostActionInterface, Cs
         }
     }
 }
-

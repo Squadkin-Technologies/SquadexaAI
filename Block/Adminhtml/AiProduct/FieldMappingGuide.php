@@ -58,4 +58,3 @@ class FieldMappingGuide extends Template
         );
     }
 }
-

@@ -9,7 +9,9 @@ namespace Squadkin\SquadexaAI\Controller\Adminhtml\GeneratedCsv;
 
 class Index extends \Magento\Backend\App\Action
 {
-
+    /**
+     * @var \Magento\Framework\View\Result\PageFactory
+     */
     protected $resultPageFactory;
 
     /**
@@ -38,4 +40,3 @@ class Index extends \Magento\Backend\App\Action
             return $resultPage;
     }
 }
-

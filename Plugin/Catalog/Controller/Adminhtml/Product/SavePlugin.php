@@ -22,7 +22,7 @@ class SavePlugin
     /**
      * Custom data key to store AI product ID
      */
-    const AI_PRODUCT_ID_KEY = 'ai_product_id';
+    public const AI_PRODUCT_ID_KEY = 'ai_product_id';
 
     /**
      * @var RedirectFactory
@@ -159,4 +159,3 @@ class SavePlugin
         return $result;
     }
 }
-

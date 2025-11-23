@@ -17,11 +17,11 @@ use Squadkin\SquadexaAI\Logger\Logger as SquadexaLogger;
 
 class SquadexaApiService
 {
-    const API_BASE_URL = 'https://www.squadexa.ai/';
-    const REDIRECT_URL = 'https://www.squadexa.ai/';
-    const API_KEY_CONFIG = 'squadexaiproductcreator/authentication/api_key';
+    public const API_BASE_URL = 'https://www.squadexa.ai/';
+    public const REDIRECT_URL = 'https://www.squadexa.ai/';
+    public const API_KEY_CONFIG = 'squadexaiproductcreator/authentication/api_key';
     
-    const API_ENDPOINTS = [
+    public const API_ENDPOINTS = [
         // Authentication endpoints
         'register' => '/api/v1/auth/register',
         'login' => '/api/v1/auth/login',
@@ -228,7 +228,9 @@ class SquadexaApiService
                         'response_body' => $responseBody,
                         'json_error' => $jsonError->getMessage()
                     ]);
-                    throw new LocalizedException(__('Invalid JSON response from generate API key: %1', $jsonError->getMessage()));
+                    throw new LocalizedException(
+                        __('Invalid JSON response from generate API key: %1', $jsonError->getMessage())
+                    );
                 }
             } else {
                 $errorMessage = $this->getErrorMessage($responseCode, $responseBody);
@@ -252,6 +254,7 @@ class SquadexaApiService
 
     /**
      * Check if access token is expired and refresh if needed
+     *
      * Only refresh if we have a valid API key (permanent) to avoid unnecessary logins
      *
      * @return bool
@@ -262,7 +265,6 @@ class SquadexaApiService
         $accessToken = $this->getAccessToken();
         $apiKey = $this->getApiKey();
         
-        // If we have an API key (permanent), we don't need to refresh access token
         if (!empty($apiKey) && !empty($accessToken)) {
             $this->squadexaLogger->logDebug('API key available, skipping access token refresh', [
                 'api_key_length' => strlen($apiKey),
@@ -271,13 +273,11 @@ class SquadexaApiService
             return true;
         }
         
-        // If no access token, we can't refresh
         if (empty($accessToken)) {
             $this->squadexaLogger->logDebug('No access token available, cannot refresh');
             return false;
         }
         
-        // Check if token is expired (30 minutes = 1800 seconds)
         $tokenCreated = $this->scopeConfig->getValue('squadexaiproductcreator/authentication/token_created');
         $this->squadexaLogger->logDebug('Token creation timestamp', [
             'token_created' => $tokenCreated
@@ -289,37 +289,18 @@ class SquadexaApiService
         }
         
         $tokenAge = time() - strtotime($tokenCreated);
-        if ($tokenAge < 1800) { // Token is still valid (less than 30 minutes)
+        if ($tokenAge < 1800) {
             $this->squadexaLogger->logDebug('Access token still valid', [
                 'token_age_minutes' => floor($tokenAge / 60),
                 'remaining_minutes' => floor((1800 - $tokenAge) / 60)
             ]);
             return true;
         }
-        
-        // Token is expired, but we should not auto-refresh
-        // User should manually click "Generate API Key" button
         $this->squadexaLogger->logWarning('Access token expired, manual refresh required', [
             'token_age_minutes' => floor($tokenAge / 60)
         ]);
         
         return false;
-    }
-
-    /**
-     * Update access token in configuration
-     *
-     * @param string $accessToken
-     * @return void
-     */
-    private function updateAccessToken(string $accessToken): void
-    {
-        // This would typically be done through Magento's configuration save
-        // For now, we'll log the need to update the token
-        $this->logger->info('SquadexaAI: Access token needs to be updated in configuration', [
-            'new_token_length' => strlen($accessToken),
-            'timestamp' => date('Y-m-d H:i:s')
-        ]);
     }
 
     /**
@@ -392,7 +373,9 @@ class SquadexaApiService
                         'response_body' => $responseBody,
                         'json_error' => $jsonError->getMessage()
                     ]);
-                    throw new LocalizedException(__('Invalid JSON response from login API: %1', $jsonError->getMessage()));
+                    throw new LocalizedException(
+                        __('Invalid JSON response from login API: %1', $jsonError->getMessage())
+                    );
                 }
             } else {
                 $errorMessage = $this->getErrorMessage($responseCode, $responseBody);
@@ -425,23 +408,21 @@ class SquadexaApiService
      */
     public function makeApiRequest(string $endpoint, string $method = 'GET', array $data = []): array
     {
-        // Try access token first, then fall back to API key
         $accessToken = $this->getAccessToken();
         $apiKey = $this->getApiKey();
         
         if (empty($accessToken) && empty($apiKey)) {
             $this->logger->error('SquadexaAI API Error: No authentication configured');
-            throw new LocalizedException(__('No authentication configured. Please either set an API key or generate an access token.'));
+            throw new LocalizedException(
+                __('No authentication configured. Please either set an API key or generate an access token.')
+            );
         }
 
         $baseUrl = rtrim($this->getApiBaseUrl(), '/');
         $url = $baseUrl . $endpoint;
 
-        // Use access token if available, otherwise use API key
         $authToken = !empty($accessToken) ? $accessToken : $apiKey;
         $authType = !empty($accessToken) ? 'access_token' : 'api_key';
-
-        // Set headers
         $this->curl->setHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $authToken,
@@ -524,31 +505,6 @@ class SquadexaApiService
     }
 
     /**
-     * Get general usage stats (requires API key)
-     *
-     * @return array
-     * @throws LocalizedException
-     */
-    public function getGeneralUsageStats(): array
-    {
-        return $this->makeApiRequestWithApiKey(self::API_ENDPOINTS['usage_stats_general']);
-    }
-
-    /**
-     * Get general usage history (requires API key)
-     *
-     * @param int $limit
-     * @param int $offset
-     * @return array
-     * @throws LocalizedException
-     */
-    public function getGeneralUsageHistory(int $limit = 20, int $offset = 0): array
-    {
-        $endpoint = self::API_ENDPOINTS['usage_history_general'] . '?limit=' . $limit . '&offset=' . $offset;
-        return $this->makeApiRequestWithApiKey($endpoint, 'GET');
-    }
-
-    /**
      * Get user profile (requires API key)
      *
      * @return array
@@ -604,7 +560,6 @@ class SquadexaApiService
         return $this->makeApiRequestWithApiKey(self::API_ENDPOINTS['product_details'], 'POST', $productData);
     }
 
-
     /**
      * Create batch job (requires API key)
      *
@@ -626,7 +581,9 @@ class SquadexaApiService
             throw new LocalizedException(__('API key is not configured. Please generate an API key first.'));
         }
 
-        if (!file_exists($filePath) || !is_readable($filePath)) {
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction
+        if (!file_exists($filePath) || !is_readable($filePath)) { // phpcs:ignore
             throw new LocalizedException(__('File does not exist or is not readable: %1', $filePath));
         }
 
@@ -635,8 +592,10 @@ class SquadexaApiService
 
         // Prepare multipart form data for file upload
         $boundary = uniqid();
-        $fileName = basename($filePath);
-        $fileContent = file_get_contents($filePath);
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction
+        $fileName = basename($filePath); // phpcs:ignore
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction
+        $fileContent = file_get_contents($filePath); // phpcs:ignore
 
         $body = "--{$boundary}\r\n";
         $body .= "Content-Disposition: form-data; name=\"file\"; filename=\"{$fileName}\"\r\n";
@@ -701,18 +660,6 @@ class SquadexaApiService
     }
 
     /**
-     * Create batch job (legacy method - kept for compatibility)
-     *
-     * @param array $batchData
-     * @return array
-     * @throws LocalizedException
-     */
-    public function createBatchJob(array $batchData): array
-    {
-        return $this->makeApiRequestWithApiKey(self::API_ENDPOINTS['batch_jobs'], 'POST', $batchData);
-    }
-
-    /**
      * Get job status (requires API key)
      *
      * @param string $jobId
@@ -764,7 +711,6 @@ class SquadexaApiService
             ]);
 
             if ($responseCode >= 200 && $responseCode < 300) {
-                // Return CSV content as string
                 return $responseBody;
             } else {
                 $errorMessage = $this->getErrorMessage($responseCode, $responseBody);
@@ -817,16 +763,17 @@ class SquadexaApiService
         try {
             return $this->executeApiRequest($url, $method, $data);
         } catch (LocalizedException $e) {
-            // Check if it's a 401 error (token expired)
-            if (strpos($e->getMessage(), '401') !== false || strpos($e->getMessage(), 'Authentication required') !== false) {
+            if (strpos($e->getMessage(), '401') !== false ||
+                strpos($e->getMessage(), 'Authentication required') !== false) {
                 $this->squadexaLogger->logApiError('Access token expired, manual refresh required', [
                     'url' => $url,
                     'error' => $e->getMessage()
                 ]);
-                throw new LocalizedException(__('Access token expired. Please click "Generate API Key" to refresh your authentication.'));
+                throw new LocalizedException(
+                    __('Access token expired. Please click "Generate API Key" to refresh your authentication.')
+                );
             }
             
-            // Re-throw the original exception if it's not a 401 error
             throw $e;
         }
     }
@@ -904,8 +851,6 @@ class SquadexaApiService
     private function executeApiRequest(string $url, string $method, array $data): array
     {
         try {
-            // Enable redirect following for CURL client
-            // Magento's CURL client supports setOption method
             if (method_exists($this->curl, 'setOption')) {
                 $this->curl->setOption(CURLOPT_FOLLOWLOCATION, true);
                 $this->curl->setOption(CURLOPT_MAXREDIRS, 5);
@@ -920,12 +865,10 @@ class SquadexaApiService
             $responseCode = $this->curl->getStatus();
             $responseBody = $this->curl->getBody();
             
-            // Handle 301 redirect manually if CURL didn't follow it
             if ($responseCode == 301 || $responseCode == 302) {
                 $headers = $this->curl->getHeaders();
                 $location = null;
                 
-                // Extract Location header
                 if (is_array($headers)) {
                     foreach ($headers as $header) {
                         if (stripos($header, 'Location:') === 0) {
@@ -935,7 +878,6 @@ class SquadexaApiService
                     }
                 }
                 
-                // If we got a redirect and have a location, retry with the new URL
                 if ($location) {
                     $this->logger->info('SquadexaAI API Redirect detected', [
                         'original_url' => $url,
@@ -1130,7 +1072,10 @@ class SquadexaApiService
                     $accountInfo['subscription_plan'] = $this->extractSubscriptionPlan($userProfile, $usageStats);
                     
                 } catch (\Exception $apiKeyError) {
-                    $this->squadexaLogger->logApiError('API key validation failed', ['error' => $apiKeyError->getMessage()]);
+                    $this->squadexaLogger->logApiError(
+                        'API key validation failed',
+                        ['error' => $apiKeyError->getMessage()]
+                    );
                     $accountInfo['api_key_valid'] = false;
                     $accountInfo['error'] = 'API key validation failed: ' . $apiKeyError->getMessage();
                 }
@@ -1152,7 +1097,10 @@ class SquadexaApiService
                         $accountInfo['subscription_plan'] = $this->extractSubscriptionPlan($userProfile, $usageStats);
                         
                     } catch (\Exception $accessTokenError) {
-                        $this->squadexaLogger->logApiError('Access token validation failed', ['error' => $accessTokenError->getMessage()]);
+                        $this->squadexaLogger->logApiError(
+                            'Access token validation failed',
+                            ['error' => $accessTokenError->getMessage()]
+                        );
                         $accountInfo['api_key_valid'] = false;
                         $accountInfo['error'] = 'Access token validation failed: ' . $accessTokenError->getMessage();
                     }

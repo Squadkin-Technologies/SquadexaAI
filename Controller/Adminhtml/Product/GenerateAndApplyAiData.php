@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
  */
 class GenerateAndApplyAiData extends Action
 {
-    const ADMIN_RESOURCE = 'Magento_Catalog::products';
+    public const ADMIN_RESOURCE = 'Magento_Catalog::products';
 
     /**
      * @var JsonFactory
@@ -171,4 +171,3 @@ class GenerateAndApplyAiData extends Action
         }
     }
 }
-

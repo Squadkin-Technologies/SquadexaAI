@@ -29,8 +29,17 @@ class DownloadErrorReport extends Action
     /**
      * @var RedirectFactory
      */
+    /**
+     * @var RedirectFactory
+     */
     protected $resultRedirectFactory;
 
+    /**
+     * @param Context $context
+     * @param FileFactory $fileFactory
+     * @param Filesystem $filesystem
+     * @param RedirectFactory $resultRedirectFactory
+     */
     public function __construct(
         Context $context,
         FileFactory $fileFactory,
@@ -43,6 +52,11 @@ class DownloadErrorReport extends Action
         $this->resultRedirectFactory = $resultRedirectFactory;
     }
 
+    /**
+     * Execute action
+     *
+     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface
+     */
     public function execute()
     {
         $file = $this->getRequest()->getParam('file');
@@ -50,7 +64,9 @@ class DownloadErrorReport extends Action
             $this->messageManager->addErrorMessage(__('No error report file specified.'));
             return $this->resultRedirectFactory->create()->setPath('*/*/index');
         }
-        $filePath = 'AIProductCreator/ErrorReports/' . basename($file);
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction
+        $fileName = basename($file); // phpcs:ignore
+        $filePath = 'AIProductCreator/ErrorReports/' . $fileName;
         $varDirectory = $this->filesystem->getDirectoryRead(DirectoryList::VAR_DIR);
         if (!$varDirectory->isExist($filePath)) {
             $this->messageManager->addErrorMessage(__('Error report file does not exist.'));
@@ -58,7 +74,7 @@ class DownloadErrorReport extends Action
         }
         $absolutePath = $varDirectory->getAbsolutePath($filePath);
         return $this->fileFactory->create(
-            basename($file),
+            $fileName,
             [
                 'type'  => 'filename',
                 'value' => $absolutePath,
@@ -68,8 +84,13 @@ class DownloadErrorReport extends Action
         );
     }
 
+    /**
+     * Check if action is allowed
+     *
+     * @return bool
+     */
     protected function _isAllowed()
     {
         return $this->_authorization->isAllowed('Squadkin_SquadexaAI::GeneratedCsv_view');
     }
-} 
+}

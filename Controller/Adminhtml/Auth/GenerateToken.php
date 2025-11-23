@@ -124,7 +124,9 @@ class GenerateToken extends Action
 
                 return $result->setData([
                     'success' => true,
-                    'message' => __('API key generated successfully! Your permanent API key has been saved and is ready to use.'),
+                    'message' => __(
+                        'API key generated successfully! Your permanent API key has been saved and is ready to use.'
+                    ),
                     'api_key' => $apiKeyData['api_key'],
                     'api_key_created' => $apiKeyCreated
                 ]);

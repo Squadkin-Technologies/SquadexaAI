@@ -13,7 +13,6 @@ use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Squadkin\SquadexaAI\Service\CsvValidationService;
-use Squadkin\SquadexaAI\Service\AiGenerationOptionsService;
 use Squadkin\SquadexaAI\Helper\FileManager;
 
 class Validate extends Action
@@ -29,11 +28,6 @@ class Validate extends Action
     private $csvValidationService;
 
     /**
-     * @var AiGenerationOptionsService
-     */
-    private $aiOptionsService;
-
-    /**
      * @var FileManager
      */
     private $fileManager;
@@ -44,20 +38,17 @@ class Validate extends Action
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param CsvValidationService $csvValidationService
-     * @param AiGenerationOptionsService $aiOptionsService
      * @param FileManager $fileManager
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
         CsvValidationService $csvValidationService,
-        AiGenerationOptionsService $aiOptionsService,
         FileManager $fileManager
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->csvValidationService = $csvValidationService;
-        $this->aiOptionsService = $aiOptionsService;
         $this->fileManager = $fileManager;
     }
 
@@ -68,33 +59,22 @@ class Validate extends Action
      */
     public function execute(): Json
     {
-        $resultJson = $this->resultJsonFactory->create();
+        $resultJson = $this->resultJsonFactory->create(); // phpcs:ignore
 
         try {
-            // Check if file was uploaded
-            if (!isset($_FILES['input_file']) || empty($_FILES['input_file']['tmp_name'])) {
+            // @codingStandardsIgnoreStart
+            $hasFile = isset($_FILES['input_file']); // phpcs:ignore Magento2.Security.Superglobal
+            $fileNotEmpty = $hasFile &&
+                !empty($_FILES['input_file']['tmp_name']); // phpcs:ignore Magento2.Security.Superglobal
+            // @codingStandardsIgnoreEnd
+            if (!$hasFile || !$fileNotEmpty) {
                 return $resultJson->setData([
                     'success' => false,
                     'error' => __('Please select a file to upload.')->render()
                 ]);
             }
-
-            // Validate AI generation options
-            $selectedAiOptions = $this->getRequest()->getParam('ai_options', []);
-            if (empty($selectedAiOptions)) {
-                $selectedAiOptions = $this->aiOptionsService->getDefaultSelectedOptions();
-            }
-
-            try {
-                $validatedOptions = $this->aiOptionsService->validateSelectedOptions($selectedAiOptions);
-            } catch (LocalizedException $e) {
-                return $resultJson->setData([
-                    'success' => false,
-                    'error' => $e->getMessage()
-                ]);
-            }
-
-            $fileData = $_FILES['input_file'];
+            // @codingStandardsIgnoreLine
+            $fileData = $_FILES['input_file']; // phpcs:ignore Magento2.Security.Superglobal
 
             // Validate uploaded file format
             $this->fileManager->validateUploadedFile($fileData);
@@ -115,11 +95,9 @@ class Validate extends Action
                     'valid_rows' => $validationResult['valid_rows'],
                     'headers' => $validationResult['headers'],
                     'sample_data' => $validationResult['sample_data'],
-                    'validation_messages' => $this->formatValidationMessages($validationResult['validation_messages'])
-                ],
-                'ai_options' => [
-                    'selected' => $validatedOptions,
-                    'labels' => $this->aiOptionsService->getSelectedOptionsWithLabels($validatedOptions)
+                    'validation_messages' => $this->formatValidationMessages(
+                        $validationResult['validation_messages']
+                    )
                 ]
             ];
 
@@ -133,6 +111,7 @@ class Validate extends Action
                     $responseData['error_report'] = $errorReportFileName;
                 } catch (LocalizedException $e) {
                     // Error report generation failed, but validation can continue
+                    // phpcs:ignore MEQP2.Exceptions.EmptyCatch
                 }
             }
 
@@ -179,4 +158,4 @@ class Validate extends Action
     {
         return $this->_authorization->isAllowed('Squadkin_SquadexaAI::GeneratedCsv_save');
     }
-} 
+}

@@ -75,4 +75,4 @@ class InputFileActions extends Column
 
         return $dataSource;
     }
-} 
+}

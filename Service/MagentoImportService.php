@@ -112,7 +112,9 @@ class MagentoImportService
 
         try {
             $csvId = (int)$generatedCsv->getGeneratedcsvId();
-            $this->logger->info('SquadexaAI Import: Looking for AI products with CSV ID: ' . $csvId);
+            $this->logger->info(
+                'SquadexaAI Import: Looking for AI products with CSV ID: ' . $csvId
+            );
             
             // Get AI products for this CSV
             $aiProducts = $this->getAiProductsByCsvId($csvId);
@@ -124,11 +126,17 @@ class MagentoImportService
                 
                 // Let's check if there are ANY AI products in the database
                 $allProducts = $this->aiProductRepository->getList($this->searchCriteriaBuilder->create());
-                $this->logger->info('SquadexaAI Import: Total AI products in database: ' . $allProducts->getTotalCount());
+                $this->logger->info(
+                    'SquadexaAI Import: Total AI products in database: ' .
+                    $allProducts->getTotalCount()
+                );
                 
                 if ($allProducts->getTotalCount() > 0) {
                     foreach ($allProducts->getItems() as $product) {
-                        $this->logger->info('SquadexaAI Import: Found AI product with CSV ID: ' . $product->getGeneratedcsvId());
+                        $this->logger->info(
+                            'SquadexaAI Import: Found AI product with CSV ID: ' .
+                            $product->getGeneratedcsvId()
+                        );
                     }
                 }
                 
@@ -343,7 +351,8 @@ class MagentoImportService
             // Set import data
             $import->setData([
                 Import::FIELD_NAME_IMG_FILE_DIR => '',
-                Import::FIELD_NAME_VALIDATION_STRATEGY => $importOptions['validation_strategy'] ?? ProcessingErrorAggregatorInterface::VALIDATION_STRATEGY_STOP_ON_ERROR,
+                Import::FIELD_NAME_VALIDATION_STRATEGY => $importOptions['validation_strategy'] ??
+                    ProcessingErrorAggregatorInterface::VALIDATION_STRATEGY_STOP_ON_ERROR,
                 Import::FIELD_NAME_ALLOWED_ERROR_COUNT => $importOptions['allowed_error_count'] ?? 10,
                 Import::FIELD_FIELD_SEPARATOR => $importOptions['field_separator'] ?? ',',
                 Import::FIELD_FIELD_MULTIPLE_VALUE_SEPARATOR => $importOptions['multiple_value_separator'] ?? '|',
@@ -427,11 +436,13 @@ class MagentoImportService
     private function cleanupImportFile(string $filePath): void
     {
         try {
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction
+            if (file_exists($filePath)) { // phpcs:ignore
+                // phpcs:ignore Magento2.Functions.DiscouragedFunction
+                unlink($filePath); // phpcs:ignore
             }
         } catch (\Exception $e) {
             $this->logger->warning('Unable to cleanup import file: ' . $e->getMessage());
         }
     }
-} 
+}

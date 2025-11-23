@@ -89,4 +89,3 @@ class UpdateProductButton extends GenericButton implements ButtonProviderInterfa
         return null;
     }
 }
-

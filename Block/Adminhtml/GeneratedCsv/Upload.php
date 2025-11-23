@@ -70,4 +70,4 @@ class Upload extends Template
     {
         return 10; // 10MB
     }
-} 
+}

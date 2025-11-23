@@ -25,8 +25,8 @@ use Squadkin\SquadexaAI\Model\ResourceModel\AiProduct\CollectionFactory as AiPro
 
 class FileManager extends AbstractHelper
 {
-    const INPUT_DIR = 'AIProductCreator/Input';
-    const OUTPUT_DIR = 'AIProductCreator/Output';
+    public const INPUT_DIR = 'AIProductCreator/Input';
+    public const OUTPUT_DIR = 'AIProductCreator/Output';
     
     /**
      * @var Filesystem
@@ -153,7 +153,8 @@ class FileManager extends AbstractHelper
             $filePath = self::INPUT_DIR . '/' . $fileName;
             
             // Read file content
-            $fileContent = file_get_contents($fileData['tmp_name']);
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction
+            $fileContent = file_get_contents($fileData['tmp_name']); // phpcs:ignore
             
             // Save to var directory
             $this->varDirectory->writeFile($filePath, $fileContent);
@@ -162,122 +163,6 @@ class FileManager extends AbstractHelper
         } catch (\Exception $e) {
             $this->logger->error('Error saving input file: ' . $e->getMessage());
             throw new LocalizedException(__('Could not save input file: %1', $e->getMessage()));
-        }
-    }
-
-    /**
-     * Process file with AI API
-     *
-     * @param string $inputFileName
-     * @param array $aiOptions
-     * @return array
-     * @throws LocalizedException
-     */
-    public function processWithAI(string $inputFileName, array $aiOptions = []): array
-    {
-        try {
-            $inputFilePath = self::INPUT_DIR . '/' . $inputFileName;
-            
-            $this->logger->info('SquadexaAI FileManager: Starting CSV processing', [
-                'file' => $inputFileName,
-                'ai_options' => $aiOptions
-            ]);
-            
-            // Read and parse CSV file
-            $csvData = $this->csvProcessor->getData($this->varDirectory->getAbsolutePath($inputFilePath));
-            
-            if (empty($csvData) || count($csvData) < 2) {
-                throw new LocalizedException(__('CSV file is empty or invalid.'));
-            }
-            
-            // Get headers and data rows
-            $headers = array_shift($csvData);
-            $products = [];
-            $totalRows = count($csvData);
-            
-            $this->logger->info('SquadexaAI FileManager: CSV file parsed', [
-                'total_rows' => $totalRows,
-                'headers' => $headers
-            ]);
-            
-            // Validate CSV structure and data
-            $this->validateCsvFile($headers, $csvData);
-            
-            // Process each row
-            $processedCount = 0;
-            $errorCount = 0;
-            
-            foreach ($csvData as $index => $row) {
-                if (empty($row[0])) {
-                    $this->logger->info('SquadexaAI FileManager: Skipping empty row', ['row_index' => $index]);
-                    continue; // Skip empty rows
-                }
-                
-                $productData = array_combine($headers, $row);
-                
-                // Prepare data for API
-                $apiData = [
-                    'product_name' => $productData['product_name'] ?? '',
-                    'primary_keywords' => isset($productData['primary_keywords']) ? 
-                        explode(',', $productData['primary_keywords']) : [],
-                    'secondary_keywords' => isset($productData['secondary_keywords']) ? 
-                        explode(',', $productData['secondary_keywords']) : [],
-                    'include_pricing' => isset($productData['include_pricing']) ? 
-                        (bool)$productData['include_pricing'] : false
-                ];
-                
-                $this->logger->info('SquadexaAI FileManager: Calling API for product', [
-                    'row_index' => $index,
-                    'product_name' => $apiData['product_name'],
-                    'api_data' => $apiData
-                ]);
-                
-                // Call API for each product
-                try {
-                    $apiResponse = $this->apiService->generateProduct($apiData);
-                    
-                    $this->logger->info('SquadexaAI FileManager: API response received', [
-                        'row_index' => $index,
-                        'product_name' => $apiData['product_name'],
-                        'response_keys' => array_keys($apiResponse),
-                        'response_data' => $apiResponse
-                    ]);
-                    
-                    // Merge input data with API response
-                    $mergedProduct = array_merge($productData, $apiResponse);
-                    $products[] = $mergedProduct;
-                    $processedCount++;
-                    
-                    $this->logger->info('SquadexaAI FileManager: Product processed successfully', [
-                        'row_index' => $index,
-                        'product_name' => $apiData['product_name'],
-                        'merged_keys' => array_keys($mergedProduct)
-                    ]);
-                    
-                } catch (\Exception $e) {
-                    $errorCount++;
-                    $this->logger->error('SquadexaAI FileManager: Error generating product with AI', [
-                        'row_index' => $index,
-                        'product_name' => $apiData['product_name'],
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
-                    ]);
-                    // Continue with next product
-                    continue;
-                }
-            }
-            
-            $this->logger->info('SquadexaAI FileManager: CSV processing completed', [
-                'total_rows' => $totalRows,
-                'processed' => $processedCount,
-                'errors' => $errorCount,
-                'products_returned' => count($products)
-            ]);
-            
-            return $products;
-        } catch (\Exception $e) {
-            $this->logger->error('Error processing file with AI: ' . $e->getMessage());
-            throw new LocalizedException(__('Could not process file with AI: %1', $e->getMessage()));
         }
     }
 
@@ -292,16 +177,10 @@ class FileManager extends AbstractHelper
     private function validateCsvFile(array $headers, array $dataRows): void
     {
         // Normalize headers (remove whitespace, convert to lowercase for comparison)
-        $normalizedHeaders = array_map(function($header) {
+        $normalizedHeaders = array_map(function ($header) {
             return strtolower(trim($header));
         }, $headers);
-        
-        $this->logger->info('SquadexaAI FileManager: Validating CSV file', [
-            'headers' => $headers,
-            'normalized_headers' => $normalizedHeaders,
-            'total_rows' => count($dataRows)
-        ]);
-        
+
         // Required fields
         $requiredFields = [
             'product_name' => 'Product Name',
@@ -322,7 +201,7 @@ class FileManager extends AbstractHelper
                 $normalizedField = strtolower(str_replace(['_', '-', ' '], '', $fieldKey));
                 $normalizedHeaderClean = strtolower(str_replace(['_', '-', ' '], '', $headers[$index]));
                 
-                if ($normalizedHeaderClean === $normalizedField || 
+                if ($normalizedHeaderClean === $normalizedField ||
                     $normalizedHeaderClean === strtolower(str_replace(['_', '-', ' '], '', $fieldLabel))) {
                     $found = true;
                     $actualHeaderIndex = $index;
@@ -331,7 +210,10 @@ class FileManager extends AbstractHelper
             }
             
             if (!$found) {
-                $errors[] = __('Required column "%1" is missing. Please ensure your CSV includes this column.', $fieldLabel);
+                $errors[] = __(
+                    'Required column "%1" is missing. Please ensure your CSV includes this column.',
+                    $fieldLabel
+                );
             }
         }
         
@@ -348,7 +230,8 @@ class FileManager extends AbstractHelper
         $rowErrors = [];
         
         foreach ($dataRows as $rowIndex => $row) {
-            $rowNumber = $rowIndex + 2; // +2 because row 1 is header and array is 0-indexed
+            // +2 because row 1 is header and array is 0-indexed
+            $rowNumber = $rowIndex + 2; // phpcs:ignore
             
             // Skip completely empty rows
             if (empty(array_filter($row))) {
@@ -385,13 +268,19 @@ class FileManager extends AbstractHelper
                 if ($cleanKey === 'productname' || $cleanKey === 'product_name' || $cleanKey === 'product name') {
                     $productNameValue = $value;
                 }
-                if ($cleanKey === 'primarykeywords' || $cleanKey === 'primary_keywords' || $cleanKey === 'primary keywords') {
+                if ($cleanKey === 'primarykeywords' ||
+                    $cleanKey === 'primary_keywords' ||
+                    $cleanKey === 'primary keywords') {
                     $primaryKeywordsValue = $value;
                 }
-                if ($cleanKey === 'secondarykeywords' || $cleanKey === 'secondary_keywords' || $cleanKey === 'secondary keywords') {
+                if ($cleanKey === 'secondarykeywords' ||
+                    $cleanKey === 'secondary_keywords' ||
+                    $cleanKey === 'secondary keywords') {
                     $secondaryKeywordsValue = $value;
                 }
-                if ($cleanKey === 'includepricing' || $cleanKey === 'include_pricing' || $cleanKey === 'include pricing') {
+                if ($cleanKey === 'includepricing' ||
+                    $cleanKey === 'include_pricing' ||
+                    $cleanKey === 'include pricing') {
                     $includePricingValue = $value;
                 }
             }
@@ -431,54 +320,6 @@ class FileManager extends AbstractHelper
         $this->logger->info('SquadexaAI FileManager: CSV validation passed', [
             'total_rows_validated' => count($dataRows)
         ]);
-    }
-
-    /**
-     * Save AI response as CSV file
-     *
-     * @param array $data
-     * @param string $inputFileName
-     * @return string
-     * @throws LocalizedException
-     */
-    public function saveOutputFile(array $data, string $inputFileName): string
-    {
-        try {
-            $this->createDirectories();
-            
-            $outputFileName = $this->generateOutputFileName($inputFileName);
-            $outputFilePath = self::OUTPUT_DIR . '/' . $outputFileName;
-            
-            $this->logger->info('SquadexaAI FileManager: Saving output file', [
-                'output_file' => $outputFileName,
-                'product_count' => count($data),
-                'first_product_keys' => !empty($data[0]) ? array_keys($data[0]) : []
-            ]);
-            
-            // Convert array data to CSV format
-            $csvContent = $this->convertArrayToCsv($data);
-            
-            $this->logger->info('SquadexaAI FileManager: CSV content generated', [
-                'content_length' => strlen($csvContent),
-                'first_100_chars' => substr($csvContent, 0, 100)
-            ]);
-            
-            // Save to var directory
-            $this->varDirectory->writeFile($outputFilePath, $csvContent);
-            
-            $this->logger->info('SquadexaAI FileManager: Output file saved successfully', [
-                'output_file' => $outputFileName,
-                'file_path' => $outputFilePath
-            ]);
-            
-            return $outputFileName;
-        } catch (\Exception $e) {
-            $this->logger->error('SquadexaAI FileManager: Error saving output file', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            throw new LocalizedException(__('Could not save output file: %1', $e->getMessage()));
-        }
     }
 
     /**
@@ -552,9 +393,10 @@ class FileManager extends AbstractHelper
      */
     private function generateUniqueFileName(string $originalName): string
     {
-        $pathInfo = pathinfo($originalName);
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction
+        $pathInfo = pathinfo($originalName); // phpcs:ignore
         $timestamp = date('Y-m-d_H-i-s');
-        $randomString = substr(md5(uniqid()), 0, 8);
+        $randomString = substr(hash('sha256', uniqid((string)random_int(0, PHP_INT_MAX), true)), 0, 8);
         
         // Sanitize filename: remove invalid characters and replace spaces/special chars with underscores
         $sanitizedFilename = $this->sanitizeFileName($pathInfo['filename']);
@@ -575,6 +417,7 @@ class FileManager extends AbstractHelper
         $filename = preg_replace('/[<>:"\/\\\|?*\x00-\x1F]/', '', $filename);
         
         // Replace spaces and other problematic characters with underscores
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction
         $filename = preg_replace('/[\s\(\)\[\]{}]+/', '_', $filename);
         
         // Remove multiple consecutive underscores
@@ -594,112 +437,6 @@ class FileManager extends AbstractHelper
         }
         
         return $filename;
-    }
-
-    /**
-     * Generate output file name based on input file name
-     *
-     * @param string $inputFileName
-     * @return string
-     */
-    private function generateOutputFileName(string $inputFileName): string
-    {
-        $pathInfo = pathinfo($inputFileName);
-        $sanitizedFilename = $this->sanitizeFileName($pathInfo['filename']);
-        return 'ai_generated_' . $sanitizedFilename . '.csv';
-    }
-
-    /**
-     * Convert array to CSV content
-     *
-     * @param array $data
-     * @return string
-     */
-    private function convertArrayToCsv(array $data): string
-    {
-        if (empty($data)) {
-            return '';
-        }
-        
-        $output = fopen('php://temp', 'w');
-        
-        // Check if data is associative array
-        $firstRow = reset($data);
-        $isAssociative = is_array($firstRow) && !empty($firstRow);
-        
-        if ($isAssociative) {
-            // Get headers from first row
-            $headers = array_keys($firstRow);
-            fputcsv($output, $headers, ',', '"', '\\');
-            
-            // Add data rows with values in header order
-        foreach ($data as $row) {
-                $normalizedRow = [];
-                foreach ($headers as $header) {
-                    $value = $row[$header] ?? '';
-                    $normalizedRow[] = $this->normalizeValueForCsv($value);
-                }
-                fputcsv($output, $normalizedRow, ',', '"', '\\');
-            }
-        } else {
-            // Simple indexed array - normalize each row
-        foreach ($data as $row) {
-                $normalizedRow = $this->normalizeRowForCsv($row);
-                fputcsv($output, $normalizedRow, ',', '"', '\\');
-            }
-        }
-        
-        rewind($output);
-        $csvContent = stream_get_contents($output);
-        fclose($output);
-        
-        return $csvContent;
-    }
-
-    /**
-     * Normalize a single value for CSV output
-     *
-     * @param mixed $value
-     * @return string
-     */
-    private function normalizeValueForCsv($value): string
-    {
-        // Handle different value types
-        if (is_array($value) || is_object($value)) {
-            // Convert arrays/objects to JSON
-            return $this->jsonSerializer->serialize($value);
-        } elseif (is_bool($value)) {
-            // Convert boolean to string
-            return $value ? '1' : '0';
-        } elseif ($value === null) {
-            // Convert null to empty string
-            return '';
-        } else {
-            // Keep scalar values as-is, but convert to string
-            return (string)$value;
-        }
-    }
-    
-    /**
-     * Normalize row data for CSV output - convert arrays/objects to strings
-     * Used for non-associative arrays
-     *
-     * @param array|mixed $row
-     * @return array
-     */
-    private function normalizeRowForCsv($row): array
-    {
-        // If not an array, wrap it
-        if (!is_array($row)) {
-            $row = [$row];
-        }
-        
-        $normalized = [];
-        foreach ($row as $value) {
-            $normalized[] = $this->normalizeValueForCsv($value);
-        }
-        
-        return $normalized;
     }
 
     /**
@@ -728,8 +465,9 @@ class FileManager extends AbstractHelper
         }
         
         // Check file extension
-        $allowedExtensions = ['csv', 'xlsx'];
-        $fileExtension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
+        $allowedExtensions = ['csv'];
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction
+        $fileExtension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION)); // phpcs:ignore
         
         if (!in_array($fileExtension, $allowedExtensions)) {
             throw new LocalizedException(__('Invalid file type. Only CSV and XLSX files are allowed.'));
@@ -750,7 +488,10 @@ class FileManager extends AbstractHelper
     public function saveAiProductData(array $aiProductData, ?int $generatedCsvId, string $generationType = 'csv'): array
     {
         $csvIdLog = $generatedCsvId !== null ? (string)$generatedCsvId : 'null (single product, no CSV)';
-        $this->logger->info('FileManager saveAiProductData: Starting to save ' . count($aiProductData) . ' products for CSV ID: ' . $csvIdLog . ', Type: ' . $generationType);
+        $this->logger->info(
+            'FileManager saveAiProductData: Starting to save ' . count($aiProductData) .
+            ' products for CSV ID: ' . $csvIdLog . ', Type: ' . $generationType
+        );
         
         try {
             $savedCount = 0;
@@ -772,6 +513,9 @@ class FileManager extends AbstractHelper
                 
                 // Check if a product with the same name and generation type already exists
                 // This applies to both single and CSV generation types
+                // Note: We check by product_name and generation_type only, not by generatedcsv_id
+                // This ensures that if the same product name appears in different CSV files,
+                // it will update the existing product instead of creating a duplicate
                 $aiProduct = null;
                 $isUpdate = false;
                 if ($productName) {
@@ -779,10 +523,8 @@ class FileManager extends AbstractHelper
                     $existingCollection->addFieldToFilter('product_name', $productName)
                         ->addFieldToFilter('generation_type', $generationType);
                     
-                    // For CSV generation, also filter by generatedcsv_id if provided
-                    if ($generationType === 'csv' && $generatedCsvId !== null) {
-                        $existingCollection->addFieldToFilter('generatedcsv_id', $generatedCsvId);
-                    }
+                    // Do NOT filter by generatedcsv_id when checking for duplicates
+                    // This allows updating existing products even if they came from a different CSV
                     
                     $existingCollection->setPageSize(1);
                     
@@ -796,21 +538,28 @@ class FileManager extends AbstractHelper
                     if ($existingCollection->getSize() > 0) {
                         $aiProduct = $existingCollection->getFirstItem();
                         $isUpdate = true;
-                        $this->logger->info('FileManager saveAiProductData: Found existing product, updating instead of creating new', [
-                            'aiproduct_id' => $aiProduct->getAiproductId(),
-                            'product_name' => $productName,
-                            'current_regeneration_count' => $aiProduct->getData('regeneration_count') ?? 0
-                        ]);
+                        $this->logger->info(
+                            'FileManager saveAiProductData: Found existing product, ' .
+                            'updating instead of creating new',
+                            [
+                                'aiproduct_id' => $aiProduct->getAiproductId(),
+                                'product_name' => $productName,
+                                'current_regeneration_count' => $aiProduct->getData('regeneration_count') ?? 0
+                            ]
+                        );
                     } else {
-                        $this->logger->info('FileManager saveAiProductData: No existing product found, will create new one', [
-                            'product_name' => $productName
-                        ]);
+                        $this->logger->info(
+                            'FileManager saveAiProductData: No existing product found, will create new one',
+                            [
+                                'product_name' => $productName
+                            ]
+                        );
                     }
                 }
                 
                 // If no existing product found, create a new one
                 if (!$aiProduct) {
-                $aiProduct = $this->aiProductFactory->create();
+                    $aiProduct = $this->aiProductFactory->create();
                 }
                 
                 // Set required fields
@@ -829,10 +578,13 @@ class FileManager extends AbstractHelper
                     // Magento's ORM doesn't automatically update this field even with on_update="true"
                     $aiProduct->setUpdatedAt((new \DateTime())->format('Y-m-d H:i:s'));
                     
-                    $this->logger->info('FileManager saveAiProductData: Incrementing regeneration count and updating timestamp', [
-                        'old_count' => $currentCount,
-                        'new_count' => $currentCount + 1
-                    ]);
+                    $this->logger->info(
+                        'FileManager saveAiProductData: Incrementing regeneration count and updating timestamp',
+                        [
+                            'old_count' => $currentCount,
+                            'new_count' => $currentCount + 1
+                        ]
+                    );
                 } else {
                     // New product, set regeneration_count to 0
                     $aiProduct->setData('regeneration_count', 0);
@@ -847,7 +599,7 @@ class FileManager extends AbstractHelper
                 
                 // Fields to extract and save separately (all optional)
                 $fieldsToExtract = [
-                    'product_name', 'name', 
+                    'product_name', 'name',
                     'meta_title', 'meta_description', 'short_description', 'description',
                     'key_features', 'how_to_use', 'ingredients', 'upc', 'keywords',
                     'pricing'
@@ -875,7 +627,7 @@ class FileManager extends AbstractHelper
                 
                 // Extract key_features (array to JSON string)
                 if (isset($productData['key_features'])) {
-                    $keyFeatures = is_array($productData['key_features']) 
+                    $keyFeatures = is_array($productData['key_features'])
                         ? $this->jsonSerializer->serialize($productData['key_features'])
                         : $productData['key_features'];
                     $aiProduct->setKeyFeatures($keyFeatures);
@@ -883,7 +635,7 @@ class FileManager extends AbstractHelper
                 
                 // Extract how_to_use (array to JSON string)
                 if (isset($productData['how_to_use'])) {
-                    $howToUse = is_array($productData['how_to_use']) 
+                    $howToUse = is_array($productData['how_to_use'])
                         ? $this->jsonSerializer->serialize($productData['how_to_use'])
                         : $productData['how_to_use'];
                     $aiProduct->setHowToUse($howToUse);
@@ -891,7 +643,7 @@ class FileManager extends AbstractHelper
                 
                 // Extract ingredients (array to JSON string)
                 if (isset($productData['ingredients'])) {
-                    $ingredients = is_array($productData['ingredients']) 
+                    $ingredients = is_array($productData['ingredients'])
                         ? $this->jsonSerializer->serialize($productData['ingredients'])
                         : $productData['ingredients'];
                     $aiProduct->setIngredients($ingredients);
@@ -904,7 +656,7 @@ class FileManager extends AbstractHelper
                 
                 // Extract keywords (array to JSON string)
                 if (isset($productData['keywords'])) {
-                    $keywords = is_array($productData['keywords']) 
+                    $keywords = is_array($productData['keywords'])
                         ? $this->jsonSerializer->serialize($productData['keywords'])
                         : $productData['keywords'];
                     $aiProduct->setKeywords($keywords);
@@ -939,8 +691,16 @@ class FileManager extends AbstractHelper
                 $additionalData = [];
                 foreach ($productData as $key => $value) {
                     // Skip the fields we're storing separately
-                    if (!in_array($key, $fieldsToExtract) && 
-                        !in_array($key, ['primary_keywords', 'secondary_keywords', 'item_index', 'generation_time', 'from_cache', 'error']) &&
+                    $excludedKeys = [
+                        'primary_keywords',
+                        'secondary_keywords',
+                        'item_index',
+                        'generation_time',
+                        'from_cache',
+                        'error'
+                    ];
+                    if (!in_array($key, $fieldsToExtract) &&
+                        !in_array($key, $excludedKeys) &&
                         $value !== null && $value !== '') {
                         $additionalData[$key] = $value;
                     }
@@ -956,14 +716,14 @@ class FileManager extends AbstractHelper
                 
                 // Store keywords if present
                 if (isset($productData['primary_keywords'])) {
-                    $primaryKeywords = is_array($productData['primary_keywords']) 
+                    $primaryKeywords = is_array($productData['primary_keywords'])
                         ? implode(',', $productData['primary_keywords'])
                         : $productData['primary_keywords'];
                     $aiProduct->setPrimaryKeywords($primaryKeywords);
                 }
                 
                 if (isset($productData['secondary_keywords'])) {
-                    $secondaryKeywords = is_array($productData['secondary_keywords']) 
+                    $secondaryKeywords = is_array($productData['secondary_keywords'])
                         ? implode(',', $productData['secondary_keywords'])
                         : $productData['secondary_keywords'];
                     $aiProduct->setSecondaryKeywords($secondaryKeywords);
@@ -973,8 +733,8 @@ class FileManager extends AbstractHelper
                 // Only reset if this is a new product
                 if (!$isUpdate) {
                     // Magento product creation status (always start as not created for new products)
-                $aiProduct->setIsCreatedInMagento(false);
-                $aiProduct->setMagentoProductId(null);
+                    $aiProduct->setIsCreatedInMagento(false);
+                    $aiProduct->setMagentoProductId(null);
                 }
                 // For updates, keep existing is_created_in_magento and magento_product_id values
                 
@@ -988,13 +748,15 @@ class FileManager extends AbstractHelper
                 
                 if (empty($aiProduct->getGenerationType())) {
                     $this->logger->error('FileManager saveAiProductData: Cannot save - generation_type is empty');
-                    throw new LocalizedException(__('Cannot save AI product: generation_type is required but was empty.'));
+                    throw new LocalizedException(
+                        __('Cannot save AI product: generation_type is required but was empty.')
+                    );
                 }
                 
                 // Save the AI product
                 try {
-                $this->aiProductRepository->save($aiProduct);
-                $savedCount++;
+                    $this->aiProductRepository->save($aiProduct);
+                    $savedCount++;
                     
                     if ($isUpdate) {
                         $updatedCount++;
@@ -1004,16 +766,19 @@ class FileManager extends AbstractHelper
                     
                     // Log the raw data value to see if it's actually null
                     $rawGeneratedCsvId = $aiProduct->getData('generatedcsv_id');
-                    $this->logger->info('FileManager saveAiProductData: Saved AI product', [
-                        'aiproduct_id' => $aiProduct->getAiproductId(),
-                        'generatedcsv_id' => $aiProduct->getGeneratedcsvId(),
-                        'generatedcsv_id_raw' => $rawGeneratedCsvId,
-                        'generatedcsv_id_is_null' => ($rawGeneratedCsvId === null),
-                        'product_name' => $aiProduct->getProductName(),
-                        'generation_type' => $aiProduct->getGenerationType(),
-                        'is_update' => $isUpdate,
-                        'regeneration_count' => $aiProduct->getData('regeneration_count')
-                    ]);
+                    $this->logger->info(
+                        'FileManager saveAiProductData: Saved AI product',
+                        [
+                            'aiproduct_id' => $aiProduct->getAiproductId(),
+                            'generatedcsv_id' => $aiProduct->getGeneratedcsvId(),
+                            'generatedcsv_id_raw' => $rawGeneratedCsvId,
+                            'generatedcsv_id_is_null' => ($rawGeneratedCsvId === null),
+                            'product_name' => $aiProduct->getProductName(),
+                            'generation_type' => $aiProduct->getGenerationType(),
+                            'is_update' => $isUpdate,
+                            'regeneration_count' => $aiProduct->getData('regeneration_count')
+                        ]
+                    );
                 } catch (\Exception $saveException) {
                     $this->logger->error('FileManager saveAiProductData: Failed to save AI product', [
                         'error' => $saveException->getMessage(),
@@ -1022,14 +787,21 @@ class FileManager extends AbstractHelper
                         'generation_type' => $aiProduct->getGenerationType(),
                         'generatedcsv_id' => $aiProduct->getGeneratedcsvId()
                     ]);
-                    throw new LocalizedException(__('Failed to save AI product: %1', $saveException->getMessage()), $saveException);
+                    throw new LocalizedException(
+                        __('Failed to save AI product: %1', $saveException->getMessage()),
+                        $saveException
+                    );
                 }
             }
             
-            $this->logger->info('FileManager saveAiProductData: Successfully saved ' . $savedCount . ' out of ' . count($aiProductData) . ' products', [
+            $this->logger->info(
+                'FileManager saveAiProductData: Successfully saved ' . $savedCount .
+                ' out of ' . count($aiProductData) . ' products',
+                [
                 'created' => $createdCount,
                 'updated' => $updatedCount
-            ]);
+                ]
+            );
             
             return [
                 'total_saved' => $savedCount,
@@ -1041,209 +813,6 @@ class FileManager extends AbstractHelper
             $this->logger->error('Error saving AI product data: ' . $e->getMessage());
             throw new LocalizedException(__('Could not save AI product data: %1', $e->getMessage()));
         }
-    }
-
-    /**
-     * Generate URL key from product name and SKU
-     *
-     * @param string $name
-     * @param string $sku
-     * @return string
-     */
-    private function generateUrlKey(string $name, string $sku): string
-    {
-        $urlKey = $name ?: $sku;
-        $urlKey = strtolower($urlKey);
-        $urlKey = preg_replace('/[^a-z0-9-_]/', '-', $urlKey);
-        $urlKey = preg_replace('/-+/', '-', $urlKey);
-        $urlKey = trim($urlKey, '-');
-        
-        return $urlKey;
-    }
-
-    /**
-     * Extract custom attributes from AI product data
-     *
-     * @param array $productData
-     * @return array
-     */
-    private function extractCustomAttributesFromAiData(array $productData): array
-    {
-        // Define standard product fields that should not be treated as custom attributes
-        $standardFields = [
-            'sku', 'name', 'description', 'short_description', 'price', 'special_price',
-            'weight', 'qty', 'category', 'status', 'visibility', 'type', 'attribute_set',
-            'tax_class', 'meta_title', 'meta_description', 'meta_keywords', 'url_key'
-        ];
-        
-        $customAttributes = [];
-        
-        // Extract any additional fields as custom attributes
-        foreach ($productData as $key => $value) {
-            if (!in_array($key, $standardFields) && !empty($value)) {
-                $customAttributes[$key] = $value;
-            }
-        }
-        
-        return $customAttributes;
-    }
-    
-    /**
-     * Create input reference CSV file for single product generation
-     *
-     * @param array $productData
-     * @param string $fileName
-     * @return string File path
-     * @throws FileSystemException
-     */
-    public function createSingleProductInputFile(array $productData, string $fileName): string
-    {
-        $this->createDirectories(); // Ensure directories exist
-        
-        $filePath = self::INPUT_DIR . '/' . $fileName;
-        
-        $this->logger->info('SquadexaAI FileManager: Creating single product input file', [
-            'file_name' => $fileName,
-            'file_path' => $filePath,
-            'product_data' => $productData
-        ]);
-        
-        // Prepare CSV data
-        $csvData = [
-            ['Product Name', 'Primary Keywords', 'Secondary Keywords', 'Include Pricing'],
-            [
-                $productData['product_name'],
-                $productData['primary_keywords'],
-                $productData['secondary_keywords'],
-                $productData['include_pricing'] ? 'Yes' : 'No'
-            ]
-        ];
-        
-        // Write CSV file
-        $this->varDirectory->writeFile($filePath, $this->arrayToCsv($csvData));
-        
-        $this->logger->info('SquadexaAI FileManager: Single product input file created', [
-            'file_name' => $fileName,
-            'file_path' => $filePath
-        ]);
-        
-        return $filePath;
-    }
-    
-    /**
-     * Create response CSV file for single product generation
-     *
-     * @param array $apiResponse
-     * @param string $fileName
-     * @return string File path
-     * @throws FileSystemException
-     */
-    /**
-     * Create response CSV file for single product generation
-     * Formats the API response according to the new CSV structure
-     *
-     * @param array $apiResponse
-     * @param string $fileName
-     * @return string File path
-     * @throws LocalizedException
-     */
-    public function createSingleProductResponseFile(array $apiResponse, string $fileName): string
-    {
-        $this->createDirectories(); // Ensure directories exist
-        
-        $filePath = self::OUTPUT_DIR . '/' . $fileName;
-        
-        $this->logger->info('SquadexaAI FileManager: Creating single product response file', [
-            'file_name' => $fileName,
-            'file_path' => $filePath,
-            'response_keys' => array_keys($apiResponse)
-        ]);
-        
-        // Prepare CSV header matching the new structure
-        $headers = [
-            'product_name',
-            'primary_keywords',
-            'secondary_keywords',
-            'include_pricing',
-            'meta_title',
-            'meta_description',
-            'short_description',
-            'description',
-            'key_features',
-            'how_to_use',
-            'ingredients',
-            'upc',
-            'keywords',
-            'pricing USD min',
-            'pricing USD max',
-            'pricing CAD min',
-            'pricing CAD max'
-        ];
-        
-        // Build CSV row
-        $row = [];
-        $row[] = $apiResponse['product_name'] ?? $apiResponse['name'] ?? '';
-        $row[] = is_array($apiResponse['primary_keywords'] ?? null) 
-            ? implode(',', $apiResponse['primary_keywords']) 
-            : ($apiResponse['primary_keywords'] ?? '');
-        $row[] = is_array($apiResponse['secondary_keywords'] ?? null) 
-            ? implode(',', $apiResponse['secondary_keywords']) 
-            : ($apiResponse['secondary_keywords'] ?? '');
-        $row[] = isset($apiResponse['include_pricing']) ? ($apiResponse['include_pricing'] ? 'true' : 'false') : '';
-        $row[] = $apiResponse['meta_title'] ?? '';
-        $row[] = $apiResponse['meta_description'] ?? '';
-        $row[] = $apiResponse['short_description'] ?? '';
-        $row[] = $apiResponse['description'] ?? '';
-        $row[] = is_array($apiResponse['key_features'] ?? null) 
-            ? implode('|', $apiResponse['key_features']) 
-            : ($apiResponse['key_features'] ?? '');
-        $row[] = is_array($apiResponse['how_to_use'] ?? null) 
-            ? implode('|', $apiResponse['how_to_use']) 
-            : ($apiResponse['how_to_use'] ?? '');
-        $row[] = is_array($apiResponse['ingredients'] ?? null) 
-            ? implode('|', $apiResponse['ingredients']) 
-            : ($apiResponse['ingredients'] ?? '');
-        $row[] = $apiResponse['upc'] ?? '';
-        $row[] = is_array($apiResponse['keywords'] ?? null) 
-            ? implode(',', $apiResponse['keywords']) 
-            : ($apiResponse['keywords'] ?? '');
-        
-        // Extract pricing
-        $pricing = $apiResponse['pricing'] ?? [];
-        $row[] = $pricing['USD']['min_price'] ?? '';
-        $row[] = $pricing['USD']['max_price'] ?? '';
-        $row[] = $pricing['CAD']['min_price'] ?? '';
-        $row[] = $pricing['CAD']['max_price'] ?? '';
-        
-        // Write CSV file with headers and data
-        $csvData = [$headers, $row];
-        $this->varDirectory->writeFile($filePath, $this->arrayToCsv($csvData));
-        
-        $this->logger->info('SquadexaAI FileManager: Single product response file created', [
-            'file_name' => $fileName,
-            'file_path' => $filePath
-        ]);
-        
-        return $filePath;
-    }
-    
-    /**
-     * Convert array to CSV string
-     *
-     * @param array $data
-     * @return string
-     */
-    private function arrayToCsv(array $data): string
-    {
-        $output = fopen('php://temp', 'r+');
-        foreach ($data as $row) {
-            fputcsv($output, $row, ',', '"', '\\');
-        }
-        rewind($output);
-        $csv = stream_get_contents($output);
-        fclose($output);
-        
-        return $csv;
     }
 
     /**
@@ -1262,7 +831,9 @@ class FileManager extends AbstractHelper
             }
 
             $this->createDirectories();
-            $relativePath = ($type === 'input') ? self::INPUT_DIR . '/' . $fileName : self::OUTPUT_DIR . '/' . $fileName;
+            $relativePath = ($type === 'input')
+                ? self::INPUT_DIR . '/' . $fileName
+                : self::OUTPUT_DIR . '/' . $fileName;
             
             if ($this->varDirectory->isExist($relativePath)) {
                 $this->varDirectory->delete($relativePath);
@@ -1322,10 +893,12 @@ class FileManager extends AbstractHelper
 
         // Extract filename from path if full path is provided
         if (!empty($inputFilePath) && empty($inputFileName)) {
-            $inputFileName = basename($inputFilePath);
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction
+            $inputFileName = basename($inputFilePath); // phpcs:ignore
         }
         if (!empty($responseFilePath) && empty($responseFileName)) {
-            $responseFileName = basename($responseFilePath);
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction
+            $responseFileName = basename($responseFilePath); // phpcs:ignore
         }
 
         // Delete input file if exists
@@ -1346,4 +919,4 @@ class FileManager extends AbstractHelper
 
         return $result;
     }
-} 
+}

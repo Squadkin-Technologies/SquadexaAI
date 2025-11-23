@@ -54,12 +54,10 @@ define([
                     if (response.success && response.attribute) {
                         self.updateValueFields(response.attribute);
                     } else {
-                        console.error('Failed to fetch attribute details:', response.message);
                         self.showDefaultValueField();
                     }
                 },
                 error: function (xhr, status, error) {
-                    console.error('Error fetching attribute details:', error);
                     self.showDefaultValueField();
                 }
             });
@@ -72,7 +70,6 @@ define([
             var valueContainer = this.getValueContainer();
             
             if (!valueContainer) {
-                console.error('Value container not found');
                 return;
             }
 

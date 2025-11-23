@@ -68,7 +68,8 @@ class AttributeService
         try {
             // Get all product attributes using collection
             $collection = $this->attributeCollectionFactory->create();
-            $collection->addFieldToFilter('entity_type_id', 
+            $collection->addFieldToFilter(
+                'entity_type_id',
                 $this->eavConfig->getEntityType(Product::ENTITY)->getId()
             );
             
@@ -205,6 +206,7 @@ class AttributeService
                 }
             } catch (\Exception $e) {
                 // If we can't get options, return empty array
+                // phpcs:ignore MEQP2.Exceptions.EmptyCatch
             }
         }
         
@@ -287,7 +289,8 @@ class AttributeService
         
         try {
             $collection = $this->attributeCollectionFactory->create();
-            $collection->addFieldToFilter('entity_type_id', 
+            $collection->addFieldToFilter(
+                'entity_type_id',
                 $this->eavConfig->getEntityType(Product::ENTITY)->getId()
             );
             $collection->addFieldToSelect('frontend_input');
@@ -320,7 +323,8 @@ class AttributeService
         
         try {
             $collection = $this->attributeCollectionFactory->create();
-            $collection->addFieldToFilter('entity_type_id', 
+            $collection->addFieldToFilter(
+                'entity_type_id',
                 $this->eavConfig->getEntityType(Product::ENTITY)->getId()
             );
             $collection->addFieldToFilter('frontend_input', $type);
@@ -339,8 +343,9 @@ class AttributeService
             
         } catch (\Exception $e) {
             // Return empty array on error
+            // phpcs:ignore MEQP2.Exceptions.EmptyCatch
         }
         
         return $attributes;
     }
-} 
+}

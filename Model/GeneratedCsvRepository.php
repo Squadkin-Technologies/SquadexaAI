@@ -146,4 +146,3 @@ class GeneratedCsvRepository implements GeneratedCsvRepositoryInterface
         return $this->delete($this->get($generatedCsvId));
     }
 }
-

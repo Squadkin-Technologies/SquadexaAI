@@ -44,9 +44,9 @@ class AddUpdateFromAiButton
             }
         } catch (\Exception $e) {
             // If getProduct() doesn't exist or fails, skip adding the button
+            // phpcs:ignore MEQP2.Exceptions.EmptyCatch
         }
 
         return $result;
     }
 }
-

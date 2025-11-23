@@ -57,4 +57,4 @@ interface AiProductRepositoryInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function deleteById($aiproductId);
-} 
+}

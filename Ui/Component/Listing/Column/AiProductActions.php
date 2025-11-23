@@ -16,8 +16,8 @@ use Psr\Log\LoggerInterface;
 
 class AiProductActions extends Column
 {
-    const URL_PATH_EDIT = 'squadkin_squadexaai/aiproduct/edit';
-    const URL_PATH_DELETE = 'squadkin_squadexaai/aiproduct/delete';
+    public const URL_PATH_EDIT = 'squadkin_squadexaai/aiproduct/edit';
+    public const URL_PATH_DELETE = 'squadkin_squadexaai/aiproduct/delete';
 
     /**
      * @var UrlInterface
@@ -72,7 +72,7 @@ class AiProductActions extends Column
             foreach ($dataSource['data']['items'] as &$item) {
                 if (isset($item['aiproduct_id'])) {
                     // Check if product is created in Magento
-                    $isCreatedInMagento = isset($item['is_created_in_magento']) && 
+                    $isCreatedInMagento = isset($item['is_created_in_magento']) &&
                                          ($item['is_created_in_magento'] == 1 || $item['is_created_in_magento'] === true || $item['is_created_in_magento'] === '1');
                     
                     $actions = [];
@@ -80,7 +80,7 @@ class AiProductActions extends Column
                     // Determine if we should show "Edit" or "View"
                     // Logic:
                     // - If NOT created in Magento: Always show "Edit"
-                    // - If created in Magento: 
+                    // - If created in Magento:
                     //   - Show "Edit" if AI data is newer than Magento product (regenerated after creation)
                     //   - Show "View" if AI data is older/equal to Magento product (already synced)
                     $showEdit = true;
@@ -191,4 +191,4 @@ class AiProductActions extends Column
             return true;
         }
     }
-} 
+}

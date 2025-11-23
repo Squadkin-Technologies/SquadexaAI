@@ -18,4 +18,4 @@ class AiProduct extends AbstractDb
     {
         $this->_init('squadkin_squadexaai_aiproduct', 'aiproduct_id');
     }
-} 
+}

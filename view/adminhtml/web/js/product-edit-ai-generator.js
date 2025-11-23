@@ -42,23 +42,13 @@ define([
                     responsive: true,
                     innerScroll: true,
                     title: $t('Generate/Edit Squadexa AI Data'),
-                    buttons: [{
-                        text: $t('Cancel'),
-                        class: 'action-secondary',
-                        click: function () {
-                            this.closeModal();
-                        }
-                    }, {
-                        text: $t('Generate AI Data'),
-                        class: 'action-primary',
-                        id: 'squadexa-generate-btn',
-                        click: function () {
-                            self.generateAndApplyAiData();
-                        }
-                    }]
+                    buttons: [] // Buttons will be managed dynamically via updateModalButtons
                 };
 
                 this.modalInstance = modal(modalOptions, modalElement);
+                
+                // Initialize buttons for input step
+                this.updateModalButtons('input');
             }
         },
 
@@ -128,8 +118,23 @@ define([
             var modalWrapper = modalElement.closest('.modal-popup');
             var self = this;
 
-            // Remove existing action buttons
-            modalWrapper.find('.modal-footer .action-secondary, .modal-footer .action-primary').remove();
+            // Ensure modal wrapper exists
+            if (!modalWrapper.length) {
+                // Try to find it another way
+                modalWrapper = $('.modal-popup').has(modalElement);
+                if (!modalWrapper.length) {
+                    // Modal might not be fully initialized yet, try again after a short delay
+                    setTimeout(function() {
+                        self.updateModalButtons(step);
+                    }, 100);
+                    return;
+                }
+            }
+
+            // Remove existing action buttons (including any with data-dismiss attribute)
+            modalWrapper.find('.modal-footer .action-secondary, .modal-footer .action-primary, .modal-footer button[data-dismiss]').remove();
+            // Also remove any buttons that might have been added by Magento's modal system
+            modalWrapper.find('.modal-footer button').remove();
 
             if (step === 'input') {
                 // Input step buttons
@@ -140,12 +145,23 @@ define([
                 }
                 
                 footer.html(
-                    '<button type="button" class="action-secondary" data-dismiss="modal">' + $t('Cancel') + '</button>' +
+                    '<button type="button" class="action-secondary" id="squadexa-cancel-btn">' + $t('Cancel') + '</button>' +
                     '<button type="button" class="action-primary" id="squadexa-generate-btn">' + $t('Generate AI Data') + '</button>'
                 );
                 
-                // Attach handler
-                footer.find('#squadexa-generate-btn').on('click', function () {
+                // Attach handlers - use off() first to remove any existing handlers
+                footer.find('#squadexa-cancel-btn').off('click').on('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var $modal = $('#squadexa-ai-generator-modal');
+                    if ($modal.length && $modal.data('mageModal')) {
+                        $modal.modal('closeModal');
+                    }
+                });
+                
+                footer.find('#squadexa-generate-btn').off('click').on('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     self.generateAndApplyAiData();
                 });
             } else if (step === 'review') {
@@ -206,6 +222,13 @@ define([
                 '<div data-ui-id="message-' + type + '">' + message + '</div>' +
                 '</div>';
             $('#squadexa-ai-generator-message').html(messageHtml);
+        },
+
+        /**
+         * Clear messages
+         */
+        clearMessages: function () {
+            $('#squadexa-ai-generator-message').html('');
         },
 
         /**
@@ -348,7 +371,6 @@ define([
                 ajaxUrl = urlBuilder.build(urlPath);
             }
             
-            console.log('[AI Generator] AJAX URL:', ajaxUrl);
             
             $.ajax({
                 url: ajaxUrl,
@@ -363,6 +385,9 @@ define([
                     $('body').loader('hide');
                     
                     if (response.success && response.mapped_data) {
+                        // Clear loading message
+                        self.clearMessages();
+                        
                         if (response.raw_data && response.raw_data.pricing && (!response.mapped_data.price || response.mapped_data.price === '')) {
                             var fallbackPrice = self.extractPriceFromPricing(response.raw_data.pricing);
                             if (fallbackPrice) {
@@ -391,12 +416,6 @@ define([
                     }
                     
                     self.showMessage(errorMessage, 'error');
-                    console.error('AJAX Error:', {
-                        'status': xhr.status,
-                        'statusText': xhr.statusText,
-                        'url': ajaxUrl,
-                        'error': error
-                    });
                 }
             });
         },
@@ -454,6 +473,9 @@ define([
          */
         showReviewInModal: function (mappedData, rawData) {
             var self = this;
+            
+            // Clear any existing messages (including loading message)
+            this.clearMessages();
             
             var reviewContent = '<div class="admin__scope-old">';
             reviewContent += '<div class="admin__data-grid-wrap" style="max-height: 400px; overflow-y: auto;">';
@@ -571,7 +593,6 @@ define([
             require(['uiRegistry'], function (registry) {
                 registry.get(dataSourceName, function (dataSource) {
                     if (!dataSource) {
-                        console.error('[AI Generator] Data source not found:', dataSourceName);
                         return;
                     }
                     
@@ -588,12 +609,6 @@ define([
                     if (!productId) {
                         productId = self.config.productId > 0 ? self.config.productId.toString() : 'new';
                     }
-                    
-                    console.log('[AI Generator] Applying mapped data to form', {
-                        'product_id': productId,
-                        'fields_count': Object.keys(mappedData).length,
-                        'fields': Object.keys(mappedData)
-                    });
                     
                     var successCount = 0;
                     var failCount = 0;
@@ -621,7 +636,6 @@ define([
                             paths.forEach(function (path) {
                                 try {
                                     dataSource.set(path, value);
-                                    console.log('[AI Generator] Set value via dataSource.set(' + path + ') for ' + attributeCode + ':', value);
                                     setSuccess = true;
                                 } catch (e) {
                                     // Try next path
@@ -639,7 +653,6 @@ define([
                             }
                             
                             dataSource.data[productId]['product'][attributeCode] = value;
-                            console.log('[AI Generator] Set value via direct data manipulation for ' + attributeCode + ':', value);
                             setSuccess = true;
                         }
                         
@@ -651,23 +664,18 @@ define([
                                     try {
                                         if (field.setValue) {
                                             field.setValue(value);
-                                            console.log('[AI Generator] Set value via field.setValue for ' + attributeCode + ':', value);
                                             successCount++;
                                         } else if (typeof field.value === 'function') {
                                             field.value(value);
-                                            console.log('[AI Generator] Set value via field.value() for ' + attributeCode + ':', value);
                                             successCount++;
                                         } else {
                                             field.value = value;
-                                            console.log('[AI Generator] Set value via field.value property for ' + attributeCode + ':', value);
                                             successCount++;
                                         }
                                     } catch (e) {
-                                        console.warn('[AI Generator] Error setting field ' + attributeCode + ':', e);
                                         failCount++;
                                     }
                                 } else {
-                                    console.warn('[AI Generator] Field component not found for ' + attributeCode);
                                     failCount++;
                                 }
                             });
@@ -705,11 +713,9 @@ define([
                                 
                                 if (!isDescriptionApplied) {
                                     // Description not applied - show manual copy view as fallback
-                                    console.log('[AI Generator] Description not applied after new logic attempt. Showing manual copy popup.');
                                     self.showDescriptionManualCopyView(mappedData.description);
                                 } else {
                                     // All fields applied successfully
-                                    console.log('[AI Generator] Description successfully applied!');
                                     self.showMessage(
                                         $t('AI data has been applied to the product form successfully!'),
                                         'success'
@@ -734,11 +740,9 @@ define([
                     
                     if (pendingCount > 0) {
                         setTimeout(function () {
-                            console.log('[AI Generator] Values set - Success: ' + successCount + ', Failed: ' + failCount);
                             verifyAndHandleDescription();
                         }, 2000);
                     } else {
-                        console.log('[AI Generator] Values set - Success: ' + successCount + ', Failed: ' + failCount);
                         verifyAndHandleDescription();
                     }
                 });
@@ -777,7 +781,6 @@ define([
         _updateDescriptionWithDataSource: function (value, dataSource, productId) {
             var self = this;
             
-            console.log('[AI Generator] Setting description in dataSource and waiting for Page Builder to initialize...');
             
             // First, set description in dataSource immediately (before Page Builder initializes)
             if (dataSource && dataSource.data) {
@@ -795,7 +798,6 @@ define([
                         dataSource.set(productId + '.product.description', value);
                         dataSource.set('data.' + productId + '.product.description', value);
                     } catch (e) {
-                        console.warn('[AI Generator] Error setting description via dataSource.set():', e);
                     }
                 }
             }
@@ -847,7 +849,6 @@ define([
                     var $pageBuilderTextarea = $descriptionContainer.find('textarea[data-role="source"]');
                     
                     if ($pageBuilderStage.length || $pageBuilderIframe.length || $pageBuilderTextarea.length) {
-                        console.log('[AI Generator] Page Builder found! Updating description...');
                         pageBuilderFound = true;
                         
                         // Get description value from dataSource
@@ -884,7 +885,6 @@ define([
                             });
                         });
                         
-                        console.log('[AI Generator] Description updated in Page Builder!');
                         
                         // Mark as updated for verification
                         self.descriptionUpdateStatus.updated = true;
@@ -895,7 +895,6 @@ define([
                 if (!pageBuilderFound && observerAttempts < maxObserverAttempts) {
                     setTimeout(tryUpdatePageBuilder, 500);
                 } else if (!pageBuilderFound) {
-                    console.log('[AI Generator] Page Builder not found. Description is in dataSource.');
                 }
             };
             
@@ -957,7 +956,6 @@ define([
             var isApplied = false;
             var expectedValueTrimmed = expectedValue.trim();
             
-            console.log('[AI Generator] Verifying description application. Expected value length:', expectedValueTrimmed.length);
             
             // First, check if Page Builder is active for description field
             var isPageBuilderActive = false;
@@ -967,7 +965,6 @@ define([
                 var $pageBuilderStage = $descriptionContainer.find('[data-role="pagebuilder-stage"]');
                 if ($pageBuilderStage.length > 0) {
                     isPageBuilderActive = true;
-                    console.log('[AI Generator] Page Builder is active for description field');
                     
                     // For Page Builder, check the actual stage content
                     // Page Builder stores content in a specific format, check if it contains our text
@@ -980,7 +977,6 @@ define([
                         if (pbTextareaValue.indexOf(expectedValueTrimmed) !== -1 || 
                             pbTextareaValue.replace(/<[^>]*>/g, '').trim() === expectedValueTrimmed) {
                             isApplied = true;
-                            console.log('[AI Generator] Description verified in Page Builder textarea');
                         }
                     }
                 }
@@ -1008,7 +1004,6 @@ define([
                             fieldValueTextOnly === expectedValueTextOnly ||
                             fieldValueTrimmed.indexOf(expectedValueTrimmed) !== -1) {
                             isApplied = true;
-                            console.log('[AI Generator] Description verified in DOM field:', selector, 'Value length:', fieldValueTrimmed.length);
                             return false; // Break forEach
                         }
                     }
@@ -1028,9 +1023,7 @@ define([
                         editorTextOnly === expectedTextOnly ||
                         editorContentTrimmed.indexOf(expectedValueTrimmed) !== -1) {
                         isApplied = true;
-                        console.log('[AI Generator] Description verified in TinyMCE editor. Content length:', editorContentTrimmed.length);
                     } else {
-                        console.log('[AI Generator] TinyMCE content mismatch. Editor:', editorContentTrimmed.length, 'Expected:', expectedValueTrimmed.length);
                     }
                 }
             }
@@ -1056,21 +1049,18 @@ define([
                                     if (fieldValueTrimmed === expectedValueTrimmed || 
                                         fieldTextOnly === expectedTextOnly) {
                                         isApplied = true;
-                                        console.log('[AI Generator] Description verified in UI component');
                                     }
                                 }
                             }
                         });
                     });
                 } catch (e) {
-                    console.warn('[AI Generator] Error checking UI registry:', e);
                 }
             }
             
             // For Page Builder, if we couldn't verify, assume it's NOT applied
             // because Page Builder requires special handling
             if (isPageBuilderActive && !isApplied) {
-                console.log('[AI Generator] Page Builder is active but description not verified - assuming NOT applied');
                 isApplied = false;
             }
             
@@ -1089,18 +1079,15 @@ define([
                 
                 if (descriptionValue && descriptionValue.trim() === expectedValueTrimmed) {
                     dataSourceHasValue = true;
-                    console.log('[AI Generator] Data source has description value');
                 }
             }
             
             // Only consider it applied if BOTH data source AND visible field have it
             // OR if we verified it in a visible field (which is more reliable)
             if (dataSourceHasValue && !isApplied) {
-                console.log('[AI Generator] Data source has value but visible field does not - marking as NOT applied');
                 isApplied = false;
             }
             
-            console.log('[AI Generator] Description verification result:', isApplied, 'Page Builder active:', isPageBuilderActive);
             return isApplied;
         },
 
@@ -1152,9 +1139,7 @@ define([
                     try {
                         document.execCommand('copy');
                         $('#squadexa-copy-success-msg').fadeIn().delay(2000).fadeOut();
-                        console.log('[AI Generator] Description copied to clipboard');
                     } catch (err) {
-                        console.error('[AI Generator] Failed to copy:', err);
                         // Fallback: select text for manual copy
                         textarea.focus();
                         textarea.select();

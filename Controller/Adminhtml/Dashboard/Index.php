@@ -15,7 +15,7 @@ class Index extends Action
     /**
      * Authorization level
      */
-    const ADMIN_RESOURCE = 'Squadkin_SquadexaAI::dashboard';
+    public const ADMIN_RESOURCE = 'Squadkin_SquadexaAI::dashboard';
 
     /**
      * @var PageFactory
@@ -49,4 +49,3 @@ class Index extends Action
         return $resultPage;
     }
 }
-

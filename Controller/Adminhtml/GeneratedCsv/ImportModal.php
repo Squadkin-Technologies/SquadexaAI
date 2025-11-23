@@ -121,4 +121,4 @@ class ImportModal extends Action
     {
         return $this->_authorization->isAllowed('Squadkin_SquadexaAI::GeneratedCsv_save');
     }
-} 
+}

@@ -23,7 +23,7 @@ use Psr\Log\LoggerInterface;
  */
 class GetMappedData extends Action implements HttpGetActionInterface, CsrfAwareActionInterface
 {
-    const ADMIN_RESOURCE = 'Squadkin_SquadexaAI::squadkin_squadexaai_aiproduct';
+    public const ADMIN_RESOURCE = 'Squadkin_SquadexaAI::squadkin_squadexaai_aiproduct';
     
     /**
      * Public actions that don't require secret key validation
@@ -73,7 +73,7 @@ class GetMappedData extends Action implements HttpGetActionInterface, CsrfAwareA
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function createCsrfValidationException(RequestInterface $request): ?InvalidRequestException
     {
@@ -81,7 +81,7 @@ class GetMappedData extends Action implements HttpGetActionInterface, CsrfAwareA
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function validateForCsrf(RequestInterface $request): ?bool
     {
@@ -93,7 +93,7 @@ class GetMappedData extends Action implements HttpGetActionInterface, CsrfAwareA
     
     /**
      * Override to skip secret key validation for AJAX requests
-     * 
+     *
      * @return bool
      */
     public function _processUrlKeys()
@@ -185,4 +185,3 @@ class GetMappedData extends Action implements HttpGetActionInterface, CsrfAwareA
         }
     }
 }
-

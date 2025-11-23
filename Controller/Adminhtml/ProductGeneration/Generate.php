@@ -176,31 +176,50 @@ class Generate extends Action
 
             // Build URLs for guidance
             $aiProductGridUrl = $this->getUrl('squadkin_squadexaai/aiproduct/index');
-            $fieldMappingConfigUrl = $this->getUrl('adminhtml/system_config/edit/section/squadexaiproductcreator', ['_fragment' => 'squadexaiproductcreator_field_mapping-link']);
+            $fieldMappingConfigUrl = $this->getUrl(
+                'adminhtml/system_config/edit/section/squadexaiproductcreator',
+                ['_fragment' => 'squadexaiproductcreator_field_mapping-link']
+            );
             
             // Create comprehensive success message with step-by-step guidance
             if ($isUpdate) {
                 $successMessage = '<strong>Product updated successfully!</strong><br/>' .
-                    '<p style="margin-top: 10px; margin-bottom: 5px;">An existing product with the same name was found and updated with the latest AI-generated data.</p>' .
+                    '<p style="margin-top: 10px; margin-bottom: 5px;">' .
+                    'An existing product with the same name was found and updated ' .
+                    'with the latest AI-generated data.</p>' .
                     '<p style="margin-top: 10px; margin-bottom: 5px;"><strong>What\'s Next?</strong></p>' .
-                    '<p style="margin-bottom: 5px;">You have been redirected to the <a href="' . $aiProductGridUrl . '" target="_blank"><strong>Squadexa AI - Products Data</strong></a> grid. From here you can:</p>' .
+                    '<p style="margin-bottom: 5px;">You have been redirected to the ' .
+                    '<a href="' . $aiProductGridUrl . '" target="_blank">' .
+                    '<strong>Squadexa AI - Products Data</strong></a> grid. From here you can:</p>' .
                     '<ul style="margin-left: 20px; margin-top: 5px; margin-bottom: 10px;">' .
                     '<li>View and edit the updated AI-generated product response</li>' .
-                    '<li>If the product is already created in Magento, use "Update Product in Magento" to sync the latest changes</li>' .
+                    '<li>If the product is already created in Magento, use ' .
+                    '"Update Product in Magento" to sync the latest changes</li>' .
                     '<li>Or create a new product using the "Create Product from AI Data" action</li>' .
                     '</ul>' .
-                    '<p style="margin-bottom: 5px;"><strong>Important:</strong> Before creating or updating products, make sure you have configured field mappings in <a href="' . $fieldMappingConfigUrl . '" target="_blank"><strong>System Configuration → Field Mapping</strong></a>.</p>';
+                    '<p style="margin-bottom: 5px;"><strong>Important:</strong> ' .
+                    'Before creating or updating products, make sure you have configured ' .
+                    'field mappings in <a href="' . $fieldMappingConfigUrl . '" target="_blank">' .
+                    '<strong>System Configuration → Field Mapping</strong></a>.</p>';
             } else {
                 $successMessage = '<strong>Product generated successfully!</strong><br/>' .
                     '<p style="margin-top: 10px; margin-bottom: 5px;"><strong>What\'s Next?</strong></p>' .
-                    '<p style="margin-bottom: 5px;">You have been redirected to the <a href="' . $aiProductGridUrl . '" target="_blank"><strong>Squadexa AI - Products Data</strong></a> grid. From here you can:</p>' .
+                    '<p style="margin-bottom: 5px;">You have been redirected to the ' .
+                    '<a href="' . $aiProductGridUrl . '" target="_blank">' .
+                    '<strong>Squadexa AI - Products Data</strong></a> grid. From here you can:</p>' .
                     '<ul style="margin-left: 20px; margin-top: 5px; margin-bottom: 10px;">' .
                     '<li>View and edit each AI-generated product response</li>' .
-                    '<li>Create products one by one using the "Create Product from AI Data" action in the grid</li>' .
+                    '<li>Create products one by one using the "Create Product from AI Data" ' .
+                    'action in the grid</li>' .
                     '<li>Or edit individual products and create them from the edit page</li>' .
                     '</ul>' .
-                    '<p style="margin-bottom: 5px;"><strong>Important:</strong> Before creating products, make sure you have configured field mappings in <a href="' . $fieldMappingConfigUrl . '" target="_blank"><strong>System Configuration → Field Mapping</strong></a>.</p>' .
-                    '<p style="margin-bottom: 5px;">Field mappings tell the system which Magento product attributes to use for each AI-generated field.</p>';
+                    '<p style="margin-bottom: 5px;"><strong>Important:</strong> ' .
+                    'Before creating products, make sure you have configured field mappings ' .
+                    'in <a href="' . $fieldMappingConfigUrl . '" target="_blank">' .
+                    '<strong>System Configuration → Field Mapping</strong></a>.</p>' .
+                    '<p style="margin-bottom: 5px;">' .
+                    'Field mappings tell the system which Magento product ' .
+                    'attributes to use for each AI-generated field.</p>';
             }
             
             // Store HTML message in session to be displayed on AI Product grid page after redirect
@@ -246,7 +265,8 @@ class Generate extends Action
      */
     protected function _isAllowed(): bool
     {
-        return $this->_authorization->isAllowed('Squadkin_SquadexaAI::squadexaiproductcreator');
+        return $this->_authorization->isAllowed(
+            'Squadkin_SquadexaAI::squadexaiproductcreator'
+        );
     }
 }
-

@@ -60,9 +60,12 @@ class ValidateApiKey extends Action
             $tempApiService = $this->_objectManager->create(
                 SquadexaApiService::class,
                 [
-                    'scopeConfig' => $this->_objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class),
+                    'scopeConfig' => $this->_objectManager->get(
+                        \Magento\Framework\App\Config\ScopeConfigInterface::class
+                    ),
                     'curl' => $this->_objectManager->get(\Magento\Framework\HTTP\Client\Curl::class),
-                    'jsonSerializer' => $this->_objectManager->get(\Magento\Framework\Serialize\Serializer\Json::class),
+                    'jsonSerializer' => $this->_objectManager
+                        ->get(\Magento\Framework\Serialize\Serializer\Json::class),
                     'logger' => $this->_objectManager->get(\Psr\Log\LoggerInterface::class)
                 ]
             );
@@ -75,15 +78,39 @@ class ValidateApiKey extends Action
             
             // Mock the getValue method to return our test API key
             $mockScopeConfig = new class($scopeConfig, $apiKey) {
+                /**
+                 * @var \Magento\Framework\App\Config\ScopeConfigInterface
+                 */
                 private $originalScopeConfig;
+                
+                /**
+                 * @var string
+                 */
                 private $testApiKey;
                 
-                public function __construct($originalScopeConfig, $testApiKey) {
+                /**
+                 * @param \Magento\Framework\App\Config\ScopeConfigInterface $originalScopeConfig
+                 * @param string $testApiKey
+                 */
+                public function __construct($originalScopeConfig, $testApiKey)
+                {
                     $this->originalScopeConfig = $originalScopeConfig;
                     $this->testApiKey = $testApiKey;
                 }
                 
-                public function getValue($path, $scopeType = \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $scopeCode = null) {
+                /**
+                 * Get config value
+                 *
+                 * @param string $path
+                 * @param string $scopeType
+                 * @param string|null $scopeCode
+                 * @return string|null
+                 */
+                public function getValue(
+                    $path,
+                    $scopeType = \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                    $scopeCode = null
+                ) {
                     if ($path === 'squadexaiproductcreator/authentication/api_key') {
                         return $this->testApiKey;
                     }

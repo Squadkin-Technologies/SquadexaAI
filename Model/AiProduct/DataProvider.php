@@ -183,4 +183,4 @@ class DataProvider extends AbstractDataProvider
         
         return $formattedAttributes;
     }
-} 
+}

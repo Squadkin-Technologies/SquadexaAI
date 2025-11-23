@@ -61,7 +61,9 @@ class Edit extends Action
                 $resultRedirect = $this->resultRedirectFactory->create();
                 return $resultRedirect->setPath('*/*/');
             } catch (\Exception $e) {
-                $this->messageManager->addErrorMessage(__('An error occurred while loading the AI product: %1', $e->getMessage()));
+                $this->messageManager->addErrorMessage(
+                    __('An error occurred while loading the AI product: %1', $e->getMessage())
+                );
                 $resultRedirect = $this->resultRedirectFactory->create();
                 return $resultRedirect->setPath('*/*/');
             }
@@ -81,4 +83,4 @@ class Edit extends Action
     {
         return $this->_authorization->isAllowed('Squadkin_SquadexaAI::AiProduct_update');
     }
-} 
+}

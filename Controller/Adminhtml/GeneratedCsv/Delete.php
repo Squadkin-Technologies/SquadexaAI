@@ -28,7 +28,7 @@ class Delete extends Action
     /**
      * Authorization level
      */
-    const ADMIN_RESOURCE = 'Squadkin_SquadexaAI::squadkin_squadexaai_generatedcsv_delete';
+    public const ADMIN_RESOURCE = 'Squadkin_SquadexaAI::squadkin_squadexaai_generatedcsv_delete';
 
     /**
      * @var GeneratedCsvRepositoryInterface
@@ -109,7 +109,10 @@ class Delete extends Action
             // Prepare success message
             $message = __('The record has been deleted.');
             if (!empty($fileDeletionResult['errors'])) {
-                $message .= ' ' . __('Note: Some files could not be deleted: %1', implode(', ', $fileDeletionResult['errors']));
+                $message .= ' ' . __(
+                    'Note: Some files could not be deleted: %1',
+                    implode(', ', $fileDeletionResult['errors'])
+                );
             }
 
             $this->messageManager->addSuccessMessage($message);
@@ -144,4 +147,3 @@ class Delete extends Action
         return $resultRedirect;
     }
 }
-

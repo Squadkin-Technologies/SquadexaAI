@@ -24,7 +24,7 @@ class ProductSaveAfter implements ObserverInterface
     /**
      * Custom data key to store AI product ID in product object
      */
-    const AI_PRODUCT_ID_KEY = 'ai_product_id';
+    public const AI_PRODUCT_ID_KEY = 'ai_product_id';
 
     /**
      * @var AiProductRepositoryInterface
@@ -183,4 +183,3 @@ class ProductSaveAfter implements ObserverInterface
         }
     }
 }
-

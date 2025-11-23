@@ -154,4 +154,4 @@ class ImportActions extends Column
 
         return $actions;
     }
-} 
+}

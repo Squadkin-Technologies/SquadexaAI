@@ -94,7 +94,7 @@ class ProductCreateActions extends Column
     private function getProductActions(array $item): array
     {
         $actions = [];
-        $csvId = (int)$item['generatedcsv_id']; // Cast to int as grid data comes as string 
+        $csvId = (int)$item['generatedcsv_id']; // Cast to int as grid data comes as string
         $generationType = $item['generation_type'] ?? 'csv';
 
         try {
@@ -172,4 +172,3 @@ class ProductCreateActions extends Column
         }
     }
 }
-

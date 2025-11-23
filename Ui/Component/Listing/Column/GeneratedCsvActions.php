@@ -23,7 +23,7 @@ class GeneratedCsvActions extends Column
     /**
      * URL path for delete action
      */
-    const URL_PATH_DELETE = 'squadkin_squadexaai/generatedcsv/delete';
+    public const URL_PATH_DELETE = 'squadkin_squadexaai/generatedcsv/delete';
 
     /**
      * @var UrlInterface
@@ -83,4 +83,3 @@ class GeneratedCsvActions extends Column
         return $dataSource;
     }
 }
-

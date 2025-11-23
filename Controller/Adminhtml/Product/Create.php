@@ -147,8 +147,9 @@ class Create extends Action
                     
                 } catch (\Exception $e) {
                     $this->logger->error('Error creating product: ' . $e->getMessage());
-                    $errors[] = __('Failed to create product %1: %2', 
-                        $aiProduct->getSku(), 
+                    $errors[] = __(
+                        'Failed to create product %1: %2',
+                        $aiProduct->getSku(),
                         $e->getMessage()
                     );
                 }
@@ -294,4 +295,3 @@ class Create extends Action
         return $this->_authorization->isAllowed('Squadkin_SquadexaAI::GeneratedCsv');
     }
 }
-

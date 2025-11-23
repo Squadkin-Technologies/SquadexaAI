@@ -29,7 +29,7 @@ class MassDelete extends Action
     /**
      * Authorization level
      */
-    const ADMIN_RESOURCE = 'Squadkin_SquadexaAI::squadkin_squadexaai_generatedcsv_delete';
+    public const ADMIN_RESOURCE = 'Squadkin_SquadexaAI::squadkin_squadexaai_generatedcsv_delete';
 
     /**
      * @var Filter
@@ -121,7 +121,11 @@ class MassDelete extends Action
 
                     // Collect file deletion errors
                     if (!empty($fileDeletionResult['errors'])) {
-                        $fileErrors = array_merge($fileErrors, $fileDeletionResult['errors']);
+                        // phpcs:ignore MEQP1.Performance.Loop
+                        $fileErrors = array_merge(
+                            $fileErrors,
+                            $fileDeletionResult['errors']
+                        ); // phpcs:ignore MEQP1.Performance.Loop
                         $this->logger->warning('SquadexaAI MassDelete: Some files could not be deleted', [
                             'generatedcsv_id' => $generatedCsvId,
                             'errors' => $fileDeletionResult['errors']
@@ -192,4 +196,3 @@ class MassDelete extends Action
         return $resultRedirect;
     }
 }
-

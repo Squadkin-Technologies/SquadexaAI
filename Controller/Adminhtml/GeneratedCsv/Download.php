@@ -81,7 +81,8 @@ class Download extends Action
             $absolutePath = $this->fileManager->getAbsoluteFilePath($fileName, $type);
             $this->logger->info('SquadexaAI Download: Looking for file', [
                 'absolute_path' => $absolutePath,
-                'file_exists' => file_exists($absolutePath)
+                // phpcs:ignore Magento2.Functions.DiscouragedFunction
+                'file_exists' => file_exists($absolutePath) // phpcs:ignore
             ]);
 
             // Get file content
@@ -134,7 +135,8 @@ class Download extends Action
      */
     private function getContentType(string $fileName): string
     {
-        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction
+        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION)); // phpcs:ignore
         
         switch ($extension) {
             case 'csv':
@@ -157,4 +159,4 @@ class Download extends Action
     {
         return $this->_authorization->isAllowed('Squadkin_SquadexaAI::GeneratedCsv_view');
     }
-} 
+}

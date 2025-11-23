@@ -24,6 +24,12 @@ class AiGenerator extends Template
      */
     private $jsonSerializer;
 
+    /**
+     * @param Context $context
+     * @param Registry $registry
+     * @param Json $jsonSerializer
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         Registry $registry,
@@ -37,6 +43,8 @@ class AiGenerator extends Template
 
     /**
      * Current product instance
+     *
+     * @return ProductInterface|null
      */
     public function getProduct(): ?ProductInterface
     {
@@ -45,26 +53,51 @@ class AiGenerator extends Template
         return $product;
     }
 
+    /**
+     * Get product ID
+     *
+     * @return int
+     */
     public function getProductId(): int
     {
         return (int)($this->getProduct()?->getId() ?? 0);
     }
 
+    /**
+     * Get product name
+     *
+     * @return string
+     */
     public function getProductName(): string
     {
         return (string)($this->getProduct()?->getName() ?? '');
     }
 
+    /**
+     * Get meta title
+     *
+     * @return string
+     */
     public function getMetaTitle(): string
     {
         return (string)($this->getProduct()?->getMetaTitle() ?? '');
     }
 
+    /**
+     * Get meta description
+     *
+     * @return string
+     */
     public function getMetaDescription(): string
     {
         return (string)($this->getProduct()?->getMetaDescription() ?? '');
     }
 
+    /**
+     * Get meta keywords
+     *
+     * @return string
+     */
     public function getMetaKeywords(): string
     {
         return (string)($this->getProduct()?->getMetaKeyword() ?? '');
@@ -86,4 +119,3 @@ class AiGenerator extends Template
         return $this->jsonSerializer->serialize($config);
     }
 }
-

@@ -93,6 +93,7 @@ class MagentoProductCreator
                     return $this->updateExistingProduct($existingProduct, $aiProduct);
                 } catch (\Exception $e) {
                     // Product doesn't exist, create new one
+                    // phpcs:ignore MEQP2.Exceptions.EmptyCatch
                 }
             }
 
@@ -117,7 +118,10 @@ class MagentoProductCreator
             $aiProduct->setIsCreatedInMagento(true);
             $this->aiProductRepository->save($aiProduct);
             
-            $this->logger->info('Created Magento product with ID: ' . $savedProduct->getId() . ' from AI product: ' . $aiProduct->getSku());
+            $this->logger->info(
+                'Created Magento product with ID: ' . $savedProduct->getId() .
+                ' from AI product: ' . $aiProduct->getSku()
+            );
             
             return $savedProduct;
             
@@ -147,7 +151,10 @@ class MagentoProductCreator
             // Save the updated product
             $savedProduct = $this->productRepository->save($product);
             
-            $this->logger->info('Updated Magento product with ID: ' . $savedProduct->getId() . ' from AI product: ' . $aiProduct->getSku());
+            $this->logger->info(
+                'Updated Magento product with ID: ' . $savedProduct->getId() .
+                ' from AI product: ' . $aiProduct->getSku()
+            );
             
             return $savedProduct;
             
@@ -323,4 +330,4 @@ class MagentoProductCreator
         
         return $results;
     }
-} 
+}

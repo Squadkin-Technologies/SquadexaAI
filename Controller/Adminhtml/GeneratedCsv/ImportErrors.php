@@ -145,7 +145,7 @@ class ImportErrors extends Action
         
         // If no line breaks, try semicolons
         if (count($logEntries) <= 1 && strpos($errorMessage, ';') !== false) {
-            $logEntries = array_filter(explode(';', $errorMessage), function($entry) {
+            $logEntries = array_filter(explode(';', $errorMessage), function ($entry) {
                 return !empty(trim($entry));
             });
         }
@@ -162,4 +162,4 @@ class ImportErrors extends Action
     {
         return $this->_authorization->isAllowed('Squadkin_SquadexaAI::GeneratedCsv_save');
     }
-} 
+}

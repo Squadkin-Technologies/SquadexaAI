@@ -218,8 +218,10 @@ class AiFieldMappingService
             );
             throw new LocalizedException(__(
                 'Field mapping configuration is required before %1 from AI data. ' .
-                'Please configure field mappings in <a href="%2" target="_blank">System Configuration → Field Mapping</a>. ' .
-                'Field mappings tell the system which Magento product attributes to use for each AI-generated field.',
+                'Please configure field mappings in ' .
+                '<a href="%2" target="_blank">System Configuration → Field Mapping</a>. ' .
+                'Field mappings tell the system which Magento product attributes ' .
+                'to use for each AI-generated field.',
                 $action,
                 $configUrl
             ));

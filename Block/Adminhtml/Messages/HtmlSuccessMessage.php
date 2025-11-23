@@ -56,4 +56,3 @@ class HtmlSuccessMessage extends Template
         return (bool)$this->session->getData('squadexa_html_success_message');
     }
 }
-

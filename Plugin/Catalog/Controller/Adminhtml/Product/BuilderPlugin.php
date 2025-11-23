@@ -42,7 +42,7 @@ class BuilderPlugin
     /**
      * Custom data key to store AI product ID in product object
      */
-    const AI_PRODUCT_ID_KEY = 'ai_product_id';
+    public const AI_PRODUCT_ID_KEY = 'ai_product_id';
 
     /**
      * Pre-fill product with AI data after build
@@ -169,4 +169,3 @@ class BuilderPlugin
         return $result;
     }
 }
-

@@ -18,7 +18,7 @@ use Magento\Framework\Serialize\Serializer\Json;
  */
 class FieldMapping extends AbstractHelper
 {
-    const XML_PATH_FIELD_MAPPING = 'squadexaiproductcreator/field_mapping/default_mapping_rules';
+    public const XML_PATH_FIELD_MAPPING = 'squadexaiproductcreator/field_mapping/default_mapping_rules';
 
     /**
      * @var DecoderInterface
@@ -143,4 +143,3 @@ class FieldMapping extends AbstractHelper
         return $magentoData;
     }
 }
-

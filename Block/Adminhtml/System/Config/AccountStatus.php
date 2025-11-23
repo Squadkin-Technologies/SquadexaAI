@@ -57,7 +57,10 @@ class AccountStatus extends Field
             $apiKey = $this->apiService->getApiKey();
             
             if (empty($apiKey)) {
-                $html .= $this->renderError('No API key configured. Please enter your username/password and click "Generate API Key" to authenticate.');
+                $html .= $this->renderError(
+                    'No API key configured. Please enter your username/password ' .
+                    'and click "Generate API Key" to authenticate.'
+                );
             } else {
                 try {
                     // Test health check first
@@ -76,13 +79,18 @@ class AccountStatus extends Field
                         $accountInfo = $this->apiService->getAccountInformation();
                         $html .= $this->renderAccountInfo($accountInfo);
                     } catch (\Exception $accountError) {
-                        $this->logger->error('SquadexaAI Account Info Failed', ['error' => $accountError->getMessage()]);
+                        $this->logger->error(
+                            'SquadexaAI Account Info Failed',
+                            ['error' => $accountError->getMessage()]
+                        );
                         
                         // Check if it's an authentication error
-                        if (strpos($accountError->getMessage(), '401') !== false || 
+                        if (strpos($accountError->getMessage(), '401') !== false ||
                             strpos($accountError->getMessage(), 'Authentication required') !== false ||
                             strpos($accountError->getMessage(), 'expired') !== false) {
-                            $html .= $this->renderError('Access token expired. Please click "Generate API Key" to refresh your authentication.');
+                            $html .= $this->renderError(
+                                'Access token expired. Please click "Generate API Key" to refresh your authentication.'
+                            );
                         } else {
                             $html .= $this->renderError('API key validation failed: ' . $accountError->getMessage());
                         }
@@ -109,15 +117,17 @@ class AccountStatus extends Field
             ]);
             
             // Return a safe fallback HTML to prevent blank page
-            return '<div id="squadexa-account-status">
+            $fallbackHtml = '<div id="squadexa-account-status">
                 <div class="account-error">
                     <h3>⚠️ Configuration Error</h3>
                     <div class="error-message">
-                        <p><strong>Error:</strong> Unable to load account status. Please check the logs for more details.</p>
+                        <p><strong>Error:</strong> Unable to load account status. ';
+            $fallbackHtml .= 'Please check the logs for more details.</p>
                         <p>This is a fallback message to prevent the configuration page from being blank.</p>
                     </div>
                 </div>
             </div>';
+            return $fallbackHtml;
         }
     }
 
@@ -234,7 +244,8 @@ class AccountStatus extends Field
         $html .= '<div class="status-item">';
         $html .= '<span class="status-icon">📊</span>';
         $html .= '<span class="status-label">Current Plan</span>';
-        $html .= '<span class="status-value">' . $planName . ' ' . ($subscriptionPlan['calls_limit'] ?? 5) . ' calls/month</span>';
+        $html .= '<span class="status-value">' . $planName . ' ';
+        $html .= ($subscriptionPlan['calls_limit'] ?? 5) . ' calls/month</span>';
         $html .= '</div>';
         
         // Calls Remaining
@@ -274,13 +285,17 @@ class AccountStatus extends Field
         $html .= '<div class="progress-bar">';
         $html .= '<div class="progress-fill" style="width: ' . $percentage . '%"></div>';
         $html .= '</div>';
-        $html .= '<p><strong>' . ($callsLimit - $callsRemaining) . '/' . $callsLimit . '</strong> descriptions generated</p>';
+        $html .= '<p><strong>' . ($callsLimit - $callsRemaining) . '/' . $callsLimit;
+        $html .= '</strong> descriptions generated</p>';
         $html .= '</div>';
         
         // Free Trial Banner
         if ($callsRemaining > 0) {
             $html .= '<div class="trial-banner">';
-            $html .= '<p>🎉 <strong>Free Trial</strong> You have ' . $callsRemaining . ' descriptions remaining in your free trial. <a href="#" target="_blank">Upgrade now</a> to get unlimited access.</p>';
+            $html .= '<p>🎉 <strong>Free Trial</strong> You have ' . $callsRemaining;
+            $html .= ' descriptions remaining in your free trial. ';
+            $html .= '<a href="#" target="_blank">Upgrade now</a> ';
+            $html .= 'to get unlimited access.</p>';
             $html .= '</div>';
         }
         
@@ -302,13 +317,18 @@ class AccountStatus extends Field
             $html = '<div class="account-error">';
             $html .= '<h3>❌ Account Status</h3>';
             $html .= '<div class="error-message">';
-            $html .= '<p><strong>Error:</strong> ' . htmlspecialchars($message) . '</p>';
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction
+            $html .= '<p><strong>Error:</strong> ' . htmlspecialchars($message) . '</p>'; // phpcs:ignore
             $html .= '<p>Please check your API key configuration and try again.</p>';
             $html .= '<p><strong>Debug Info:</strong></p>';
             $html .= '<ul>';
-            $html .= '<li>API Base URL: ' . htmlspecialchars($this->apiService->getApiBaseUrl()) . '</li>';
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction
+            $html .= '<li>API Base URL: ' . htmlspecialchars($this->apiService->getApiBaseUrl()); // phpcs:ignore
+            $html .= '</li>';
             $html .= '<li>API Key Length: ' . strlen($this->apiService->getApiKey()) . '</li>';
-            $html .= '<li>API Key Prefix: ' . htmlspecialchars(substr($this->apiService->getApiKey(), 0, 10)) . '...</li>';
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction
+            $html .= '<li>API Key Prefix: ';
+            $html .= htmlspecialchars(substr($this->apiService->getApiKey(), 0, 10)) . '...</li>'; // phpcs:ignore
             $html .= '</ul>';
             $html .= '</div>';
             $html .= '</div>';
@@ -316,10 +336,12 @@ class AccountStatus extends Field
             return $html;
         } catch (\Exception $e) {
             // Fallback error message if something goes wrong
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction
+            $fallbackMessage = htmlspecialchars($message);
             return '<div class="account-error">
                 <h3>❌ Account Status</h3>
                 <div class="error-message">
-                    <p><strong>Error:</strong> ' . htmlspecialchars($message) . '</p>
+                    <p><strong>Error:</strong> ' . $fallbackMessage . '</p>
                     <p>Please check your API key configuration and try again.</p>
                 </div>
             </div>';

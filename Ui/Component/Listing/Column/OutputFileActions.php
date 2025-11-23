@@ -50,6 +50,7 @@ class OutputFileActions extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
                 $name = $this->getData('name');
+                $importStatus = $item['import_status'] ?? 'pending';
                 
                 // Check if response file exists
                 if (isset($item['response_file_name']) && !empty($item['response_file_name'])) {
@@ -69,15 +70,34 @@ class OutputFileActions extends Column
                         ]
                     ];
                 } elseif (isset($item['job_id']) && !empty($item['job_id'])) {
-                    // Job ID exists but file not ready - show In Progress status
-                    $item[$name] = [
-                        'in_progress' => [
-                            'label' => __('In Progress...'),
-                            'class' => 'action-in-progress',
-                            'generatedcsv_id' => $item['generatedcsv_id'] ?? null,
-                            'job_id' => $item['job_id']
-                        ]
-                    ];
+                    // Check status - if completed but file not ready yet, show different message
+                    if ($importStatus === 'completed') {
+                        // Status is completed but file might be processing - show processing message
+                        $item[$name] = [
+                            'in_progress' => [
+                                'label' => __('Processing File...'),
+                                'class' => 'action-in-progress',
+                                'generatedcsv_id' => $item['generatedcsv_id'] ?? null,
+                                'job_id' => $item['job_id']
+                            ]
+                        ];
+                    } elseif ($importStatus === 'failed') {
+                        // Job failed
+                        $item[$name] = [
+                            'label' => __('Failed'),
+                            'class' => 'action-failed'
+                        ];
+                    } else {
+                        // Job ID exists but file not ready - show In Progress status
+                        $item[$name] = [
+                            'in_progress' => [
+                                'label' => __('In Progress...'),
+                                'class' => 'action-in-progress',
+                                'generatedcsv_id' => $item['generatedcsv_id'] ?? null,
+                                'job_id' => $item['job_id']
+                            ]
+                        ];
+                    }
                 } else {
                     // No job ID and no file - show No File Available
                     $item[$name] = [
@@ -89,4 +109,4 @@ class OutputFileActions extends Column
 
         return $dataSource;
     }
-} 
+}

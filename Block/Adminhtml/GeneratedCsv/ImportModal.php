@@ -129,4 +129,4 @@ class ImportModal extends Template
     {
         return $this->getUrl('squadkin_squadexaai/generatedcsv/index');
     }
-} 
+}

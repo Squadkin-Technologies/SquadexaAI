@@ -20,7 +20,7 @@ class ProductRepositoryPlugin
     /**
      * Custom data key to store AI product ID in product object
      */
-    const AI_PRODUCT_ID_KEY = 'ai_product_id';
+    public const AI_PRODUCT_ID_KEY = 'ai_product_id';
 
     /**
      * @var RequestInterface
@@ -122,6 +122,4 @@ class ProductRepositoryPlugin
         }
         return [$product, $saveOptions];
     }
-
 }
-

@@ -197,4 +197,3 @@ class GeneratedCsv extends AbstractModel implements GeneratedCsvInterface
         return $this->setData(self::JOB_ID, $jobId);
     }
 }
-

@@ -19,7 +19,7 @@ class Handler extends Base
     protected $loggerType = Logger::INFO;
 
     /**
-     * File name
+     * Handler file name
      *
      * @var string
      */

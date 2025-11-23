@@ -157,4 +157,3 @@ class Dashboard extends Template
         }
     }
 }
-

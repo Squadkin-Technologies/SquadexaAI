@@ -104,4 +104,4 @@ class CreateMagentoProducts extends Action
     {
         return $this->_authorization->isAllowed('Squadkin_SquadexaAI::AiProduct_save');
     }
-} 
+}

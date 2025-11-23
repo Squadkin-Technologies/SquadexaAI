@@ -26,4 +26,4 @@ class Collection extends AbstractCollection
             \Squadkin\SquadexaAI\Model\ResourceModel\AiProduct::class
         );
     }
-} 
+}

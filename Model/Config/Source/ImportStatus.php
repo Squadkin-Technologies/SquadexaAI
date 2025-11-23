@@ -48,4 +48,4 @@ class ImportStatus implements OptionSourceInterface
             self::STATUS_FAILED => __('Failed')
         ];
     }
-} 
+}

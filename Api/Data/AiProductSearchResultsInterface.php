@@ -10,15 +10,17 @@ namespace Squadkin\SquadexaAI\Api\Data;
 interface AiProductSearchResultsInterface extends \Magento\Framework\Api\SearchResultsInterface
 {
     /**
-     * Get AiProduct list.
+     * Get AiProduct list
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface[]
      */
     public function getItems();
 
     /**
-     * Set AiProduct list.
+     * Set AiProduct list
+     *
      * @param \Squadkin\SquadexaAI\Api\Data\AiProductInterface[] $items
      * @return $this
      */
     public function setItems(array $items);
-} 
+}

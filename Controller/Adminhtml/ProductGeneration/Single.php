@@ -210,36 +210,59 @@ class Single extends Action
             }
             
             // Save to AiProduct table with null generatedCsvId for single products
-            $saveResult = $this->fileManager->saveAiProductData($productArray, null, 'single');
+            $saveResult = $this->fileManager->saveAiProductData(
+                $productArray,
+                null,
+                'single'
+            );
             $isUpdate = $saveResult['updated_count'] > 0;
 
             // Build URLs for guidance
             $aiProductGridUrl = $this->getUrl('squadkin_squadexaai/aiproduct/index');
-            $fieldMappingConfigUrl = $this->getUrl('adminhtml/system_config/edit/section/squadexaiproductcreator', ['_fragment' => 'squadexaiproductcreator_field_mapping-link']);
+            $fieldMappingConfigUrl = $this->getUrl(
+                'adminhtml/system_config/edit/section/squadexaiproductcreator',
+                ['_fragment' => 'squadexaiproductcreator_field_mapping-link']
+            );
             
             // Create comprehensive success message with step-by-step guidance
             if ($isUpdate) {
                 $successMessage = '<strong>Product updated successfully!</strong><br/>' .
-                    '<p style="margin-top: 10px; margin-bottom: 5px;">An existing product with the same name was found and updated with the latest AI-generated data.</p>' .
+                    '<p style="margin-top: 10px; margin-bottom: 5px;">' .
+                    'An existing product with the same name was found and updated ' .
+                    'with the latest AI-generated data.</p>' .
                     '<p style="margin-top: 10px; margin-bottom: 5px;"><strong>What\'s Next?</strong></p>' .
-                    '<p style="margin-bottom: 5px;">You can now view this product in the <a href="' . $aiProductGridUrl . '" target="_blank"><strong>Squadexa AI - Products Data</strong></a> grid. From there you can:</p>' .
+                    '<p style="margin-bottom: 5px;">You can now view this product in the ' .
+                    '<a href="' . $aiProductGridUrl . '" target="_blank">' .
+                    '<strong>Squadexa AI - Products Data</strong></a> grid. From there you can:</p>' .
                     '<ul style="margin-left: 20px; margin-top: 5px; margin-bottom: 10px;">' .
                     '<li>View and edit the updated AI-generated product response</li>' .
-                    '<li>If the product is already created in Magento, use "Update Product in Magento" to sync the latest changes</li>' .
+                    '<li>If the product is already created in Magento, use ' .
+                    '"Update Product in Magento" to sync the latest changes</li>' .
                     '<li>Or create a new product using the "Create Product from AI Data" action</li>' .
                     '</ul>' .
-                    '<p style="margin-bottom: 5px;"><strong>Important:</strong> Before creating or updating products, make sure you have configured field mappings in <a href="' . $fieldMappingConfigUrl . '" target="_blank"><strong>System Configuration → Field Mapping</strong></a>.</p>';
+                    '<p style="margin-bottom: 5px;"><strong>Important:</strong> ' .
+                    'Before creating or updating products, make sure you have configured ' .
+                    'field mappings in <a href="' . $fieldMappingConfigUrl . '" target="_blank">' .
+                    '<strong>System Configuration → Field Mapping</strong></a>.</p>';
             } else {
                 $successMessage = '<strong>Product generated successfully!</strong><br/>' .
                     '<p style="margin-top: 10px; margin-bottom: 5px;"><strong>What\'s Next?</strong></p>' .
-                    '<p style="margin-bottom: 5px;">You can now view this product in the <a href="' . $aiProductGridUrl . '" target="_blank"><strong>Squadexa AI - Products Data</strong></a> grid. From there you can:</p>' .
+                    '<p style="margin-bottom: 5px;">You can now view this product in the ' .
+                    '<a href="' . $aiProductGridUrl . '" target="_blank">' .
+                    '<strong>Squadexa AI - Products Data</strong></a> grid. From there you can:</p>' .
                     '<ul style="margin-left: 20px; margin-top: 5px; margin-bottom: 10px;">' .
                     '<li>View and edit the AI-generated product response</li>' .
-                    '<li>Create the product using the "Create Product from AI Data" action in the grid</li>' .
+                    '<li>Create the product using the "Create Product from AI Data" ' .
+                    'action in the grid</li>' .
                     '<li>Or edit the product and create it from the edit page</li>' .
                     '</ul>' .
-                    '<p style="margin-bottom: 5px;"><strong>Important:</strong> Before creating the product, make sure you have configured field mappings in <a href="' . $fieldMappingConfigUrl . '" target="_blank"><strong>System Configuration → Field Mapping</strong></a>.</p>' .
-                    '<p style="margin-bottom: 5px;">Field mappings tell the system which Magento product attributes to use for each AI-generated field.</p>';
+                    '<p style="margin-bottom: 5px;"><strong>Important:</strong> ' .
+                    'Before creating the product, make sure you have configured field mappings ' .
+                    'in <a href="' . $fieldMappingConfigUrl . '" target="_blank">' .
+                    '<strong>System Configuration → Field Mapping</strong></a>.</p>' .
+                    '<p style="margin-bottom: 5px;">' .
+                    'Field mappings tell the system which Magento product attributes ' .
+                    'to use for each AI-generated field.</p>';
             }
             
             // Store HTML message in session to be displayed on AI Product grid page after redirect
@@ -249,13 +272,16 @@ class Single extends Action
                 'success' => true,
                 'message' => __('Product generated successfully!'),
                 'data' => $apiResponse
-            ]);
+            ]); // phpcs:ignore
 
         } catch (LocalizedException $e) {
-            $this->logger->error('SquadexaAI Single Product Generation Error', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            $this->logger->error(
+                'SquadexaAI Single Product Generation Error',
+                [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]
+            );
             
             return $result->setData([
                 'success' => false,
@@ -304,7 +330,7 @@ class Single extends Action
                 
                 // Sort by creation date descending only if we have records
                 if (!empty($records)) {
-                    usort($records, function($a, $b) {
+                    usort($records, function ($a, $b) {
                         return strtotime($b['created_at']) - strtotime($a['created_at']);
                     });
                 }

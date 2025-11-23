@@ -34,4 +34,3 @@ class CreateProductButton extends GenericButton implements ButtonProviderInterfa
         return $data;
     }
 }
-

@@ -87,7 +87,6 @@ define([
                 });
                 
                 // You can show a notification here if needed
-                console.warn(warningMsg);
             }
         },
 

@@ -26,7 +26,6 @@ define([
             clearInterval(pollingIntervals[generatedCsvId]);
         }
 
-        console.log('SquadexaAI: Starting polling for CSV ID:', generatedCsvId);
 
         // Poll immediately on start
         checkJobStatus(generatedCsvId);
@@ -46,7 +45,6 @@ define([
         if (pollingIntervals[generatedCsvId]) {
             clearInterval(pollingIntervals[generatedCsvId]);
             delete pollingIntervals[generatedCsvId];
-            console.log('SquadexaAI: Stopped polling for CSV ID:', generatedCsvId);
         }
     }
 
@@ -57,7 +55,6 @@ define([
      */
     function checkJobStatus(generatedCsvId) {
         if (!pollUrl || !formKey) {
-            console.error('SquadexaAI: Poll URL or form key not set');
             return;
         }
 
@@ -72,37 +69,33 @@ define([
             showLoader: false, // Don't show loader for background polling
             success: function(response) {
                 if (response.success) {
-                    console.log('SquadexaAI: Job status check', {
-                        'csv_id': generatedCsvId,
-                        'status': response.status,
-                        'progress': response.progress
-                    });
-
-                    // If status is completed, refresh grid ONCE and stop polling
-                    if (response.status === 'completed' && response.refresh_grid) {
-                        console.log('SquadexaAI: Job completed, refreshing grid');
+                    // If status is completed, refresh grid and stop polling
+                    if (response.status === 'completed') {
                         stopPolling(generatedCsvId);
                         
-                        // Only refresh once per job
-                        if (!hasRefreshed[generatedCsvId]) {
-                            hasRefreshed[generatedCsvId] = true;
-                            refreshGrid();
-                        }
+                        // Refresh grid when status becomes completed
+                        // Use a small delay to ensure database is updated
+                        setTimeout(function() {
+                            if (!hasRefreshed[generatedCsvId]) {
+                                hasRefreshed[generatedCsvId] = true;
+                                refreshGrid();
+                            }
+                        }, 1000);
                     } else if (response.status === 'failed') {
-                        console.log('SquadexaAI: Job failed');
                         stopPolling(generatedCsvId);
+                        // Refresh grid to show failed status
+                        setTimeout(function() {
+                            refreshGrid();
+                        }, 1000);
                     }
+                    // Continue polling for pending/processing status
                 } else {
-                    console.error('SquadexaAI: Job status check failed', response);
                     // Stop polling on error only after multiple failures
                 }
             },
             error: function(xhr, status, error) {
-                console.error('SquadexaAI: AJAX error checking job status', {
-                    'status': status,
-                    'error': error
-                });
                 // Don't stop polling on transient errors
+                // Log error but continue polling
             }
         });
     }
@@ -120,7 +113,6 @@ define([
                 listingProvider.reload({
                     refresh: true
                 });
-                console.log('SquadexaAI: Grid refreshed via provider');
             } else {
                 // Alternative method: trigger grid refresh through UI component
                 var listingComponent = registry.get('squadkin_squadexaai_generatedcsv_listing');
@@ -128,17 +120,14 @@ define([
                     listingComponent.source.reload({
                         refresh: true
                     });
-                    console.log('SquadexaAI: Grid refreshed via component');
                 } else {
                     // Fallback: reload page after delay
-                    console.log('SquadexaAI: Reloading page as fallback');
                     setTimeout(function() {
                         window.location.reload();
                     }, 1000);
                 }
             }
         } catch (e) {
-            console.error('SquadexaAI: Error refreshing grid', e);
             // Fallback to page reload
             setTimeout(function() {
                 window.location.reload();
@@ -172,20 +161,18 @@ define([
                             var status = row.import_status || row['import_status'] || '';
                             
                             // Start polling if job_id exists but file is not ready
+                            // Also poll if status is completed but file not yet downloaded (file might be processing)
                             if (csvId && jobId && !responseFile && 
-                                (status === 'pending' || status === 'processing' || status === 'in_progress' || status === '')) {
-                                console.log('SquadexaAI: Found pending job', {
-                                    'csv_id': csvId,
-                                    'job_id': jobId,
-                                    'status': status
-                                });
-                                startPolling(parseInt(csvId));
+                                (status === 'pending' || status === 'processing' || status === 'in_progress' || status === '' || status === 'completed')) {
+                                // Only start polling if not already polling
+                                if (!pollingIntervals[csvId]) {
+                                    startPolling(parseInt(csvId));
+                                }
                             }
                         });
                     }
                 }
             } catch (e) {
-                console.error('SquadexaAI: Error checking grid data', e);
             }
         }
 

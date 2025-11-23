@@ -20,4 +20,3 @@ class GeneratedCsv extends AbstractDb
         $this->_init('squadkin_squadexaai_generatedcsv', 'generatedcsv_id');
     }
 }
-

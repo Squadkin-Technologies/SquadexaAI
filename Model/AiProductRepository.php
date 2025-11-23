@@ -143,4 +143,4 @@ class AiProductRepository implements AiProductRepositoryInterface
     {
         return $this->delete($this->get($aiProductId));
     }
-} 
+}

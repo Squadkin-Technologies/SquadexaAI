@@ -90,4 +90,4 @@ class AttributeDetails extends Action
     {
         return $this->_authorization->isAllowed('Squadkin_SquadexaAI::AiProduct');
     }
-} 
+}

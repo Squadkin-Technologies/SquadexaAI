@@ -14,6 +14,7 @@ interface GeneratedCsvRepositoryInterface
 
     /**
      * Save GeneratedCsv
+     *
      * @param \Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface $generatedCsv
      * @return \Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -24,6 +25,7 @@ interface GeneratedCsvRepositoryInterface
 
     /**
      * Retrieve GeneratedCsv
+     *
      * @param string $generatedcsvId
      * @return \Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -31,7 +33,8 @@ interface GeneratedCsvRepositoryInterface
     public function get($generatedcsvId);
 
     /**
-     * Retrieve GeneratedCsv matching the specified criteria.
+     * Retrieve GeneratedCsv matching the specified criteria
+     *
      * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
      * @return \Squadkin\SquadexaAI\Api\Data\GeneratedCsvSearchResultsInterface
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -42,6 +45,7 @@ interface GeneratedCsvRepositoryInterface
 
     /**
      * Delete GeneratedCsv
+     *
      * @param \Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface $generatedCsv
      * @return bool true on success
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -52,6 +56,7 @@ interface GeneratedCsvRepositoryInterface
 
     /**
      * Delete GeneratedCsv by ID
+     *
      * @param string $generatedcsvId
      * @return bool true on success
      * @throws \Magento\Framework\Exception\NoSuchEntityException
@@ -59,4 +64,3 @@ interface GeneratedCsvRepositoryInterface
      */
     public function deleteById($generatedcsvId);
 }
-

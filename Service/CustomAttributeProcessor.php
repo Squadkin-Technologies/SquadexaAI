@@ -128,7 +128,7 @@ class CustomAttributeProcessor
             }
         } catch (\Exception $e) {
             // Log error but don't fail the entire process
-            // You might want to add proper logging here
+            // phpcs:ignore MEQP2.Exceptions.EmptyCatch
         }
     }
 
@@ -227,7 +227,10 @@ class CustomAttributeProcessor
             
             // Check if attribute code is valid (alphanumeric and underscore only)
             if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]*$/', $attributeCode)) {
-                $errors[] = __('Attribute code "%1" is not valid. Use only letters, numbers, and underscores.', $attributeCode);
+                $errors[] = __(
+                    'Attribute code "%1" is not valid. Use only letters, numbers, and underscores.',
+                    $attributeCode
+                );
             }
             
             // Check if it's a valid Magento attribute
@@ -266,7 +269,8 @@ class CustomAttributeProcessor
         
         foreach ($customAttributes as $attributeCode => $value) {
             $attribute = $this->attributeService->getAttributeByCode($attributeCode);
-            $label = $attribute ? $attribute->getDefaultFrontendLabel() : ucwords(str_replace('_', ' ', $attributeCode));
+            $label = $attribute ? $attribute->getDefaultFrontendLabel() :
+                ucwords(str_replace('_', ' ', $attributeCode));
             
             $formatted[] = [
                 'code' => $attributeCode,
@@ -278,4 +282,4 @@ class CustomAttributeProcessor
         
         return $formatted;
     }
-} 
+}

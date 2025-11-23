@@ -749,4 +749,4 @@ class AiProduct extends AbstractModel implements AiProductInterface
     {
         return $this->setData('regeneration_count', (int)$count);
     }
-} 
+}

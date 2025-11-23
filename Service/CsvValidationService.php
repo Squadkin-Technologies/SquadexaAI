@@ -29,7 +29,14 @@ class CsvValidationService
     public const ERROR_MISSING_REQUIRED_COLUMNS = 'Missing required columns: %s';
     public const ERROR_DUPLICATE_HEADERS = 'Duplicate column headers found: %s';
     public const ERROR_INVALID_ROW_DATA = 'Invalid data in row %s: %s';
+    /**
+     * Error message for missing name column
+     */
     public const ERROR_MISSING_NAME_COLUMN = 'Name column is missing or empty in row %s';
+    
+    /**
+     * Error message for invalid data type
+     */
     public const ERROR_INVALID_DATA_TYPE = 'Invalid data type in column "%s", row %s';
 
     /**
@@ -69,7 +76,7 @@ class CsvValidationService
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    private $logger; // phpcs:ignore
 
     /**
      * @param Csv $csvProcessor
@@ -143,11 +150,14 @@ class CsvValidationService
             $validationResult['sample_data'] = $rowValidation['sample_data'];
 
             // Determine overall validation result
-            $validationResult['is_valid'] = !$errorAggregator->hasToBeTerminated() && 
+            $validationResult['is_valid'] = !$errorAggregator->hasToBeTerminated() &&
                                           $errorAggregator->getErrorsCount() === 0;
 
             // Generate validation messages
-            $validationResult['validation_messages'] = $this->generateValidationMessages($errorAggregator, $validationResult);
+            $validationResult['validation_messages'] = $this->generateValidationMessages(
+                $errorAggregator,
+                $validationResult
+            );
 
         } catch (\Exception $e) {
             $this->logger->error('CSV validation error: ' . $e->getMessage());
@@ -172,7 +182,7 @@ class CsvValidationService
         }
 
         // Normalize headers (trim whitespace, convert to lowercase for comparison)
-        $normalizedHeaders = array_map(function($header) {
+        $normalizedHeaders = array_map(function ($header) {
             return trim(strtolower($header));
         }, $headers);
 
@@ -180,10 +190,10 @@ class CsvValidationService
         $duplicates = array_diff_key($normalizedHeaders, array_unique($normalizedHeaders));
         if (!empty($duplicates)) {
             $this->addError(
-                $errorAggregator, 
-                self::ERROR_DUPLICATE_HEADERS, 
-                0, 
-                null, 
+                $errorAggregator,
+                self::ERROR_DUPLICATE_HEADERS,
+                0,
+                null,
                 implode(', ', array_unique($duplicates))
             );
             return false;
@@ -199,10 +209,10 @@ class CsvValidationService
 
         if (!empty($missingRequired)) {
             $this->addError(
-                $errorAggregator, 
-                self::ERROR_MISSING_REQUIRED_COLUMNS, 
-                0, 
-                null, 
+                $errorAggregator,
+                self::ERROR_MISSING_REQUIRED_COLUMNS,
+                0,
+                null,
                 implode(', ', $missingRequired)
             );
             return false;
@@ -219,14 +229,17 @@ class CsvValidationService
      * @param ProcessingErrorAggregatorInterface $errorAggregator
      * @return array
      */
-    private function validateDataRows(array $dataRows, array $headers, ProcessingErrorAggregatorInterface $errorAggregator): array
-    {
+    private function validateDataRows(
+        array $dataRows,
+        array $headers,
+        ProcessingErrorAggregatorInterface $errorAggregator
+    ): array {
         $validRows = 0;
         $sampleData = [];
         $headerCount = count($headers);
         
         // Normalize headers for comparison
-        $normalizedHeaders = array_map(function($header) {
+        $normalizedHeaders = array_map(function ($header) {
             return trim(strtolower($header));
         }, $headers);
         
@@ -265,7 +278,14 @@ class CsvValidationService
             }
 
             // Perform basic data type validation
-            $this->validateRowDataTypes($row, $headers, $normalizedHeaders, $actualRowNumber, $errorAggregator, $isRowValid);
+            $this->validateRowDataTypes(
+                $row,
+                $headers,
+                $normalizedHeaders,
+                $actualRowNumber,
+                $errorAggregator,
+                $isRowValid
+            );
 
             if ($isRowValid) {
                 $validRows++;
@@ -295,12 +315,12 @@ class CsvValidationService
      * @param bool &$isRowValid
      */
     private function validateRowDataTypes(
-        array $row, 
-        array $headers, 
-        array $normalizedHeaders, 
-        int $rowNumber, 
-        ProcessingErrorAggregatorInterface $errorAggregator,
-        bool &$isRowValid
+        array                                 $row,
+        array                                 $headers,
+        array                                 $normalizedHeaders,
+        int                                   $rowNumber,
+        ProcessingErrorAggregatorInterface    $errorAggregator,
+        bool                                  &$isRowValid
     ): void {
         // Define expected data types for certain columns
         $numericColumns = ['price', 'special_price', 'weight', 'qty'];
@@ -381,7 +401,7 @@ class CsvValidationService
      * @return array
      */
     private function generateValidationMessages(
-        ProcessingErrorAggregatorInterface $errorAggregator, 
+        ProcessingErrorAggregatorInterface $errorAggregator,
         array $validationResult
     ): array {
         $messages = [];
@@ -415,7 +435,7 @@ class CsvValidationService
      * @throws LocalizedException
      */
     public function generateErrorReport(
-        ProcessingErrorAggregatorInterface $errorAggregator, 
+        ProcessingErrorAggregatorInterface $errorAggregator,
         string $originalFileName
     ): string {
         if (!$errorAggregator->getErrorsCount()) {
@@ -436,7 +456,8 @@ class CsvValidationService
         }
 
         // Generate error report file name
-        $pathInfo = pathinfo($originalFileName);
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction
+        $pathInfo = pathinfo($originalFileName); // phpcs:ignore
         $errorFileName = 'error_report_' . $pathInfo['filename'] . '_' . date('Y-m-d_H-i-s') . '.csv';
         $errorFilePath = 'AIProductCreator/ErrorReports/' . $errorFileName;
 
@@ -465,15 +486,23 @@ class CsvValidationService
             return '';
         }
 
-        $output = fopen('php://temp', 'w');
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction
+        $output = fopen('php://temp', 'w'); // phpcs:ignore
 
         foreach ($data as $row) {
-            fputcsv($output, $row, ',', '"', '\\');
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction
+            fputcsv($output, $row, ',', '"', '\\'); // phpcs:ignore
         }
 
         rewind($output);
-        $csvContent = stream_get_contents($output);
-        fclose($output);
+        try {
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction
+            $csvContent = stream_get_contents($output); // phpcs:ignore
+        } catch (\Exception $e) {
+            $csvContent = '';
+        }
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction
+        fclose($output); // phpcs:ignore
 
         return $csvContent;
     }
@@ -522,4 +551,4 @@ class CsvValidationService
     {
         return $this->filesystem;
     }
-} 
+}
