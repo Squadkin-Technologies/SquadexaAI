@@ -2,11 +2,12 @@
     "name": "squadkin/module-squadexaai",
     "description": "SquadexaAI - AI Product Builder, Product Generator, Product Creator",
     "type": "magento2-module",
-    "license": "GPL-3.0",
+    "license": "proprietary",
     "authors": [
         {
-            "name": "Mage2Gen",
-            "email": "info@mage2gen.com"
+            "name": "Squadkin Technologies Pvt. Ltd.",
+            "email": "support@squadkin.com",
+            "homepage": "https://www.squadkin.com/"
         }
     ],
     "minimum-stability": "dev",

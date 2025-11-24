@@ -1,17 +1,48 @@
-Copyright © 2025-present 
+Copyright © 2025 Squadkin Technologies Pvt. Ltd. All Rights Reserved.
 
-This file is part of Squadkin/SquadexaAI.
+PROPRIETARY SOFTWARE - ALL RIGHTS RESERVED
 
-Squadkin/SquadexaAI is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This file is part of the SquadexaAI Magento 2 Extension 
+("Software") developed and owned by Squadkin Technologies Pvt. Ltd.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+This extension is the property of Squadkin Technologies Pvt. Ltd.
+Website: https://www.squadkin.com/
 
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
-Please see LICENSE.txt for the full text of GNU General Public License
+IMPORTANT NOTICE:
+This Software is proprietary and confidential. Unauthorized copying, 
+distribution, modification, or use of this Software, via any means, is 
+strictly prohibited and may result in severe civil and criminal penalties. 
+Violators will be prosecuted to the maximum extent permitted by law.
+
+RESTRICTIONS:
+- You may NOT copy, reproduce, or duplicate this Software or any portion 
+  thereof without explicit written permission from Squadkin Technologies Pvt. Ltd.
+- You may NOT modify, adapt, alter, translate, or create derivative works 
+  based upon this Software without explicit written permission.
+- You may NOT reverse engineer, decompile, disassemble, or otherwise attempt 
+  to derive the source code of this Software.
+- You may NOT rent, lease, loan, sell, sublicense, distribute, or otherwise 
+  transfer this Software to any third party.
+- You may NOT remove, alter, or obscure any proprietary notices, labels, or 
+  marks on this Software.
+
+LEGAL ACTION:
+Any unauthorized use of this Software will result in legal action, including 
+but not limited to:
+- Seeking injunctive relief to prevent further violations
+- Pursuing monetary damages for copyright infringement
+- Reporting violations to appropriate law enforcement authorities
+- Pursuing criminal charges where applicable
+
+For licensing inquiries or to report violations, please contact:
+
+Squadkin Technologies Pvt. Ltd.
+Website: https://www.squadkin.com/
+Email: support@squadkin.com
+Phone: +91 9033037934
+Address: Ahmedabad, 382330, Gujarat, India
+
+Please see LICENSE.txt for the complete license agreement.
+
+© 2025 Squadkin Technologies Pvt. Ltd. All rights reserved.
+This extension is the property of Squadkin Technologies Pvt. Ltd.
