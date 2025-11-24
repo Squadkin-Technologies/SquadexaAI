@@ -10,8 +10,12 @@
             "homepage": "https://www.squadkin.com/"
         }
     ],
+    "require": {
+        "php": ">=8.0",
+        "squadkin/module-base": "*"
+    },
+    "version": "1.0.0",
     "minimum-stability": "dev",
-    "require": {},
     "autoload": {
         "files": [
             "registration.php"

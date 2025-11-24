@@ -30,6 +30,7 @@
     display: flex;
     gap: 16px;
     font-size: 14px;
+    align-items: center;
 }
 .dashboard-header .date {
     color: #666;
@@ -87,15 +88,23 @@
 .plan-limit {
     text-align: right;
 }
+.plan-limit-monthly-container, .plan-limit-daily-container {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
 .limit-label {
-    color: #666;
-    font-size: 12px;
-    margin-bottom: 4px;
+    color: #333;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    margin-right: 5px;
+    align-items: center;
 }
 .limit-value {
     color: #333;
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 500;
     margin-bottom: 12px;
 }
 .upgrade-button {
@@ -147,7 +156,7 @@
 }
 .card-label {
     color: #666;
-    font-size: 12px;
+    font-size: 16px;
     margin-bottom: 8px;
 }
 .card-value {
@@ -158,7 +167,7 @@
 }
 .card-subtitle {
     color: #999;
-    font-size: 12px;
+    font-size: 14px;
 }
 .card-trend {
     position: absolute;
@@ -237,7 +246,7 @@
     background: #fff;
     border-radius: 12px;
     padding: 24px;
-    margin-bottom: 24px;
+    margin-top: 24px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 .activity-list {
@@ -282,6 +291,134 @@
 .activity-time {
     color: #999;
     font-size: 11px;
+}
+.activity-processing {
+    color: #666;
+    font-size: 11px;
+    margin-top: 4px;
+}
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.section-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 20px;
+    font-weight: 600;
+}
+.section-header p {
+    margin: 4px 0 0 0;
+    color: #666;
+    font-size: 13px;
+}
+.activity-count {
+    color: #666;
+    font-size: 12px;
+    background: #f3f4f6;
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+/* Activity Pagination */
+.activity-pagination {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.pagination-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+    font-size: 13px;
+}
+.pagination-info #current-page,
+.pagination-info #total-pages {
+    font-weight: 600;
+    color: #3b82f6;
+}
+.pagination-items {
+    color: #999;
+    font-size: 12px;
+}
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.pagination-btn {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    color: #666;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 80px;
+}
+.pagination-btn:hover:not(:disabled) {
+    border-color: #3b82f6;
+    color: #3b82f6;
+    background: #f0f9ff;
+}
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.pagination-numbers {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.pagination-number {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    color: #666;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 40px;
+}
+.pagination-number:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+    background: #f0f9ff;
+}
+.pagination-number.active {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: #fff;
+}
+.pagination-number.active:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+}
+.pagination-ellipsis {
+    color: #999;
+    padding: 0 4px;
+    font-size: 13px;
+}
+.activity-loading,
+.activity-error {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+    font-size: 14px;
+}
+.activity-error {
+    color: #ef4444;
 }
 
 /* Account & API Section */
@@ -453,4 +590,3 @@
 .dashboard-no-key .action-primary:hover, .dashboard-no-data .action-primary:hover {
     transform: scale(1.05);
 }
-

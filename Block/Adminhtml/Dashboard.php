@@ -105,13 +105,14 @@ class Dashboard extends Template
                 $this->logger->error('Subscription info not available: ' . $e->getMessage());
             }
             
-            // Fetch recent activities
+            // Fetch recent activities (all activities, pagination handled in template)
             try {
                 $usageHistory = $this->apiService->getUsageHistory();
                 $this->logger->info('SquadexaAI Dashboard - Usage History Response:', ['data' => $usageHistory]);
                 
                 if (!empty($usageHistory['history'])) {
-                    $data['recent_activities'] = array_slice($usageHistory['history'], 0, 5);
+                    // Get all activities, pagination will be handled in template
+                    $data['recent_activities'] = $usageHistory['history'];
                     $data['has_data'] = true;
                 }
             } catch (\Exception $e) {

@@ -49,12 +49,20 @@ $data = $block->getDashboardData();
                 </div>
             </div>
             <div class="plan-limit">
-                <div class="limit-label"><?= __('Monthly Limit') ?></div>
-                <div class="limit-value"><?= number_format($monthlyLimit) ?> <?= __('words') ?></div>
-                <div class="limit-sublabel"><?= __('Daily: %1 words', number_format($dailyLimit)) ?></div>
-                <button class="upgrade-button" onclick="window.open('https://squadexa.ai//pricing', '_blank')">
-                    👑 <?= __('Upgrade Now') ?>
-                </button>
+                <div class="plan-limit-monthly-container">
+                    <div class="limit-label"><?= __('Monthly Limit: ') ?></div>
+                    <div class="limit-value"><?= number_format($monthlyLimit) ?> <?= __('words') ?></div>
+                </div>
+                <div class="plan-limit-daily-container">
+                    <div class="limit-label"><?= __('Daily Limit: ') ?></div>
+                    <div class="limit-value"><?= number_format($dailyLimit) ?> <?= __('words') ?></div>
+                </div>
+                <div class="plan-limit-upgrade-container">
+                    <button class="upgrade-button" onclick="window.open('https://squadexa.ai//pricing', '_blank')">
+                        👑 <?= __('Upgrade Now') ?>
+                    </button>
+                    </div>
+                </div>
             </div>
         </div>
         <?php endif; ?>
@@ -137,39 +145,6 @@ $data = $block->getDashboardData();
         </div>
         <?php endif; ?>
 
-        <!-- Recent Activity -->
-        <?php if ($block->shouldShowSection($data, 'recent_activity')): ?>
-        <div class="recent-activity-section">
-            <div class="section-header">
-                <h3><?= __('Recent Activity') ?></h3>
-                <p><?= __('Your latest AI tool usage and activity') ?></p>
-            </div>
-            <div class="activity-list">
-                <?php foreach ($data['recent_activities'] as $activity): 
-                    $toolType = $activity['tool_type'] ?? 'product_generator';
-                    $toolName = ucwords(str_replace('_', ' ', $toolType));
-                    $totalWords = $activity['total_words'] ?? 0;
-                    $timestamp = $activity['created_at'] ?? date('Y-m-d H:i:s');
-                    $success = $activity['success'] ?? true;
-                    $processingTime = isset($activity['processing_time_ms']) ? round($activity['processing_time_ms'] / 1000, 2) . 's' : 'N/A';
-                ?>
-                <div class="activity-item">
-                    <div class="activity-icon"><?= $success ? '🟢' : '🔴' ?></div>
-                    <div class="activity-details">
-                        <div class="activity-title"><?= $block->escapeHtml($toolName) ?></div>
-                        <div class="activity-type"><?= __('Endpoint: %1', $block->escapeHtml($activity['endpoint'] ?? '/api/v1/' . $toolType)) ?></div>
-                    </div>
-                    <div class="activity-meta">
-                        <div class="activity-words"><?= number_format($totalWords) ?> <?= __('words') ?></div>
-                        <div class="activity-time"><?= $block->escapeHtml(date('d/m/Y, H:i', strtotime($timestamp))) ?></div>
-                        <div class="activity-processing"><?= __('Processing: %1', $processingTime) ?></div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-        <?php endif; ?>
-
         <!-- Account Status and API Key -->
         <div class="account-api-grid">
             <!-- Account Status Card -->
@@ -229,6 +204,81 @@ $data = $block->getDashboardData();
             </div>
         </div>
 
+
+        <!-- Recent Activity -->
+        <?php if ($block->shouldShowSection($data, 'recent_activity')): 
+            $allActivities = $data['recent_activities'] ?? [];
+            $totalItems = count($allActivities);
+            $perPage = 10;
+            $totalPages = ceil($totalItems / $perPage);
+            $currentPage = 1;
+            $offset = ($currentPage - 1) * $perPage;
+            $paginatedActivities = array_slice($allActivities, $offset, $perPage);
+        ?>
+        <div class="recent-activity-section">
+            <div class="section-header">
+                <div>
+                    <h3><?= __('Recent Activity') ?></h3>
+                    <p><?= __('Your latest AI tool usage and activity') ?></p>
+                </div>
+                <span class="activity-count"><?= __('Total: %1 logs', $totalItems) ?></span>
+            </div>
+            <div class="activity-list" id="activity-list-container">
+                <?php foreach ($paginatedActivities as $activity): 
+                    $toolType = $activity['tool_type'] ?? 'product_generator';
+                    $toolName = ucwords(str_replace('_', ' ', $toolType));
+                    $totalWords = $activity['total_words'] ?? 0;
+                    $timestamp = $activity['created_at'] ?? date('Y-m-d H:i:s');
+                    $success = $activity['success'] ?? true;
+                    $processingTime = isset($activity['processing_time_ms']) ? round($activity['processing_time_ms'] / 1000, 2) . 's' : 'N/A';
+                ?>
+                <div class="activity-item">
+                    <div class="activity-icon"><?= $success ? '🟢' : '🔴' ?></div>
+                    <div class="activity-details">
+                        <div class="activity-title"><?= $block->escapeHtml($toolName) ?></div>
+                        <div class="activity-type"><?= __('Endpoint: %1', $block->escapeHtml($activity['endpoint'] ?? '/api/v1/' . $toolType)) ?></div>
+                    </div>
+                    <div class="activity-meta">
+                        <div class="activity-words"><?= number_format($totalWords) ?> <?= __('words') ?></div>
+                        <div class="activity-time"><?= $block->escapeHtml(date('d/m/Y, H:i', strtotime($timestamp))) ?></div>
+                        <div class="activity-processing"><?= __('Processing: %1', $processingTime) ?></div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            
+            <?php if ($totalPages > 1): ?>
+            <div class="activity-pagination" id="activity-pagination">
+                <div class="pagination-info">
+                    <?= __('Page %1 of %2', '<span id="current-page">1</span>', '<span id="total-pages">' . $totalPages . '</span>') ?>
+                    <span class="pagination-items">(<?= __('Showing %1-%2 of %3', 1, min($perPage, $totalItems), $totalItems) ?>)</span>
+                </div>
+                <div class="pagination-controls">
+                    <button class="pagination-btn" id="prev-page" onclick="loadActivityPage(<?= $currentPage - 1 ?>)" disabled>
+                        <?= __('Previous') ?>
+                    </button>
+                    <div class="pagination-numbers" id="pagination-numbers">
+                        <?php for ($i = 1; $i <= min(5, $totalPages); $i++): ?>
+                            <button class="pagination-number <?= $i === 1 ? 'active' : '' ?>" onclick="loadActivityPage(<?= $i ?>)">
+                                <?= $i ?>
+                            </button>
+                        <?php endfor; ?>
+                        <?php if ($totalPages > 5): ?>
+                            <span class="pagination-ellipsis">...</span>
+                            <button class="pagination-number" onclick="loadActivityPage(<?= $totalPages ?>)">
+                                <?= $totalPages ?>
+                            </button>
+                        <?php endif; ?>
+                    </div>
+                    <button class="pagination-btn" id="next-page" onclick="loadActivityPage(<?= $currentPage + 1 ?>)" <?= $currentPage >= $totalPages ? 'disabled' : '' ?>>
+                        <?= __('Next') ?>
+                    </button>
+                </div>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+
         <!-- No Data Message -->
         <?php if (!$data['has_data']): ?>
         <div class="dashboard-no-data">
@@ -248,11 +298,126 @@ $data = $block->getDashboardData();
     <?php endif; ?>
 </div>
 
-<style>
-<?= file_get_contents(__DIR__ . '/../css/dashboard.css') ?>
-</style>
-
 <script>
+require(['jquery'], function($) {
+    window.activityPagination = {
+        totalPages: <?= $totalPages ?? 1 ?>,
+        totalItems: <?= $totalItems ?? 0 ?>,
+        perPage: 10,
+        currentPage: 1,
+        activityUrl: '<?= $block->getUrl('squadkin_squadexaai/dashboard/activity') ?>'
+    };
+    
+    window.loadActivityPage = function(page) {
+        if (page < 1 || page > window.activityPagination.totalPages) {
+            return;
+        }
+        
+        // Show loading state
+        const container = document.getElementById('activity-list-container');
+        const pagination = document.getElementById('activity-pagination');
+        container.innerHTML = '<div class="activity-loading"><?= __('Loading...') ?></div>';
+        
+        // Disable pagination buttons
+        const buttons = pagination.querySelectorAll('button');
+        buttons.forEach(btn => btn.disabled = true);
+        
+        // Make AJAX request
+        $.ajax({
+            url: window.activityPagination.activityUrl,
+            type: 'GET',
+            data: { page: page },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Update activities
+                    let html = '';
+                    response.activities.forEach(function(activity) {
+                        html += '<div class="activity-item">' +
+                            '<div class="activity-icon">' + (activity.success ? '🟢' : '🔴') + '</div>' +
+                            '<div class="activity-details">' +
+                            '<div class="activity-title">' + activity.tool_name + '</div>' +
+                            '<div class="activity-type"><?= __('Endpoint:') ?> ' + activity.endpoint + '</div>' +
+                            '</div>' +
+                            '<div class="activity-meta">' +
+                            '<div class="activity-words">' + parseInt(activity.total_words).toLocaleString() + ' <?= __('words') ?></div>' +
+                            '<div class="activity-time">' + activity.timestamp + '</div>' +
+                            '<div class="activity-processing"><?= __('Processing:') ?> ' + activity.processing_time + '</div>' +
+                            '</div>' +
+                            '</div>';
+                    });
+                    container.innerHTML = html;
+                    
+                    // Update pagination
+                    updatePagination(response.pagination);
+                    
+                    // Update current page
+                    window.activityPagination.currentPage = page;
+                } else {
+                    container.innerHTML = '<div class="activity-error">' + (response.message || '<?= __('Error loading activities') ?>') + '</div>';
+                }
+            },
+            error: function() {
+                container.innerHTML = '<div class="activity-error"><?= __('Error loading activities. Please try again.') ?></div>';
+            },
+            complete: function() {
+                // Re-enable pagination buttons
+                buttons.forEach(btn => btn.disabled = false);
+            }
+        });
+    };
+    
+    function updatePagination(pagination) {
+        const currentPageEl = document.getElementById('current-page');
+        const totalPagesEl = document.getElementById('total-pages');
+        const prevBtn = document.getElementById('prev-page');
+        const nextBtn = document.getElementById('next-page');
+        const numbersContainer = document.getElementById('pagination-numbers');
+        
+        if (currentPageEl) currentPageEl.textContent = pagination.current_page;
+        if (totalPagesEl) totalPagesEl.textContent = pagination.total_pages;
+        if (prevBtn) prevBtn.disabled = !pagination.has_prev;
+        if (nextBtn) nextBtn.disabled = !pagination.has_next;
+        
+        // Update page numbers
+        if (numbersContainer) {
+            let html = '';
+            const currentPage = pagination.current_page;
+            const totalPages = pagination.total_pages;
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            
+            if (startPage > 1) {
+                html += '<button class="pagination-number" onclick="loadActivityPage(1)">1</button>';
+                if (startPage > 2) {
+                    html += '<span class="pagination-ellipsis">...</span>';
+                }
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                html += '<button class="pagination-number ' + (i === currentPage ? 'active' : '') + '" onclick="loadActivityPage(' + i + ')">' + i + '</button>';
+            }
+            
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    html += '<span class="pagination-ellipsis">...</span>';
+                }
+                html += '<button class="pagination-number" onclick="loadActivityPage(' + totalPages + ')">' + totalPages + '</button>';
+            }
+            
+            numbersContainer.innerHTML = html;
+        }
+        
+        // Update pagination info
+        const startItem = ((pagination.current_page - 1) * pagination.per_page) + 1;
+        const endItem = Math.min(pagination.current_page * pagination.per_page, pagination.total_items);
+        const infoText = document.querySelector('.pagination-items');
+        if (infoText) {
+            infoText.textContent = '(<?= __('Showing') ?> ' + startItem + '-' + endItem + ' <?= __('of') ?> ' + pagination.total_items + ')';
+        }
+    }
+});
+
 function copyApiKey() {
     const apiKey = '<?= $block->escapeJs($apiKey) ?>';
     navigator.clipboard.writeText(apiKey).then(function() {
