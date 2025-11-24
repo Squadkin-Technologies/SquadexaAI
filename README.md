@@ -37,7 +37,30 @@ SquadexaAI delivers AI-powered product creation tools to Magento merchants. The 
 
 > **Important:** Before configuring the module in Magento, make sure you have a SquadexaAI account and plan. API keys are issued inside the SquadexaAI dashboard after purchasing a plan at [https://squadexa.ai/pricing](https://squadexa.ai/pricing).
 
-### Option 1: Manual (Zip/Tar)
+### Option 1: Composer (Recommended)
+1. Add your private repository that contains `squadkin/module-squadexaai`.
+2. Require the module:
+   ```bash
+   composer require squadkin/module-squadexaai
+   ```
+3. Enable the module:
+   ```bash
+   php bin/magento module:enable Squadkin_SquadexaAI
+   ```
+4. Run setup upgrade:
+   ```bash
+   php bin/magento setup:upgrade
+   ```
+5. Deploy static content if required:
+   ```bash
+   php bin/magento setup:static-content:deploy -f
+   ```
+6. Flush cache:
+   ```bash
+   php bin/magento cache:flush
+   ```
+
+### Option 2: Manual (Zip/Tar)
 1. Copy the contents to `app/code/Squadkin/SquadexaAI`.
 2. Enable the module:
    ```bash
@@ -55,14 +78,6 @@ SquadexaAI delivers AI-powered product creation tools to Magento merchants. The 
    ```bash
    php bin/magento cache:flush
    ```
-
-### Option 2: Composer
-1. Add your private repository that contains `squadkin/module-squadexaai`.
-2. Require the module:
-   ```bash
-   composer require squadkin/module-squadexaai
-   ```
-3. Repeat steps 2–5 from the manual installation (enable module, upgrade, deploy static content, flush cache).
 
 ## License
 This software is proprietary and confidential. Unauthorized copying, distribution, resale, or reverse engineering is strictly prohibited and will be prosecuted to the maximum extent permitted under law. Refer to `LICENSE.txt` for the complete license agreement.
