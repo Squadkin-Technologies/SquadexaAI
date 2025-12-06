@@ -1,6 +1,6 @@
 # Squadkin SquadexaAI Magento 2 Extension
 
-`squadkin/module-squadexaai`
+`squadkintechnologies/module-squadexaai`
 
 **Copyright © 2025 Squadkin Technologies Pvt. Ltd. All Rights Reserved.**  
 **PROPRIETARY SOFTWARE – DO NOT COPY OR DISTRIBUTE**
@@ -38,24 +38,27 @@ SquadexaAI delivers AI-powered product creation tools to Magento merchants. The 
 > **Important:** Before configuring the module in Magento, make sure you have a SquadexaAI account and plan. API keys are issued inside the SquadexaAI dashboard after purchasing a plan at [https://squadexa.ai/pricing](https://squadexa.ai/pricing).
 
 ### Option 1: Composer (Recommended)
-1. Add your private repository that contains `squadkin/module-squadexaai`.
-2. Require the module:
+1. Configure the Packagist repository in your Magento root directory:
    ```bash
-   composer require squadkin/module-squadexaai
+   composer config repositories.packagist composer https://packagist.org
    ```
-3. Enable the module:
+2. Require the modules (Base module is required as a dependency):
+   ```bash
+   composer require squadkintechnologies/module-squadexaai
+   ```
+4. Enable the module:
    ```bash
    php bin/magento module:enable Squadkin_SquadexaAI
    ```
-4. Run setup upgrade:
+5. Run setup upgrade:
    ```bash
    php bin/magento setup:upgrade
    ```
-5. Deploy static content if required:
+6. Deploy static content if required:
    ```bash
    php bin/magento setup:static-content:deploy -f
    ```
-6. Flush cache:
+7. Flush cache:
    ```bash
    php bin/magento cache:flush
    ```

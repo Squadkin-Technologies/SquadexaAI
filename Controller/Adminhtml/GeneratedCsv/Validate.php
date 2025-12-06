@@ -63,9 +63,9 @@ class Validate extends Action
 
         try {
             // @codingStandardsIgnoreStart
-            $hasFile = isset($_FILES['input_file']); // phpcs:ignore Magento2.Security.Superglobal
-            $fileNotEmpty = $hasFile &&
-                !empty($_FILES['input_file']['tmp_name']); // phpcs:ignore Magento2.Security.Superglobal
+            $file = $this->getRequest()->getFiles('input_file');
+            $hasFile = !empty($file);
+            $fileNotEmpty = $hasFile && !empty($file['tmp_name']);
             // @codingStandardsIgnoreEnd
             if (!$hasFile || !$fileNotEmpty) {
                 return $resultJson->setData([
@@ -74,7 +74,7 @@ class Validate extends Action
                 ]);
             }
             // @codingStandardsIgnoreLine
-            $fileData = $_FILES['input_file']; // phpcs:ignore Magento2.Security.Superglobal
+            $fileData = $file;
 
             // Validate uploaded file format
             $this->fileManager->validateUploadedFile($fileData);

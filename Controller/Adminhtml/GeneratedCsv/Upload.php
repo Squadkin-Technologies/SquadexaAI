@@ -101,17 +101,16 @@ class Upload extends Action
         $resultRedirect->setPath('*/*/index');
 
         try {
-            // @codingStandardsIgnoreStart
-            $hasFile = isset($_FILES['input_file']); // phpcs:ignore Magento2.Security.Superglobal
-            $fileNotEmpty = $hasFile &&
-                !empty($_FILES['input_file']['tmp_name']); // phpcs:ignore Magento2.Security.Superglobal
+            $file = $this->getRequest()->getFiles('input_file');
+            $hasFile = !empty($file);
+            $fileNotEmpty = $hasFile && !empty($file['tmp_name']);
             // @codingStandardsIgnoreEnd
             if (!$hasFile || !$fileNotEmpty) {
                 $this->messageManager->addErrorMessage(__('Please select a file to upload.'));
                 return $resultRedirect;
             }
             // @codingStandardsIgnoreLine
-            $fileData = $_FILES['input_file']; // phpcs:ignore Magento2.Security.Superglobal
+            $fileData = $file;
 
             $this->fileManager->validateUploadedFile($fileData);
 

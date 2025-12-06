@@ -101,7 +101,7 @@ class ImportExecute extends Action
             
             // --- CSV Validation Logic ---
             // @codingStandardsIgnoreLine
-            $customCsvFile = $_FILES['custom_csv_file'] ?? null; // phpcs:ignore Magento2.Security.Superglobal
+            $customCsvFile = $this->getRequest()->getFiles('custom_csv_file');
             $csvFilePath = '';
             $csvFileName = '';
             if ($customCsvFile && $customCsvFile['tmp_name']) {
@@ -115,7 +115,7 @@ class ImportExecute extends Action
                     $varDirectory->create($customDir);
                 }
                 // @codingStandardsIgnoreLine
-                $tmpName = $customCsvFile['tmp_name']; // phpcs:ignore Magento2.Security.Superglobal
+                $tmpName = $customCsvFile['tmp_name'];
                 // phpcs:ignore Magento2.Functions.DiscouragedFunction
                 $fileContent = file_get_contents($tmpName); // phpcs:ignore
                 $varDirectory->writeFile($csvFilePath, $fileContent);
