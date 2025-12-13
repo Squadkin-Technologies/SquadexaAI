@@ -62,25 +62,8 @@ class Validate extends Action
         $resultJson = $this->resultJsonFactory->create(); // phpcs:ignore
 
         try {
-            // @codingStandardsIgnoreStart
-            $file = $this->getRequest()->getFiles('input_file');
-            $hasFile = !empty($file);
-            $fileNotEmpty = $hasFile && !empty($file['tmp_name']);
-            // @codingStandardsIgnoreEnd
-            if (!$hasFile || !$fileNotEmpty) {
-                return $resultJson->setData([
-                    'success' => false,
-                    'error' => __('Please select a file to upload.')->render()
-                ]);
-            }
-            // @codingStandardsIgnoreLine
-            $fileData = $file;
-
-            // Validate uploaded file format
-            $this->fileManager->validateUploadedFile($fileData);
-
             // Save file temporarily for validation
-            $tempFileName = $this->fileManager->saveInputFile($fileData);
+            $tempFileName = $this->fileManager->saveUploadedFile('input_file');
             $tempFilePath = 'AIProductCreator/Input/' . $tempFileName;
 
             // Perform CSV validation
@@ -106,7 +89,7 @@ class Validate extends Action
                 try {
                     $errorReportFileName = $this->csvValidationService->generateErrorReport(
                         $validationResult['error_aggregator'],
-                        $fileData['name']
+                        $tempFileName
                     );
                     $responseData['error_report'] = $errorReportFileName;
                 } catch (LocalizedException $e) {

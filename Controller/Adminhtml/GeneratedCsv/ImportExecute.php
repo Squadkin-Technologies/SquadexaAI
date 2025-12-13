@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface;
 use Squadkin\SquadexaAI\Service\MagentoImportService;
 use Squadkin\SquadexaAI\Service\CsvValidationService;
+use Squadkin\SquadexaAI\Helper\FileManager;
 
 class ImportExecute extends Action
 {
@@ -45,6 +46,11 @@ class ImportExecute extends Action
     private $csvValidationService;
 
     /**
+     * @var FileManager
+     */
+    private $fileManager;
+
+    /**
      * ImportExecute constructor.
      *
      * @param Context $context
@@ -60,14 +66,17 @@ class ImportExecute extends Action
         GeneratedCsvRepositoryInterface $generatedCsvRepository,
         MagentoImportService $importService,
         LoggerInterface $logger,
-        CsvValidationService $csvValidationService // phpcs:ignore
+        CsvValidationService $csvValidationService,
+        FileManager $fileManager
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->generatedCsvRepository = $generatedCsvRepository;
         $this->importService = $importService;
         $this->logger = $logger;
+        $this->logger = $logger;
         $this->csvValidationService = $csvValidationService;
+        $this->fileManager = $fileManager;
     }
 
     /**
@@ -100,28 +109,30 @@ class ImportExecute extends Action
             $this->logger->info('SquadexaAI ImportExecute: Import options: ' . $importOptionsStr);
             
             // --- CSV Validation Logic ---
-            // @codingStandardsIgnoreLine
-            $customCsvFile = $this->getRequest()->getFiles('custom_csv_file');
             $csvFilePath = '';
             $csvFileName = '';
-            if ($customCsvFile && $customCsvFile['tmp_name']) {
-                // Save custom CSV to var/AIProductCreator/CustomImports
-                $customDir = 'AIProductCreator/CustomImports';
-                $csvFileName = uniqid('custom_import_') . '.csv';
-                $csvFilePath = $customDir . '/' . $csvFileName;
-                $varDirectory = $this->csvValidationService->getFilesystem()
-                    ->getDirectoryWrite(\Magento\Framework\App\Filesystem\DirectoryList::VAR_DIR);
-                if (!$varDirectory->isExist($customDir)) {
-                    $varDirectory->create($customDir);
-                }
-                // @codingStandardsIgnoreLine
-                $tmpName = $customCsvFile['tmp_name'];
-                // phpcs:ignore Magento2.Functions.DiscouragedFunction
-                $fileContent = file_get_contents($tmpName); // phpcs:ignore
-                $varDirectory->writeFile($csvFilePath, $fileContent);
+            $isCustomUpload = false;
+            
+            try {
+                // Try to upload custom CSV
+                $csvFileName = $this->fileManager->saveUploadedFile(
+                    'custom_csv_file',
+                    'AIProductCreator/CustomImports'
+                );
+                $csvFilePath = 'AIProductCreator/CustomImports/' . $csvFileName;
+                $isCustomUpload = true;
+                
                 $this->logger->info(
                     'SquadexaAI ImportExecute: Custom CSV uploaded and saved as ' . $csvFilePath
                 );
+            } catch (\Exception $uploadException) {
+                // No custom file uploaded or upload failed, fall back to default
+                $isCustomUpload = false;
+                // We don't log error here as it's a valid flow to not have custom file
+            }
+
+            if ($isCustomUpload) {
+                // Already handled above
             } else {
                 // Use default linked CSV
                 $csvFileName = $generatedCsv->getResponseFileName();
@@ -152,7 +163,7 @@ class ImportExecute extends Action
             // --- End CSV Validation Logic ---
 
             // If custom CSV, import directly from file
-            if ($customCsvFile && $customCsvFile['tmp_name']) {
+            if ($isCustomUpload) {
                 $this->logger->info(
                     'SquadexaAI ImportExecute: Importing directly from custom CSV file: ' . $csvFilePath
                 );

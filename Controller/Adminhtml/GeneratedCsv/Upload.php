@@ -101,20 +101,7 @@ class Upload extends Action
         $resultRedirect->setPath('*/*/index');
 
         try {
-            $file = $this->getRequest()->getFiles('input_file');
-            $hasFile = !empty($file);
-            $fileNotEmpty = $hasFile && !empty($file['tmp_name']);
-            // @codingStandardsIgnoreEnd
-            if (!$hasFile || !$fileNotEmpty) {
-                $this->messageManager->addErrorMessage(__('Please select a file to upload.'));
-                return $resultRedirect;
-            }
-            // @codingStandardsIgnoreLine
-            $fileData = $file;
-
-            $this->fileManager->validateUploadedFile($fileData);
-
-            $inputFileName = $this->fileManager->saveInputFile($fileData);
+            $inputFileName = $this->fileManager->saveUploadedFile('input_file');
             $varDirectory = $this->directoryList->getPath('var');
             $inputFilePath = $varDirectory . '/AIProductCreator/Input/' . $inputFileName;
             $fullInputFilePath = $inputFilePath;

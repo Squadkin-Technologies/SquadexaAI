@@ -22,6 +22,7 @@ use Squadkin\SquadexaAI\Api\AiProductRepositoryInterface;
 use Squadkin\SquadexaAI\Api\Data\AiProductInterfaceFactory;
 use Squadkin\SquadexaAI\Service\SquadexaApiService;
 use Squadkin\SquadexaAI\Model\ResourceModel\AiProduct\CollectionFactory as AiProductCollectionFactory;
+use Magento\Framework\File\UploaderFactory;
 
 class FileManager extends AbstractHelper
 {
@@ -79,6 +80,11 @@ class FileManager extends AbstractHelper
     private $aiProductCollectionFactory;
 
     /**
+     * @var UploaderFactory
+     */
+    private $uploaderFactory;
+
+    /**
      * FileManager constructor.
      *
      * @param Context $context
@@ -102,7 +108,8 @@ class FileManager extends AbstractHelper
         AiProductRepositoryInterface $aiProductRepository,
         AiProductInterfaceFactory $aiProductFactory,
         SquadexaApiService $apiService,
-        AiProductCollectionFactory $aiProductCollectionFactory
+        AiProductCollectionFactory $aiProductCollectionFactory,
+        UploaderFactory $uploaderFactory
     ) {
         parent::__construct($context);
         $this->filesystem = $filesystem;
@@ -115,6 +122,7 @@ class FileManager extends AbstractHelper
         $this->aiProductFactory = $aiProductFactory;
         $this->apiService = $apiService;
         $this->aiProductCollectionFactory = $aiProductCollectionFactory;
+        $this->uploaderFactory = $uploaderFactory;
     }
 
     /**
@@ -138,31 +146,44 @@ class FileManager extends AbstractHelper
     }
 
     /**
-     * Save uploaded file to input directory
+     * Save uploaded file
      *
-     * @param array $fileData
+     * @param string $fileId
+     * @param string $subDir
      * @return string
      * @throws LocalizedException
      */
-    public function saveInputFile(array $fileData): string
+    public function saveUploadedFile(string $fileId, string $subDir = self::INPUT_DIR): string
     {
         try {
             $this->createDirectories();
             
-            $fileName = $this->generateUniqueFileName($fileData['name']);
-            $filePath = self::INPUT_DIR . '/' . $fileName;
+            /** @var \Magento\Framework\File\Uploader $uploader */
+            $uploader = $this->uploaderFactory->create(['fileId' => $fileId]);
+            $uploader->setAllowedExtensions(['csv']);
+            $uploader->setAllowRenameFiles(true);
+            $uploader->setFilesDispersion(false);
             
-            // Read file content
-            // phpcs:ignore Magento2.Functions.DiscouragedFunction
-            $fileContent = file_get_contents($fileData['tmp_name']); // phpcs:ignore
+            // Check file size (max 10MB) handled by php.ini usually, but we can check here too if needed.
+            // Magento Uploader checks upload_max_filesize from php.ini
             
-            // Save to var directory
-            $this->varDirectory->writeFile($filePath, $fileContent);
+            // Validate upload
+            // Standard validation happens in save()
             
-            return $fileName;
+            $path = $this->varDirectory->getAbsolutePath($subDir);
+            
+            // Handle filename sanitization
+            $fileName = $uploader->getCorrectFileName($uploader->getFileExtension());
+            $sanitizedName = $this->generateUniqueFileName($fileName);
+            
+            // The save method moves the file
+            $result = $uploader->save($path, $sanitizedName);
+            
+            return $result['file'];
+            
         } catch (\Exception $e) {
-            $this->logger->error('Error saving input file: ' . $e->getMessage());
-            throw new LocalizedException(__('Could not save input file: %1', $e->getMessage()));
+            $this->logger->error('SquadexaAI FileManager: Upload error: ' . $e->getMessage());
+            throw new LocalizedException(__('File upload failed: %1', $e->getMessage()));
         }
     }
 
@@ -439,42 +460,7 @@ class FileManager extends AbstractHelper
         return $filename;
     }
 
-    /**
-     * Validate uploaded file
-     *
-     * @param array $fileData
-     * @return bool
-     * @throws LocalizedException
-     */
-    public function validateUploadedFile(array $fileData): bool
-    {
-        // Check if file was uploaded
-        if (!isset($fileData['tmp_name']) || empty($fileData['tmp_name'])) {
-            throw new LocalizedException(__('No file was uploaded.'));
-        }
-        
-        // Check for upload errors
-        if ($fileData['error'] !== UPLOAD_ERR_OK) {
-            throw new LocalizedException(__('File upload error: %1', $fileData['error']));
-        }
-        
-        // Check file size (max 10MB)
-        $maxSize = 10 * 1024 * 1024; // 10MB
-        if ($fileData['size'] > $maxSize) {
-            throw new LocalizedException(__('File size exceeds maximum limit of 10MB.'));
-        }
-        
-        // Check file extension
-        $allowedExtensions = ['csv'];
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction
-        $fileExtension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION)); // phpcs:ignore
-        
-        if (!in_array($fileExtension, $allowedExtensions)) {
-            throw new LocalizedException(__('Invalid file type. Only CSV and XLSX files are allowed.'));
-        }
-        
-        return true;
-    }
+
 
     /**
      * Save AI product data to database

@@ -4,7 +4,6 @@
 	<head>
 		<css src="Squadkin_SquadexaAI::css/product-create-modal.css"/>
 		<css src="Squadkin_SquadexaAI::css/generatedcsv-grid.css"/>
-		<script src="Squadkin_SquadexaAI::js/job-status-poll.js"/>
 	</head>
 	<body>
 		<referenceContainer name="content">
