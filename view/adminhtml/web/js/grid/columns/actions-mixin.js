@@ -20,7 +20,7 @@ define([
                     var rowIndex = action.rowIndex;
                     var self = this;
                     
-                    return function() {
+                    return function () {
                         self.applyAction('create_product', rowIndex);
                         return false;
                     };
@@ -30,7 +30,7 @@ define([
                     var rowIndex = action.rowIndex;
                     var self = this;
                     
-                    return function() {
+                    return function () {
                         self.applyAction('update_product', rowIndex);
                         return false;
                     };

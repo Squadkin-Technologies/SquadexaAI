@@ -1,7 +1,7 @@
 /**
  * Copyright © 2024 Squadkin. All rights reserved.
  * See COPYING.txt for license details.
- * 
+ *
  * Single Product Generation Form Handler - Simple Version
  */
 
@@ -60,11 +60,11 @@ define([
                         });
                         
                         if (response.redirect_url) {
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 window.location.href = response.redirect_url;
                             }, 1500);
                         } else {
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 window.location.href = config.generatedCsvUrl || 'squadkin_squadexaai/generatedcsv/index';
                             }, 1500);
                         }

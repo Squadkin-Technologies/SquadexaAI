@@ -14,13 +14,16 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Psr\Log\LoggerInterface;
 use Squadkin\SquadexaAI\Logger\Logger as SquadexaLogger;
+use Magento\Framework\Stdlib\DateTime\DateTime;
+use Magento\Framework\Math\Random;
+use Magento\Framework\Filesystem\Io\File as IoFile;
 
 class SquadexaApiService
 {
     public const API_BASE_URL = 'https://www.squadexa.ai/';
     public const REDIRECT_URL = 'https://www.squadexa.ai/';
     public const API_KEY_CONFIG = 'squadexaiproductcreator/authentication/api_key';
-    
+
     public const API_ENDPOINTS = [
         // Authentication endpoints
         'register' => '/api/v1/auth/register',
@@ -28,23 +31,23 @@ class SquadexaApiService
         'regenerate_api_key' => '/api/v1/auth/regenerate-api-key',
         'api_key_metadata' => '/api/v1/auth/api-key',
         'user_profile' => '/api/v1/auth/me',
-        
+
         // Usage Statistics endpoints (correct ones!)
         'usage_stats' => '/api/v1/usage-stats',
         'usage_history' => '/api/v1/usage-history',
-        
+
         // Health check endpoints
         'health_check' => '/api/v1/health',
         'health_ready' => '/api/v1/health/ready',
         'health_live' => '/api/v1/health/live',
         'health_detailed' => '/api/v1/health/detailed',
-        
+
         // Product generation endpoints (Core functionality)
         'product_details' => '/api/v1/product-details',
         'batch_jobs' => '/api/v1/batch-jobs',
         'job_status' => '/api/v1/job-status',
         'job_download' => '/api/v1/job-download',
-        
+
         // Billing endpoints
         'billing_plans' => '/api/v1/billing/plans',
         'billing_subscription' => '/api/v1/billing/subscription',
@@ -83,12 +86,30 @@ class SquadexaApiService
     private $encryptor;
 
     /**
+     * @var DateTime
+     */
+    private $dateTime;
+
+    /**
+     * @var Random
+     */
+    private $mathRandom;
+
+    /**
+     * @var IoFile
+     */
+    private $ioFile;
+
+    /**
      * @param ScopeConfigInterface $scopeConfig
      * @param Curl $curl
      * @param Json $jsonSerializer
      * @param LoggerInterface $logger
      * @param SquadexaLogger $squadexaLogger
      * @param EncryptorInterface $encryptor
+     * @param DateTime $dateTime
+     * @param Random $mathRandom
+     * @param IoFile $ioFile
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -96,7 +117,10 @@ class SquadexaApiService
         Json $jsonSerializer,
         LoggerInterface $logger,
         SquadexaLogger $squadexaLogger,
-        EncryptorInterface $encryptor
+        EncryptorInterface $encryptor,
+        DateTime $dateTime,
+        Random $mathRandom,
+        IoFile $ioFile
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->curl = $curl;
@@ -104,6 +128,9 @@ class SquadexaApiService
         $this->logger = $logger;
         $this->squadexaLogger = $squadexaLogger;
         $this->encryptor = $encryptor;
+        $this->dateTime = $dateTime;
+        $this->mathRandom = $mathRandom;
+        $this->ioFile = $ioFile;
     }
 
     /**
@@ -203,7 +230,7 @@ class SquadexaApiService
 
         try {
             $this->curl->post($url, '{}');
-            
+
             $responseCode = $this->curl->getStatus();
             $responseBody = $this->curl->getBody();
 
@@ -264,7 +291,7 @@ class SquadexaApiService
     {
         $accessToken = $this->getAccessToken();
         $apiKey = $this->getApiKey();
-        
+
         if (!empty($apiKey) && !empty($accessToken)) {
             $this->squadexaLogger->logDebug('API key available, skipping access token refresh', [
                 'api_key_length' => strlen($apiKey),
@@ -272,23 +299,23 @@ class SquadexaApiService
             ]);
             return true;
         }
-        
+
         if (empty($accessToken)) {
             $this->squadexaLogger->logDebug('No access token available, cannot refresh');
             return false;
         }
-        
+
         $tokenCreated = $this->scopeConfig->getValue('squadexaiproductcreator/authentication/token_created');
         $this->squadexaLogger->logDebug('Token creation timestamp', [
             'token_created' => $tokenCreated
         ]);
-        
+
         if (empty($tokenCreated)) {
             $this->squadexaLogger->logDebug('No token creation timestamp found, assuming expired');
             return false;
         }
-        
-        $tokenAge = time() - strtotime($tokenCreated);
+
+        $tokenAge = $this->dateTime->gmtTimestamp() - $this->dateTime->timestamp($tokenCreated);
         if ($tokenAge < 1800) {
             $this->squadexaLogger->logDebug('Access token still valid', [
                 'token_age_minutes' => floor($tokenAge / 60),
@@ -299,7 +326,7 @@ class SquadexaApiService
         $this->squadexaLogger->logWarning('Access token expired, manual refresh required', [
             'token_age_minutes' => floor($tokenAge / 60)
         ]);
-        
+
         return false;
     }
 
@@ -348,7 +375,7 @@ class SquadexaApiService
 
         try {
             $this->curl->post($url, $this->jsonSerializer->serialize($loginData));
-            
+
             $responseCode = $this->curl->getStatus();
             $responseBody = $this->curl->getBody();
 
@@ -410,7 +437,7 @@ class SquadexaApiService
     {
         $accessToken = $this->getAccessToken();
         $apiKey = $this->getApiKey();
-        
+
         if (empty($accessToken) && empty($apiKey)) {
             $this->logger->error('SquadexaAI API Error: No authentication configured');
             throw new LocalizedException(
@@ -581,9 +608,7 @@ class SquadexaApiService
             throw new LocalizedException(__('API key is not configured. Please generate an API key first.'));
         }
 
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction
-        if (!file_exists($filePath) || !is_readable($filePath)) { // phpcs:ignore
+        if (!$this->ioFile->fileExists($filePath)) {
             throw new LocalizedException(__('File does not exist or is not readable: %1', $filePath));
         }
 
@@ -591,11 +616,14 @@ class SquadexaApiService
         $url = $baseUrl . self::API_ENDPOINTS['batch_jobs'];
 
         // Prepare multipart form data for file upload
-        $boundary = uniqid();
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction
-        $fileName = basename($filePath); // phpcs:ignore
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction
-        $fileContent = file_get_contents($filePath); // phpcs:ignore
+        try {
+            $boundary = $this->mathRandom->getRandomString(13);
+        } catch (LocalizedException $e) {
+            $boundary = 'boundary_' . time();
+        }
+        $pathInfo = $this->ioFile->getPathInfo($filePath);
+        $fileName = $pathInfo['basename'];
+        $fileContent = $this->ioFile->read($filePath);
 
         $body = "--{$boundary}\r\n";
         $body .= "Content-Disposition: form-data; name=\"file\"; filename=\"{$fileName}\"\r\n";

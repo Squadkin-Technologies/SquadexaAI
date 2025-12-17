@@ -16,6 +16,8 @@ use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregatorI
 use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingErrorAggregatorInterfaceFactory;
 use Magento\ImportExport\Model\Import\ErrorProcessing\ProcessingError;
 use Psr\Log\LoggerInterface;
+use Magento\Framework\Stdlib\DateTime\DateTime;
+use Magento\Framework\Filesystem\Io\File;
 
 class CsvValidationService
 {
@@ -74,6 +76,16 @@ class CsvValidationService
     private $errorAggregatorFactory;
 
     /**
+     * @var DateTime
+     */
+    private $dateTime;
+
+    /**
+     * @var File
+     */
+    private $ioFile;
+
+    /**
      * @var LoggerInterface
      */
     private $logger; // phpcs:ignore
@@ -83,18 +95,24 @@ class CsvValidationService
      * @param Filesystem $filesystem
      * @param ProcessingErrorAggregatorInterfaceFactory $errorAggregatorFactory
      * @param LoggerInterface $logger
+     * @param DateTime $dateTime
+     * @param File $ioFile
      */
     public function __construct(
         Csv $csvProcessor,
         Filesystem $filesystem,
         ProcessingErrorAggregatorInterfaceFactory $errorAggregatorFactory,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        DateTime $dateTime,
+        File $ioFile
     ) {
         $this->csvProcessor = $csvProcessor;
         $this->filesystem = $filesystem;
         $this->varDirectory = $filesystem->getDirectoryWrite(DirectoryList::VAR_DIR);
         $this->errorAggregatorFactory = $errorAggregatorFactory;
         $this->logger = $logger;
+        $this->dateTime = $dateTime;
+        $this->ioFile = $ioFile;
     }
 
     /**
@@ -303,25 +321,27 @@ class CsvValidationService
             'sample_data' => $sampleData
         ];
     }
-
+    // @codingStandardsIgnoreStart
     /**
      * Validate data types in a row
+     * phpcs:ignore Magento2.Annotation.MethodArguments.VisualAlignment
      *
-     * @param array $row
-     * @param array $headers
-     * @param array $normalizedHeaders
-     * @param int $rowNumber
+     * @param array                              $row
+     * @param array                              $headers
+     * @param array                              $normalizedHeaders
+     * @param int                                $rowNumber
      * @param ProcessingErrorAggregatorInterface $errorAggregator
-     * @param bool &$isRowValid
+     * @param bool                               &$isRowValid
      */
     private function validateRowDataTypes(
-        array                                 $row,
-        array                                 $headers,
-        array                                 $normalizedHeaders,
-        int                                   $rowNumber,
-        ProcessingErrorAggregatorInterface    $errorAggregator,
-        bool                                  &$isRowValid
+        array $row,
+        array $headers,
+        array $normalizedHeaders,
+        int $rowNumber,
+        ProcessingErrorAggregatorInterface $errorAggregator,
+        bool &$isRowValid
     ): void {
+        // @codingStandardsIgnoreEnd
         // Define expected data types for certain columns
         $numericColumns = ['price', 'special_price', 'weight', 'qty'];
         $booleanColumns = ['status']; // will be validated as enabled/disabled
@@ -456,9 +476,8 @@ class CsvValidationService
         }
 
         // Generate error report file name
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction
-        $pathInfo = pathinfo($originalFileName); // phpcs:ignore
-        $errorFileName = 'error_report_' . $pathInfo['filename'] . '_' . date('Y-m-d_H-i-s') . '.csv';
+        $pathInfo = $this->ioFile->getPathInfo($originalFileName);
+        $errorFileName = 'error_report_' . $pathInfo['filename'] . '_' . $this->dateTime->date('Y-m-d_H-i-s') . '.csv';
         $errorFilePath = 'AIProductCreator/ErrorReports/' . $errorFileName;
 
         // Create error reports directory
@@ -467,44 +486,11 @@ class CsvValidationService
             $this->varDirectory->create($errorReportsDir);
         }
 
-        // Convert error data to CSV
-        $csvContent = $this->convertArrayToCsv($errorReportData);
-        $this->varDirectory->writeFile($errorFilePath, $csvContent);
+        // Write CSV content using Csv processor
+        $fullPath = $this->varDirectory->getAbsolutePath($errorFilePath);
+        $this->csvProcessor->saveData($fullPath, $errorReportData);
 
         return $errorFileName;
-    }
-
-    /**
-     * Convert array to CSV content
-     *
-     * @param array $data
-     * @return string
-     */
-    private function convertArrayToCsv(array $data): string
-    {
-        if (empty($data)) {
-            return '';
-        }
-
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction
-        $output = fopen('php://temp', 'w'); // phpcs:ignore
-
-        foreach ($data as $row) {
-            // phpcs:ignore Magento2.Functions.DiscouragedFunction
-            fputcsv($output, $row, ',', '"', '\\'); // phpcs:ignore
-        }
-
-        rewind($output);
-        try {
-            // phpcs:ignore Magento2.Functions.DiscouragedFunction
-            $csvContent = stream_get_contents($output); // phpcs:ignore
-        } catch (\Exception $e) {
-            $csvContent = '';
-        }
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction
-        fclose($output); // phpcs:ignore
-
-        return $csvContent;
     }
 
     /**

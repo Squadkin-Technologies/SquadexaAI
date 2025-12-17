@@ -15,7 +15,7 @@ use Magento\Catalog\Block\Adminhtml\Product\Edit\Button\Generic;
 class GenerateAiData extends Generic
 {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getButtonData()
     {

@@ -15,6 +15,8 @@ use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 class CreateProductButton extends GenericButton implements ButtonProviderInterface
 {
     /**
+     * Get button data
+     *
      * @return array
      */
     public function getButtonData(): array
@@ -27,7 +29,8 @@ class CreateProductButton extends GenericButton implements ButtonProviderInterfa
             $data = [
                 'label' => __('Create Product from AI Data'),
                 'class' => 'primary',
-                'on_click' => 'window.createProductFromAiModal && window.createProductFromAiModal.open(' . $aiproductId . ')',
+                'on_click' => 'window.createProductFromAiModal && window.createProductFromAiModal.open(' .
+                    $aiproductId . ')',
                 'sort_order' => 20,
             ];
         }

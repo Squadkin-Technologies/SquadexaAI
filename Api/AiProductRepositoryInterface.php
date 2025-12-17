@@ -13,6 +13,7 @@ interface AiProductRepositoryInterface
 {
     /**
      * Save AiProduct
+     *
      * @param \Squadkin\SquadexaAI\Api\Data\AiProductInterface $aiProduct
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -23,6 +24,7 @@ interface AiProductRepositoryInterface
 
     /**
      * Retrieve AiProduct
+     *
      * @param string $aiproductId
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -31,6 +33,7 @@ interface AiProductRepositoryInterface
 
     /**
      * Retrieve AiProduct matching the specified criteria.
+     *
      * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductSearchResultsInterface
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -41,6 +44,7 @@ interface AiProductRepositoryInterface
 
     /**
      * Delete AiProduct
+     *
      * @param \Squadkin\SquadexaAI\Api\Data\AiProductInterface $aiProduct
      * @return bool true on success
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -51,6 +55,7 @@ interface AiProductRepositoryInterface
 
     /**
      * Delete AiProduct by ID
+     *
      * @param string $aiproductId
      * @return bool true on success
      * @throws \Magento\Framework\Exception\NoSuchEntityException

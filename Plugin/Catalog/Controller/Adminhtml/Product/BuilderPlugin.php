@@ -71,94 +71,7 @@ class BuilderPlugin
         
         // Only apply for new products (no ID) and when ai_data parameter exists
         if (!$result->getId() && $aiProductIdParam) {
-            try {
-                $aiDataEncoded = $request->getParam('ai_data');
-                $this->logger->info('BuilderPlugin: Processing AI data', [
-                    'ai_data_param_exists' => !empty($aiDataEncoded),
-                    'ai_data_length' => strlen($aiDataEncoded ?? '')
-                ]);
-
-                // Decode base64 and then JSON
-                $decodedBase64 = base64_decode($aiDataEncoded, true);
-                if ($decodedBase64 === false) {
-                    $this->logger->error('BuilderPlugin: Failed to decode base64 data');
-                    return $result;
-                }
-
-                $aiData = $this->jsonSerializer->unserialize($decodedBase64);
-                
-                if (!is_array($aiData)) {
-                    $this->logger->error('BuilderPlugin: Decoded data is not an array', [
-                        'type' => gettype($aiData)
-                    ]);
-                    return $result;
-                }
-
-                $this->logger->info('BuilderPlugin: Decoded AI data', [
-                    'attributes_count' => count($aiData),
-                    'attributes' => array_keys($aiData),
-                    'sample_data' => array_slice($aiData, 0, 5, true)
-                ]);
-
-                if (!empty($aiData)) {
-                    // Apply mapped AI data to product using addData for bulk assignment
-                    $dataToSet = [];
-                    
-                    foreach ($aiData as $attributeCode => $value) {
-                        if ($value !== null && $value !== '') {
-                            // Handle array values (for multiselect, etc.)
-                            if (is_array($value)) {
-                                $dataToSet[$attributeCode] = $value;
-                            } elseif (is_string($value) && !empty(trim($value))) {
-                                $dataToSet[$attributeCode] = trim($value);
-                            } elseif (is_numeric($value)) {
-                                $dataToSet[$attributeCode] = $value;
-                            } else {
-                                $dataToSet[$attributeCode] = $value;
-                            }
-                        }
-                    }
-
-                    if (!empty($dataToSet)) {
-                        // Ensure product has attribute set before setting data
-                        // This is important for EAV attributes to be set correctly
-                        if (!$result->getAttributeSetId() && isset($dataToSet['attribute_set_id'])) {
-                            $result->setAttributeSetId($dataToSet['attribute_set_id']);
-                        }
-                        
-                        // Use addData for bulk assignment - this is more efficient
-                        $result->addData($dataToSet);
-                        
-                        // Also ensure the data is set in the product's data array
-                        // This ensures the data is available when the form loads
-                        foreach ($dataToSet as $key => $val) {
-                            $result->setData($key, $val);
-                        }
-                        
-                        // Mark product as having data changes so form recognizes the values
-                        $result->setHasDataChanges(true);
-
-                        $this->logger->info('BuilderPlugin: AI Product data applied to Magento product form', [
-                            'attributes_set_count' => count($dataToSet),
-                            'attributes_set' => array_keys($dataToSet),
-                            'product_id' => $result->getId(),
-                            'product_sku' => $result->getSku(),
-                            'product_name' => $result->getName(),
-                            'attribute_set_id' => $result->getAttributeSetId(),
-                            'type_id' => $result->getTypeId()
-                        ]);
-                    } else {
-                        $this->logger->warning('BuilderPlugin: No valid data to set after filtering');
-                    }
-                } else {
-                    $this->logger->warning('BuilderPlugin: AI data array is empty');
-                }
-            } catch (\Exception $e) {
-                $this->logger->error('BuilderPlugin: Error applying AI data to product', [
-                    'message' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
-            }
+            $this->applyAiData($result, $request, $aiProductIdParam);
         } else {
             $this->logger->debug('BuilderPlugin: Skipping - product has ID or no ai_data param', [
                 'product_id' => $result->getId(),
@@ -167,5 +80,122 @@ class BuilderPlugin
         }
 
         return $result;
+    }
+
+    /**
+     * Apply AI data to product
+     *
+     * @param \Magento\Catalog\Api\Data\ProductInterface $result
+     * @param RequestInterface $request
+     * @param string $aiProductIdParam
+     * @return void
+     */
+    private function applyAiData(
+        \Magento\Catalog\Api\Data\ProductInterface $result,
+        RequestInterface $request,
+        $aiProductIdParam
+    ) {
+        try {
+            $aiDataEncoded = $request->getParam('ai_data');
+            $this->logger->info('BuilderPlugin: Processing AI data', [
+                'ai_data_param_exists' => !empty($aiDataEncoded),
+                'ai_data_length' => strlen($aiDataEncoded ?? '')
+            ]);
+
+            // Decode base64 and then JSON
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
+            $decodedBase64 = base64_decode($aiDataEncoded, true);
+            if ($decodedBase64 === false) {
+                $this->logger->error('BuilderPlugin: Failed to decode base64 data');
+                return;
+            }
+
+            $aiData = $this->jsonSerializer->unserialize($decodedBase64);
+            
+            if (!is_array($aiData)) {
+                $this->logger->error('BuilderPlugin: Decoded data is not an array', [
+                    // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
+                    'type' => gettype($aiData)
+                ]);
+                return;
+            }
+
+            $this->logger->info('BuilderPlugin: Decoded AI data', [
+                'attributes_count' => count($aiData),
+                'attributes' => array_keys($aiData),
+                'sample_data' => array_slice($aiData, 0, 5, true)
+            ]);
+
+            if (!empty($aiData)) {
+                $this->mapDataToProduct($result, $aiData);
+            } else {
+                $this->logger->warning('BuilderPlugin: AI data array is empty');
+            }
+        } catch (\Exception $e) {
+            $this->logger->error('BuilderPlugin: Error applying AI data to product', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    }
+
+    /**
+     * Map AI data to product
+     *
+     * @param \Magento\Catalog\Api\Data\ProductInterface $result
+     * @param array $aiData
+     * @return void
+     */
+    private function mapDataToProduct(\Magento\Catalog\Api\Data\ProductInterface $result, array $aiData)
+    {
+        // Apply mapped AI data to product using addData for bulk assignment
+        $dataToSet = [];
+        
+        foreach ($aiData as $attributeCode => $value) {
+            if ($value !== null && $value !== '') {
+                // Handle array values (for multiselect, etc.)
+                if (is_array($value)) {
+                    $dataToSet[$attributeCode] = $value;
+                } elseif (is_string($value) && !empty(trim($value))) {
+                    $dataToSet[$attributeCode] = trim($value);
+                } elseif (is_numeric($value)) {
+                    $dataToSet[$attributeCode] = $value;
+                } else {
+                    $dataToSet[$attributeCode] = $value;
+                }
+            }
+        }
+
+        if (!empty($dataToSet)) {
+            // Ensure product has attribute set before setting data
+            // This is important for EAV attributes to be set correctly
+            if (!$result->getAttributeSetId() && isset($dataToSet['attribute_set_id'])) {
+                $result->setAttributeSetId($dataToSet['attribute_set_id']);
+            }
+            
+            // Use addData for bulk assignment - this is more efficient
+            $result->addData($dataToSet);
+            
+            // Also ensure the data is set in the product's data array
+            // This ensures the data is available when the form loads
+            foreach ($dataToSet as $key => $val) {
+                $result->setData($key, $val);
+            }
+            
+            // Mark product as having data changes so form recognizes the values
+            $result->setHasDataChanges(true);
+
+            $this->logger->info('BuilderPlugin: AI Product data applied to Magento product form', [
+                'attributes_set_count' => count($dataToSet),
+                'attributes_set' => array_keys($dataToSet),
+                'product_id' => $result->getId(),
+                'product_sku' => $result->getSku(),
+                'product_name' => $result->getName(),
+                'attribute_set_id' => $result->getAttributeSetId(),
+                'type_id' => $result->getTypeId()
+            ]);
+        } else {
+            $this->logger->warning('BuilderPlugin: No valid data to set after filtering');
+        }
     }
 }

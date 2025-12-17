@@ -73,7 +73,10 @@ class AiProductActions extends Column
                 if (isset($item['aiproduct_id'])) {
                     // Check if product is created in Magento
                     $isCreatedInMagento = isset($item['is_created_in_magento']) &&
-                                         ($item['is_created_in_magento'] == 1 || $item['is_created_in_magento'] === true || $item['is_created_in_magento'] === '1');
+                    $isCreatedInMagento = isset($item['is_created_in_magento']) &&
+                        ($item['is_created_in_magento'] == 1 ||
+                        $item['is_created_in_magento'] === true ||
+                        $item['is_created_in_magento'] === '1');
                     
                     $actions = [];
                     
@@ -86,7 +89,10 @@ class AiProductActions extends Column
                     $showEdit = true;
                     $actionLabel = __('Edit');
                     
-                    if ($isCreatedInMagento && isset($item['magento_product_id']) && !empty($item['magento_product_id'])) {
+                    if ($isCreatedInMagento &&
+                        isset($item['magento_product_id']) &&
+                        !empty($item['magento_product_id'])
+                    ) {
                         // Check if AI data is newer than Magento product
                         $aiDataIsNewer = $this->isAiDataNewerThanMagentoProduct(
                             $item['updated_at'] ?? null,
@@ -122,7 +128,10 @@ class AiProductActions extends Column
                         'label' => __('Delete'),
                         'confirm' => [
                             'title' => __('Delete "%1"', $item['product_name'] ?? $item['name'] ?? ''),
-                            'message' => __('Are you sure you want to delete the AI product "%1"?', $item['product_name'] ?? $item['name'] ?? '')
+                            'message' => __(
+                                'Are you sure you want to delete the AI product "%1"?',
+                                $item['product_name'] ?? $item['name'] ?? ''
+                            )
                         ]
                     ];
                     
@@ -136,7 +145,10 @@ class AiProductActions extends Column
                     }
                     
                     // Add "Update Product in Magento" action if product is already created in Magento
-                    if ($isCreatedInMagento && isset($item['magento_product_id']) && !empty($item['magento_product_id'])) {
+                    if ($isCreatedInMagento &&
+                        isset($item['magento_product_id']) &&
+                        !empty($item['magento_product_id'])
+                    ) {
                         $actions['update_product'] = [
                             'href' => '',
                             'label' => __('Update Product in Magento'),

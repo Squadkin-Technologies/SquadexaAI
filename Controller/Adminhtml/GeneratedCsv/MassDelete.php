@@ -121,11 +121,10 @@ class MassDelete extends Action
 
                     // Collect file deletion errors
                     if (!empty($fileDeletionResult['errors'])) {
-                        // phpcs:ignore MEQP1.Performance.Loop
-                        $fileErrors = array_merge(
-                            $fileErrors,
-                            $fileDeletionResult['errors']
-                        ); // phpcs:ignore MEQP1.Performance.Loop
+                        foreach ($fileDeletionResult['errors'] as $error) {
+                            $fileErrors[] = $error;
+                        }
+
                         $this->logger->warning('SquadexaAI MassDelete: Some files could not be deleted', [
                             'generatedcsv_id' => $generatedCsvId,
                             'errors' => $fileDeletionResult['errors']

@@ -124,7 +124,7 @@ define([
                 modalWrapper = $('.modal-popup').has(modalElement);
                 if (!modalWrapper.length) {
                     // Modal might not be fully initialized yet, try again after a short delay
-                    setTimeout(function() {
+                    setTimeout(function () {
                         self.updateModalButtons(step);
                     }, 100);
                     return;
@@ -829,7 +829,7 @@ define([
             var maxObserverAttempts = 60; // 30 seconds total (60 * 500ms)
             
             // Function to try updating Page Builder when found
-            var tryUpdatePageBuilder = function() {
+            var tryUpdatePageBuilder = function () {
                 if (pageBuilderFound) {
                     return; // Already updated
                 }
@@ -900,7 +900,7 @@ define([
             
             // Use MutationObserver to watch for Page Builder elements
             if (window.MutationObserver) {
-                var observer = new MutationObserver(function(mutations) {
+                var observer = new MutationObserver(function (mutations) {
                     if (!pageBuilderFound) {
                         tryUpdatePageBuilder();
                     }
@@ -974,7 +974,7 @@ define([
                     if ($pageBuilderTextarea.length) {
                         var pbTextareaValue = $pageBuilderTextarea.val() || '';
                         // Check if our expected text is in the Page Builder content
-                        if (pbTextareaValue.indexOf(expectedValueTrimmed) !== -1 || 
+                        if (pbTextareaValue.indexOf(expectedValueTrimmed) !== -1 ||
                             pbTextareaValue.replace(/<[^>]*>/g, '').trim() === expectedValueTrimmed) {
                             isApplied = true;
                         }
@@ -1000,7 +1000,7 @@ define([
                         var fieldValueTextOnly = fieldValueTrimmed.replace(/<[^>]*>/g, '').trim();
                         var expectedValueTextOnly = expectedValueTrimmed.replace(/<[^>]*>/g, '').trim();
                         
-                        if (fieldValueTrimmed === expectedValueTrimmed || 
+                        if (fieldValueTrimmed === expectedValueTrimmed ||
                             fieldValueTextOnly === expectedValueTextOnly ||
                             fieldValueTrimmed.indexOf(expectedValueTrimmed) !== -1) {
                             isApplied = true;
@@ -1019,7 +1019,7 @@ define([
                     var editorTextOnly = editorContentTrimmed.replace(/<[^>]*>/g, '').trim();
                     var expectedTextOnly = expectedValueTrimmed.replace(/<[^>]*>/g, '').trim();
                     
-                    if (editorContentTrimmed === expectedValueTrimmed || 
+                    if (editorContentTrimmed === expectedValueTrimmed ||
                         editorTextOnly === expectedTextOnly ||
                         editorContentTrimmed.indexOf(expectedValueTrimmed) !== -1) {
                         isApplied = true;
@@ -1046,7 +1046,7 @@ define([
                                     var fieldTextOnly = fieldValueTrimmed.replace(/<[^>]*>/g, '').trim();
                                     var expectedTextOnly = expectedValueTrimmed.replace(/<[^>]*>/g, '').trim();
                                     
-                                    if (fieldValueTrimmed === expectedValueTrimmed || 
+                                    if (fieldValueTrimmed === expectedValueTrimmed ||
                                         fieldTextOnly === expectedTextOnly) {
                                         isApplied = true;
                                     }

@@ -11,8 +11,7 @@
         }
     ],
     "require": {
-        "php": ">=8.0",
-        "squadkintechnologies/module-base": "*"
+        "php": ">=8.0"
     },
     "version": "1.0.0",
     "minimum-stability": "dev",

@@ -15,7 +15,7 @@ define([
         $apiKeyField.after($validateButton);
         $validateButton.after($statusDiv);
         
-        $validateButton.on('click', function() {
+        $validateButton.on('click', function () {
             var apiKey = $apiKeyField.val();
             
             if (!apiKey) {
@@ -33,7 +33,7 @@ define([
                     form_key: $('input[name="form_key"]').val()
                 },
                 dataType: 'json',
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         showStatus('success', $t('API key is valid!'));
                         if (response.account_info) {
@@ -43,13 +43,14 @@ define([
                         showStatus('error', response.message || $t('API key validation failed.'));
                     }
                 },
-                error: function() {
+                error: function () {
                     showStatus('error', $t('An error occurred while validating the API key.'));
                 }
             });
         });
         
-        function showStatus(type, message) {
+        function showStatus(type, message)
+        {
             var statusClass = type === 'success' ? 'success' : (type === 'error' ? 'error' : 'loading');
             var icon = type === 'success' ? '✓' : (type === 'error' ? '✗' : '⏳');
             
@@ -61,7 +62,8 @@ define([
             );
         }
         
-        function showAccountInfo(accountInfo) {
+        function showAccountInfo(accountInfo)
+        {
             if (accountInfo.api_key_valid && accountInfo.usage_stats) {
                 var usageStats = accountInfo.usage_stats;
                 var subscriptionPlan = accountInfo.subscription_plan || {};

@@ -14,6 +14,7 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Squadkin\SquadexaAI\Service\CsvValidationService;
 use Squadkin\SquadexaAI\Helper\FileManager;
+use Psr\Log\LoggerInterface;
 
 class Validate extends Action
 {
@@ -33,23 +34,31 @@ class Validate extends Action
     private $fileManager;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Validate constructor.
      *
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param CsvValidationService $csvValidationService
      * @param FileManager $fileManager
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
         CsvValidationService $csvValidationService,
-        FileManager $fileManager
+        FileManager $fileManager,
+        LoggerInterface $logger
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->csvValidationService = $csvValidationService;
         $this->fileManager = $fileManager;
+        $this->logger = $logger;
     }
 
     /**
@@ -59,7 +68,7 @@ class Validate extends Action
      */
     public function execute(): Json
     {
-        $resultJson = $this->resultJsonFactory->create(); // phpcs:ignore
+        $resultJson = $this->resultJsonFactory->create();
 
         try {
             // Save file temporarily for validation
@@ -94,7 +103,7 @@ class Validate extends Action
                     $responseData['error_report'] = $errorReportFileName;
                 } catch (LocalizedException $e) {
                     // Error report generation failed, but validation can continue
-                    // phpcs:ignore MEQP2.Exceptions.EmptyCatch
+                    $this->logger->error('SquadexaAI Validate: Error report generation failed: ' . $e->getMessage());
                 }
             }
 

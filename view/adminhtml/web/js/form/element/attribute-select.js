@@ -118,7 +118,7 @@ define([
          */
         hideAllValueFields: function () {
             var fields = [
-                'value', 'value_select', 'value_multiselect', 
+                'value', 'value_select', 'value_multiselect',
                 'value_boolean', 'value_date', 'value_textarea'
             ];
             
@@ -242,7 +242,7 @@ define([
          */
         getVisibleValueField: function () {
             var fields = [
-                'value', 'value_select', 'value_multiselect', 
+                'value', 'value_select', 'value_multiselect',
                 'value_boolean', 'value_date', 'value_textarea'
             ];
             

@@ -73,65 +73,7 @@ class SavePlugin
     {
         try {
             // Check if this product was created from AI data
-            $aiProductId = null;
-            $source = null;
-            
-            // Method 1: Check URL parameters (ai_data can be in the URL when form loads)
-            $urlParam = $this->request->getParam('ai_data');
-            
-            if ($urlParam) {
-                $aiProductId = $urlParam;
-                $source = 'url_param';
-            }
-            
-            // Method 2: Check POST data (form submission)
-            if (!$aiProductId && $this->request->isPost()) {
-                $postData = $this->request->getPostValue();
-                
-                // Check direct POST keys
-                $aiProductId = $postData['ai_data'] ?? $postData[self::AI_PRODUCT_ID_KEY] ?? null;
-                if ($aiProductId) {
-                    $source = 'post_data_direct';
-                }
-                
-                // Check nested in 'product' array (UI component form structure)
-                if (!$aiProductId && isset($postData['product'])) {
-                    $productData = $postData['product'];
-                    
-                    $aiProductId = $productData['ai_data'] ?? $productData[self::AI_PRODUCT_ID_KEY] ?? null;
-                    if ($aiProductId) {
-                        $source = 'post_data_product';
-                    }
-                    
-                    // Check in general sections (can exist at multiple paths)
-                    if (!$aiProductId) {
-                        $generalCandidates = [];
-                        if (isset($productData['general']) && is_array($productData['general'])) {
-                            $generalCandidates[] = [
-                                'path' => 'product.general',
-                                'data' => $productData['general']
-                            ];
-                        }
-                        if (isset($productData['product']['general']) && is_array($productData['product']['general'])) {
-                            $generalCandidates[] = [
-                                'path' => 'product.product.general',
-                                'data' => $productData['product']['general']
-                            ];
-                        }
-                        
-                        foreach ($generalCandidates as $candidate) {
-                            $generalData = $candidate['data'];
-                            $aiProductId = $generalData['ai_data'] ?? $generalData[self::AI_PRODUCT_ID_KEY] ?? null;
-                            if ($aiProductId) {
-                                $source = $candidate['path'];
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            $aiProductId = $aiProductId ? (int)$aiProductId : null;
+            $aiProductId = $this->getAiProductIdFromRequest();
 
             // If AI product ID found, redirect to Squadexa AI - Products Data grid
             if ($aiProductId && $aiProductId > 0) {
@@ -139,8 +81,7 @@ class SavePlugin
                     __('Squadexa AI generated product has been saved.')
                 );
                 $this->logger->info('SavePlugin: Redirecting to Squadexa AI - Products Data grid', [
-                    'ai_product_id' => $aiProductId,
-                    'source' => $source
+                    'ai_product_id' => $aiProductId
                 ]);
                 
                 // Redirect to Squadexa AI - Products Data grid
@@ -157,5 +98,65 @@ class SavePlugin
         }
 
         return $result;
+    }
+
+    /**
+     * Get AI Product ID from request
+     *
+     * @return int|null
+     */
+    private function getAiProductIdFromRequest()
+    {
+        $aiProductId = null;
+        
+        // Method 1: Check URL parameters
+        $urlParam = $this->request->getParam('ai_data');
+        if ($urlParam) {
+            return (int)$urlParam;
+        }
+        
+        // Method 2: Check POST data
+        if ($this->request->isPost()) {
+            $postData = $this->request->getPostValue();
+            
+            // Check direct POST keys
+            $aiProductId = $postData['ai_data'] ?? $postData[self::AI_PRODUCT_ID_KEY] ?? null;
+            
+            if (!$aiProductId && isset($postData['product'])) {
+                $productData = $postData['product'];
+                $aiProductId = $productData['ai_data'] ?? $productData[self::AI_PRODUCT_ID_KEY] ?? null;
+                
+                if (!$aiProductId) {
+                    $aiProductId = $this->findAiIdInGeneral($productData);
+                }
+            }
+        }
+
+        return $aiProductId ? (int)$aiProductId : null;
+    }
+
+    /**
+     * Find AI ID in general sections
+     *
+     * @param array $productData
+     * @return mixed|null
+     */
+    private function findAiIdInGeneral(array $productData)
+    {
+        $generalCandidates = [];
+        if (isset($productData['general']) && is_array($productData['general'])) {
+            $generalCandidates[] = $productData['general'];
+        }
+        if (isset($productData['product']['general']) && is_array($productData['product']['general'])) {
+            $generalCandidates[] = $productData['product']['general'];
+        }
+        
+        foreach ($generalCandidates as $generalData) {
+            $aiProductId = $generalData['ai_data'] ?? $generalData[self::AI_PRODUCT_ID_KEY] ?? null;
+            if ($aiProductId) {
+                return $aiProductId;
+            }
+        }
+        return null;
     }
 }

@@ -17,6 +17,7 @@ use Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface;
 use Squadkin\SquadexaAI\Service\MagentoImportService;
 use Squadkin\SquadexaAI\Service\CsvValidationService;
 use Squadkin\SquadexaAI\Helper\FileManager;
+use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 
 class ImportExecute extends Action
 {
@@ -51,6 +52,11 @@ class ImportExecute extends Action
     private $fileManager;
 
     /**
+     * @var JsonSerializer
+     */
+    private $jsonSerializer;
+
+    /**
      * ImportExecute constructor.
      *
      * @param Context $context
@@ -59,6 +65,8 @@ class ImportExecute extends Action
      * @param MagentoImportService $importService
      * @param LoggerInterface $logger
      * @param CsvValidationService $csvValidationService
+     * @param FileManager $fileManager
+     * @param JsonSerializer $jsonSerializer
      */
     public function __construct(
         Context $context,
@@ -67,16 +75,17 @@ class ImportExecute extends Action
         MagentoImportService $importService,
         LoggerInterface $logger,
         CsvValidationService $csvValidationService,
-        FileManager $fileManager
+        FileManager $fileManager,
+        JsonSerializer $jsonSerializer
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->generatedCsvRepository = $generatedCsvRepository;
         $this->importService = $importService;
         $this->logger = $logger;
-        $this->logger = $logger;
         $this->csvValidationService = $csvValidationService;
         $this->fileManager = $fileManager;
+        $this->jsonSerializer = $jsonSerializer;
     }
 
     /**
@@ -88,9 +97,9 @@ class ImportExecute extends Action
     {
         $resultJson = $this->resultJsonFactory->create();
         $csvId = (int)$this->getRequest()->getParam('csv_id');
-        
+
         $this->logger->info('SquadexaAI ImportExecute: Starting import execution for CSV ID: ' . $csvId);
-        
+
         if (!$csvId) {
             $this->logger->error('SquadexaAI ImportExecute: Invalid CSV ID provided');
             return $resultJson->setData([
@@ -102,17 +111,16 @@ class ImportExecute extends Action
         try {
             $this->logger->info('SquadexaAI ImportExecute: Loading CSV data for ID: ' . $csvId);
             $generatedCsv = $this->generatedCsvRepository->get($csvId);
-            
+
             $importOptions = $this->getRequest()->getParams();
-            // phpcs:ignore Magento2.Functions.DiscouragedFunction
-            $importOptionsStr = print_r($importOptions, true); // phpcs:ignore
+            $importOptionsStr = $this->jsonSerializer->serialize($importOptions);
             $this->logger->info('SquadexaAI ImportExecute: Import options: ' . $importOptionsStr);
-            
+
             // --- CSV Validation Logic ---
             $csvFilePath = '';
             $csvFileName = '';
             $isCustomUpload = false;
-            
+
             try {
                 // Try to upload custom CSV
                 $csvFileName = $this->fileManager->saveUploadedFile(
@@ -121,7 +129,7 @@ class ImportExecute extends Action
                 );
                 $csvFilePath = 'AIProductCreator/CustomImports/' . $csvFileName;
                 $isCustomUpload = true;
-                
+
                 $this->logger->info(
                     'SquadexaAI ImportExecute: Custom CSV uploaded and saved as ' . $csvFilePath
                 );
@@ -131,9 +139,7 @@ class ImportExecute extends Action
                 // We don't log error here as it's a valid flow to not have custom file
             }
 
-            if ($isCustomUpload) {
-                // Already handled above
-            } else {
+            if (!$isCustomUpload) {
                 // Use default linked CSV
                 $csvFileName = $generatedCsv->getResponseFileName();
                 $csvFilePath = 'AIProductCreator/Output/' . $csvFileName;
@@ -141,6 +147,7 @@ class ImportExecute extends Action
                     'SquadexaAI ImportExecute: Using default linked CSV: ' . $csvFilePath
                 );
             }
+
             // Validate CSV
             $validationResult = $this->csvValidationService->validateCsvFile($csvFilePath);
             if (!$validationResult['is_valid']) {
@@ -193,7 +200,7 @@ class ImportExecute extends Action
                 'total_count' => $result['total_count'],
                 'errors' => $result['errors'] ?? []
             ]);
-            
+
         } catch (LocalizedException $e) {
             $this->logger->error(
                 'SquadexaAI ImportExecute: LocalizedException: ' . $e->getMessage()
@@ -201,7 +208,7 @@ class ImportExecute extends Action
             $this->logger->error(
                 'SquadexaAI ImportExecute: Exception trace: ' . $e->getTraceAsString()
             );
-            
+
             // Reset status to pending on error for retry
             try {
                 $generatedCsv = $this->generatedCsvRepository->get($csvId);
@@ -213,7 +220,7 @@ class ImportExecute extends Action
                     'SquadexaAI ImportExecute: Failed to reset status: ' . $saveException->getMessage()
                 );
             }
-            
+
             return $resultJson->setData([
                 'success' => false,
                 'error' => $e->getMessage()
@@ -221,7 +228,7 @@ class ImportExecute extends Action
         } catch (\Exception $e) {
             $this->logger->error('SquadexaAI ImportExecute: General Exception: ' . $e->getMessage());
             $this->logger->error('SquadexaAI ImportExecute: Exception trace: ' . $e->getTraceAsString());
-            
+
             // Reset status to pending on error for retry
             try {
                 $generatedCsv = $this->generatedCsvRepository->get($csvId);
@@ -233,7 +240,7 @@ class ImportExecute extends Action
                     'SquadexaAI ImportExecute: Failed to reset status: ' . $saveException->getMessage()
                 );
             }
-            
+
             return $resultJson->setData([
                 'success' => false,
                 'error' => __('An unexpected error occurred during import: %1', $e->getMessage())

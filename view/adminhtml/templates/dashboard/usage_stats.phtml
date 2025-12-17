@@ -1,6 +1,7 @@
 <?php
 /**
  * @var \Squadkin\SquadexaAI\Block\Adminhtml\Dashboard\UsageStats $block
+ * @var \Magento\Framework\Escaper $escaper
  */
 $usageData = $block->getFormattedUsageData();
 $usagePercentage = $block->getUsagePercentage();
@@ -10,136 +11,229 @@ $progressColor = $block->getProgressBarColor();
 <?php if (!$block->isModuleEnabled()): ?>
     <div class="squadexa-dashboard-widget">
         <div class="widget-header">
-            <h3>SquadexaAI Dashboard</h3>
+            <h3><?= $escaper->escapeHtml(__('SquadexaAI Dashboard')) ?></h3>
         </div>
         <div class="widget-content">
             <div class="module-disabled">
-                <p><strong>SquadexaAI module is disabled.</strong></p>
-                <p>Please enable the module in <a href="<?= $block->getUrl('admin/system_config/edit/section/squadexaiproductcreator') ?>">System Configuration</a> to view usage statistics.</p>
+                <p><strong><?= $escaper->escapeHtml(__('SquadexaAI module is disabled.')) ?></strong></p>
+                <p>
+                    <?php $systemConfigUrl = $block->getUrl(
+                        'admin/system_config/edit/section/squadexaiproductcreator'
+                    ); ?>
+                    <?= $escaper->escapeHtml(__('Please enable the module in')) ?>
+                    <a href="<?= $escaper->escapeUrl($systemConfigUrl) ?>">
+                        <?= $escaper->escapeHtml(__('System Configuration')) ?>
+                    </a>
+                    <?= $escaper->escapeHtml(__('to view usage statistics.')) ?>
+                </p>
             </div>
         </div>
     </div>
 <?php elseif (!$block->isApiKeyConfigured()): ?>
     <div class="squadexa-dashboard-widget">
         <div class="widget-header">
-            <h3>SquadexaAI Dashboard</h3>
+            <h3><?= $escaper->escapeHtml(__('SquadexaAI Dashboard')) ?></h3>
         </div>
         <div class="widget-content">
             <div class="api-key-not-configured">
-                <p><strong>API key not configured.</strong></p>
-                <p>Please configure your Squadexa AI API key in <a href="<?= $block->getUrl('admin/system_config/edit/section/squadexaiproductcreator') ?>">System Configuration</a>.</p>
-                <p>Don't have an account? <a href="<?= $block->getRedirectUrl() ?>" target="_blank">Create account and get API key</a></p>
+                <p><strong><?= $escaper->escapeHtml(__('API key not configured.')) ?></strong></p>
+                <p>
+                    <?php $systemConfigUrl = $block->getUrl(
+                        'admin/system_config/edit/section/squadexaiproductcreator'
+                    ); ?>
+                    <?= $escaper->escapeHtml(__('Please configure your Squadexa AI API key in')) ?>
+                    <a href="<?= $escaper->escapeUrl($systemConfigUrl) ?>">
+                        <?= $escaper->escapeHtml(__('System Configuration')) ?>
+                    </a>.
+                </p>
+                <p>
+                    <?= $escaper->escapeHtml(__('Don\'t have an account?')) ?>
+                    <a href="<?= $escaper->escapeUrl($block->getRedirectUrl()) ?>" target="_blank">
+                        <?= $escaper->escapeHtml(__('Create account and get API key')) ?>
+                    </a>
+                </p>
             </div>
         </div>
     </div>
 <?php elseif ($usageData['error']): ?>
     <div class="squadexa-dashboard-widget">
         <div class="widget-header">
-            <h3>SquadexaAI Dashboard</h3>
+            <h3><?= $escaper->escapeHtml(__('SquadexaAI Dashboard')) ?></h3>
         </div>
         <div class="widget-content">
             <div class="api-error">
-                <p><strong>Error loading account information:</strong></p>
-                <p><?= $block->escapeHtml($usageData['message']) ?></p>
-                <p>Please check your API key configuration.</p>
+                <p><strong><?= $escaper->escapeHtml(__('Error loading account information:')) ?></strong></p>
+                <p><?= $escaper->escapeHtml($usageData['message']) ?></p>
+                <p><?= $escaper->escapeHtml(__('Please check your API key configuration.')) ?></p>
             </div>
         </div>
     </div>
 <?php else: ?>
     <div class="squadexa-dashboard-widget">
         <div class="widget-header">
-            <h3>📊 SquadexaAI Usage & Overview</h3>
-            <p>Your API usage and activity at a glance</p>
+            <h3>📊 <?= $escaper->escapeHtml(__('SquadexaAI Usage & Overview')) ?></h3>
+            <p><?= $escaper->escapeHtml(__('Your API usage and activity at a glance')) ?></p>
         </div>
         <div class="widget-content">
             <div class="usage-overview">
                 <!-- API Usage Section -->
                 <div class="api-usage-section">
-                    <h4>⚡ API Usage</h4>
+                    <h4>⚡ <?= $escaper->escapeHtml(__('API Usage')) ?></h4>
                     <div class="progress-container">
                         <div class="progress-bar">
-                            <div class="progress-fill" style="width: <?= $usagePercentage ?>%; background-color: <?= $progressColor ?>;"></div>
+                            <div class="progress-fill"
+                                 style="width: <?= $escaper->escapeHtmlAttr($usagePercentage) ?>%; 
+                                        background-color: <?= $escaper->escapeHtmlAttr($progressColor) ?>;">
+                            </div>
                         </div>
                         <div class="progress-text">
-                            <span class="calls-remaining"><?= $usageData['calls_remaining'] ?>/<?= $usageData['calls_limit'] ?></span>
-                            <span class="calls-label">calls remaining</span>
+                            <span class="calls-remaining">
+                                <?= $escaper->escapeHtml(__(
+                                    'Remaining: %1',
+                                    number_format($usageData['api_calls_remaining'])
+                                )) ?>
+                                <?= $escaper->escapeHtml(__(
+                                    'Limit: %1',
+                                    number_format($usageData['api_calls_limit'])
+                                )) ?>
+                            </span>
+                            <span class="calls-label"><?= $escaper->escapeHtml(__('calls remaining')) ?></span>
+                        </div>
+                    </div>
+                    <div class="card-words-generated">
+                        <div class="card-label"><?= $escaper->escapeHtml(__('Words Generated')) ?></div>
+                        <div class="card-value"><?= $escaper->escapeHtml(number_format(
+                            $usageData['words_generated']
+                        )) ?></div>
+                        <div class="card-subtitle">
+                            <?= $escaper->escapeHtml(__(
+                                '%1% of daily limit',
+                                number_format($usageData['words_percentage'], 1)
+                            )) ?>
                         </div>
                     </div>
                     <div class="usage-stats-grid">
                         <div class="stat-item">
-                            <span class="stat-value"><?= $usageData['calls_used'] ?></span>
-                            <span class="stat-label">Total Generated</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-value"><?= $usageData['plan_name'] ?></span>
-                            <span class="stat-label">Current Plan</span>
+                            <span class="stat-value"><?= $escaper->escapeHtml($usageData['plan_name']) ?></span>
+                            <span class="stat-label"><?= $escaper->escapeHtml(__('Current Plan')) ?></span>
                         </div>
                     </div>
                     <?php if ($usageData['calls_remaining'] > 0): ?>
                         <div class="trial-banner">
-                            <p>🎉 You have <?= $usageData['calls_remaining'] ?> free calls remaining. <a href="<?= $block->getRedirectUrl() ?>" target="_blank">Upgrade for unlimited access</a>.</p>
+                            <p>
+                                🎉 <?= $escaper->escapeHtml(
+                                    __('You have %1 free calls remaining.', $usageData['calls_remaining'])
+                                ) ?>
+                                <a href="<?= $escaper->escapeUrl($block->getRedirectUrl()) ?>" target="_blank">
+                                    <?= $escaper->escapeHtml(__('Upgrade for unlimited access')) ?>
+                                </a>.
+                            </p>
                         </div>
                     <?php endif; ?>
                 </div>
 
                 <!-- Today's Activity Section -->
                 <div class="activity-section">
-                    <h4>📈 Today's Activity</h4>
+                    <h4>📈 <?= $escaper->escapeHtml(__('Today\'s Activity')) ?></h4>
                     <div class="activity-grid">
                         <div class="activity-item">
                             <div class="activity-icon">📝</div>
                             <div class="activity-content">
-                                <span class="activity-count"><?= $usageData['descriptions_today'] ?></span>
-                                <span class="activity-label">Product Descriptions Today</span>
+                                <span class="activity-count"><?= $escaper->escapeHtml(
+                                    $usageData['calls_used']
+                                ) ?></span>
+                                <span class="activity-label">
+                                    <?= $escaper->escapeHtml(__(
+                                        'API Calls Today'
+                                    )) ?>
+                                </span>
                             </div>
                         </div>
                         <div class="activity-item">
                             <div class="activity-icon">🤖</div>
                             <div class="activity-content">
-                                <span class="activity-count"><?= $usageData['ai_humanizer_today'] ?></span>
-                                <span class="activity-label">AI Humanizer Today</span>
+                                <span class="activity-count"><?= $escaper->escapeHtml(
+                                    $usageData['ai_humanizer_today']
+                                ) ?></span>
+                                <span class="activity-label"><?= $escaper->escapeHtml(__(
+                                    'AI Humanizer Today'
+                                )) ?></span>
                             </div>
                         </div>
                         <div class="activity-item">
                             <div class="activity-icon">🔍</div>
                             <div class="activity-content">
-                                <span class="activity-count"><?= $usageData['ai_detector_today'] ?></span>
-                                <span class="activity-label">AI Detector Today</span>
+                                <span class="activity-count"><?= $escaper->escapeHtml(
+                                    $usageData['ai_detector_today']
+                                ) ?></span>
+                                <span class="activity-label"><?= $escaper->escapeHtml(__(
+                                    'AI Detector Today'
+                                )) ?></span>
                             </div>
                         </div>
                         <div class="activity-item">
                             <div class="activity-icon">🛠️</div>
                             <div class="activity-content">
-                                <span class="activity-count"><?= $usageData['ai_tools_this_week'] ?></span>
-                                <span class="activity-label">AI Tools This Week</span>
+                                <span class="activity-count"><?= $escaper->escapeHtml(
+                                    $usageData['ai_tools_this_week']
+                                ) ?></span>
+                                <span class="activity-label"><?= $escaper->escapeHtml(__(
+                                    'AI Tools This Week'
+                                )) ?></span>
                             </div>
                         </div>
                     </div>
-                    <div class="total-activity">
-                        <div class="total-item">
-                            <span class="total-label">Total Today</span>
-                            <span class="total-value"><?= $usageData['total_today'] ?> API calls</span>
+                    <div class="card-total-api">
+                        <div class="card-label"><?= $escaper->escapeHtml(__('API Calls Used')) ?></div>
+                        <div class="card-value"><?= $escaper->escapeHtml(number_format(
+                            $usageData['api_calls']
+                        )) ?></div>
+                        <div class="card-subtitle">
+                            <?= $escaper->escapeHtml(__(
+                                '%1% of limit',
+                                number_format($usageData['api_calls_percentage'], 1)
+                            )) ?>
                         </div>
                     </div>
                 </div>
 
                 <!-- Usage Overview Section -->
                 <div class="usage-overview-section">
-                    <h4>📋 Usage Overview</h4>
+                    <h4>📋 <?= $escaper->escapeHtml(__('Usage Overview')) ?></h4>
                     <div class="descriptions-progress">
                         <div class="progress-container">
                             <div class="progress-bar">
-                                <div class="progress-fill" style="width: <?= $usagePercentage ?>%; background-color: <?= $progressColor ?>;"></div>
+                                <div class="progress-fill" 
+                                     style="width: <?= $escaper->escapeHtmlAttr($usagePercentage) ?>%; 
+                                            background-color: <?= $escaper->escapeHtmlAttr($progressColor) ?>;"></div>
                             </div>
                             <div class="progress-text">
-                                <span class="descriptions-count"><?= $usageData['calls_used'] ?>/<?= $usageData['calls_limit'] ?></span>
-                                <span class="descriptions-label">descriptions generated</span>
+                                <span class="descriptions-count">
+                                    <?= $escaper->escapeHtml(__(
+                                        'Usage: %1 (%2%)',
+                                        number_format($usageData['api_calls']),
+                                        number_format($usageData['api_calls_percentage'], 1)
+                                    )) ?>
+                                </span>
+                                <span class="descriptions-label"><?= $escaper->escapeHtml(
+                                    __('descriptions generated')
+                                ) ?></span>
                             </div>
                         </div>
                     </div>
                     <?php if ($usageData['calls_remaining'] > 0): ?>
                         <div class="trial-banner">
-                            <p>🎉 <strong>Free Trial</strong> You have <?= $usageData['calls_remaining'] ?> descriptions remaining in your free trial. <a href="<?= $block->getRedirectUrl() ?>" target="_blank">Upgrade now</a> to get unlimited access.</p>
+                            <p>
+                                🎉 <strong><?= $escaper->escapeHtml(__('Free Trial')) ?></strong>
+                                <?= $escaper->escapeHtml(__(
+                                    'You have %1 descriptions remaining in your free trial.',
+                                    $usageData['calls_remaining']
+                                )) ?>
+                                <a href="<?= $escaper->escapeUrl($block->getRedirectUrl()) ?>" target="_blank">
+                                    <?= $escaper->escapeHtml(__('Upgrade now')) ?>
+                                </a>
+                                <?= $escaper->escapeHtml(__('to get unlimited access.')) ?>
+                            </p>
                         </div>
                     <?php endif; ?>
                 </div>

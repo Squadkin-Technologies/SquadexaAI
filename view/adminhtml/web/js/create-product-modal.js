@@ -68,7 +68,7 @@ define([
                 this.modalElement = $('#create-product-from-ai-modal');
                 if (!this.modalElement.length) {
                     // Try to wait a bit for DOM to be ready
-                    setTimeout(function() {
+                    setTimeout(function () {
                         self.modalElement = $('#create-product-from-ai-modal');
                         if (self.modalElement.length) {
                             self.init();
@@ -95,7 +95,7 @@ define([
                 // Try to reinitialize modal
                 this.modalElement.data('mageModal', null);
                 this.init();
-                setTimeout(function() {
+                setTimeout(function () {
                     try {
                         self.modalElement.modal('openModal');
                     } catch (e2) {
@@ -124,7 +124,7 @@ define([
         populateProductTypes: function () {
             var productTypeSelect = $('#product-type-select');
             productTypeSelect.empty().append('<option value="">-- Please Select --</option>');
-            $.each(this.productTypes, function(index, item) {
+            $.each(this.productTypes, function (index, item) {
                 productTypeSelect.append('<option value="' + item.value + '">' + item.label + '</option>');
             });
         },
@@ -240,7 +240,7 @@ define([
 
     // Also try to initialize immediately if DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             CreateProductModal.init();
         });
     } else {

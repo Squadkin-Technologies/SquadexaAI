@@ -12,12 +12,14 @@ interface GeneratedCsvSearchResultsInterface extends \Magento\Framework\Api\Sear
 
     /**
      * Get GeneratedCsv list.
+     *
      * @return \Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface[]
      */
     public function getItems();
 
     /**
      * Set input_file_name list.
+     *
      * @param \Squadkin\SquadexaAI\Api\Data\GeneratedCsvInterface[] $items
      * @return $this
      */

@@ -14,8 +14,8 @@ $formKey = $block->getFormKey();
 {
     "*": {
         "Squadkin_SquadexaAI/js/job-status-poll": {
-            "pollUrl": "<?= $block->escapeJs($pollUrl) ?>",
-            "formKey": "<?= $block->escapeJs($formKey) ?>"
+            "pollUrl": "<?= $escaper->escapeJs($pollUrl) ?>",
+            "formKey": "<?= $escaper->escapeJs($formKey) ?>"
         }
     }
 }

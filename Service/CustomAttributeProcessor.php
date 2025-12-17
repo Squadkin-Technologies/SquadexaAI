@@ -12,6 +12,8 @@ use Magento\Catalog\Model\Product;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\Serializer\Json;
 use Squadkin\SquadexaAI\Api\Data\AiProductInterface;
+use Magento\Framework\Stdlib\DateTime\DateTime;
+use Psr\Log\LoggerInterface;
 
 class CustomAttributeProcessor
 {
@@ -26,15 +28,31 @@ class CustomAttributeProcessor
     private $jsonSerializer;
 
     /**
+     * @var DateTime
+     */
+    private $dateTime;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param AttributeService $attributeService
      * @param Json $jsonSerializer
+     * @param DateTime $dateTime
+     * @param LoggerInterface $logger
      */
     public function __construct(
         AttributeService $attributeService,
-        Json $jsonSerializer
+        Json $jsonSerializer,
+        DateTime $dateTime,
+        LoggerInterface $logger
     ) {
         $this->attributeService = $attributeService;
         $this->jsonSerializer = $jsonSerializer;
+        $this->dateTime = $dateTime;
+        $this->logger = $logger;
     }
 
     /**
@@ -113,7 +131,8 @@ class CustomAttributeProcessor
                     break;
                 case 'date':
                     if ($value) {
-                        $product->setData($attributeCode, date('Y-m-d', strtotime($value)));
+                        // phpcs:ignore Magento2.Functions.DiscouragedFunction
+                        $product->setData($attributeCode, $this->dateTime->date('Y-m-d', strtotime($value)));
                     }
                     break;
                 case 'price':
@@ -128,7 +147,7 @@ class CustomAttributeProcessor
             }
         } catch (\Exception $e) {
             // Log error but don't fail the entire process
-            // phpcs:ignore MEQP2.Exceptions.EmptyCatch
+            $this->logger->warning('Failed to set attribute ' . $attributeCode . ': ' . $e->getMessage());
         }
     }
 

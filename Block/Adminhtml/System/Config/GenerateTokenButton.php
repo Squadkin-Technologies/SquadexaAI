@@ -59,12 +59,14 @@ class GenerateTokenButton extends Field
                 var button = $("#' . $buttonId . '");
                 
                 if (!username || !password) {
-                    resultDiv.html("<div class=\"message message-error\">Please enter both username and password.</div>");
+                    resultDiv.html("<div class=\"message message-error\">" +
+                        "Please enter both username and password.</div>");
                     return;
                 }
                 
                 button.prop("disabled", true).find("span").text("Generating...");
-                resultDiv.html("<div class=\"message message-notice\">Step 1: Logging in... Step 2: Generating API key...</div>");
+                resultDiv.html("<div class=\"message message-notice\">" +
+                    "Step 1: Logging in... Step 2: Generating API key...</div>");
                 
                 $.ajax({
                     url: "' . $generateUrl . '",
@@ -92,11 +94,13 @@ class GenerateTokenButton extends Field
                             
                             resultDiv.html("<div class=\"message message-success\">" + response.message + "</div>");
                         } else {
-                            resultDiv.html("<div class=\"message message-error\">Error: " + response.message + "</div>");
+                            resultDiv.html("<div class=\"message message-error\">Error: " +
+                                response.message + "</div>");
                         }
                     },
                     error: function(xhr, status, error) {
-                        resultDiv.html("<div class=\"message message-error\">Error generating token: " + error + "</div>");
+                        resultDiv.html("<div class=\"message message-error\">Error generating token: " +
+                            error + "</div>");
                     },
                     complete: function() {
                         button.prop("disabled", false).find("span").text("Generate API Key");

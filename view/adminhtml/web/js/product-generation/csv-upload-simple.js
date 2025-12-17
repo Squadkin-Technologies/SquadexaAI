@@ -1,7 +1,7 @@
 /**
  * Copyright © 2024 Squadkin. All rights reserved.
  * See COPYING.txt for license details.
- * 
+ *
  * CSV Upload Form Handler - Simple Version
  */
 

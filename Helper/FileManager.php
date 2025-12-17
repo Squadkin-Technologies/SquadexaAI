@@ -23,37 +23,40 @@ use Squadkin\SquadexaAI\Api\Data\AiProductInterfaceFactory;
 use Squadkin\SquadexaAI\Service\SquadexaApiService;
 use Squadkin\SquadexaAI\Model\ResourceModel\AiProduct\CollectionFactory as AiProductCollectionFactory;
 use Magento\Framework\File\UploaderFactory;
+use Magento\Framework\Stdlib\DateTime\DateTime;
+use Magento\Framework\Math\Random;
+use Magento\Framework\Filesystem\Io\File as IoFile;
 
 class FileManager extends AbstractHelper
 {
     public const INPUT_DIR = 'AIProductCreator/Input';
     public const OUTPUT_DIR = 'AIProductCreator/Output';
-    
+
     /**
      * @var Filesystem
      */
     private $filesystem;
-    
+
     /**
      * @var WriteInterface
      */
     private $varDirectory;
-    
+
     /**
      * @var Csv
      */
     private $csvProcessor;
-    
+
     /**
      * @var Curl
      */
     private $curl;
-    
+
     /**
      * @var Json
      */
     private $jsonSerializer;
-    
+
     /**
      * @var LoggerInterface
      */
@@ -85,6 +88,21 @@ class FileManager extends AbstractHelper
     private $uploaderFactory;
 
     /**
+     * @var DateTime
+     */
+    private $dateTime;
+
+    /**
+     * @var Random
+     */
+    private $mathRandom;
+
+    /**
+     * @var IoFile
+     */
+    private $ioFile;
+
+    /**
      * FileManager constructor.
      *
      * @param Context $context
@@ -97,6 +115,10 @@ class FileManager extends AbstractHelper
      * @param AiProductInterfaceFactory $aiProductFactory
      * @param SquadexaApiService $apiService
      * @param AiProductCollectionFactory $aiProductCollectionFactory
+     * @param UploaderFactory $uploaderFactory
+     * @param DateTime $dateTime
+     * @param Random $mathRandom
+     * @param IoFile $ioFile
      */
     public function __construct(
         Context $context,
@@ -109,7 +131,10 @@ class FileManager extends AbstractHelper
         AiProductInterfaceFactory $aiProductFactory,
         SquadexaApiService $apiService,
         AiProductCollectionFactory $aiProductCollectionFactory,
-        UploaderFactory $uploaderFactory
+        UploaderFactory $uploaderFactory,
+        DateTime $dateTime,
+        Random $mathRandom,
+        IoFile $ioFile
     ) {
         parent::__construct($context);
         $this->filesystem = $filesystem;
@@ -123,6 +148,9 @@ class FileManager extends AbstractHelper
         $this->apiService = $apiService;
         $this->aiProductCollectionFactory = $aiProductCollectionFactory;
         $this->uploaderFactory = $uploaderFactory;
+        $this->dateTime = $dateTime;
+        $this->mathRandom = $mathRandom;
+        $this->ioFile = $ioFile;
     }
 
     /**
@@ -135,11 +163,11 @@ class FileManager extends AbstractHelper
     {
         $inputDir = self::INPUT_DIR;
         $outputDir = self::OUTPUT_DIR;
-        
+
         if (!$this->varDirectory->isExist($inputDir)) {
             $this->varDirectory->create($inputDir);
         }
-        
+
         if (!$this->varDirectory->isExist($outputDir)) {
             $this->varDirectory->create($outputDir);
         }
@@ -157,30 +185,30 @@ class FileManager extends AbstractHelper
     {
         try {
             $this->createDirectories();
-            
+
             /** @var \Magento\Framework\File\Uploader $uploader */
             $uploader = $this->uploaderFactory->create(['fileId' => $fileId]);
             $uploader->setAllowedExtensions(['csv']);
             $uploader->setAllowRenameFiles(true);
             $uploader->setFilesDispersion(false);
-            
+
             // Check file size (max 10MB) handled by php.ini usually, but we can check here too if needed.
             // Magento Uploader checks upload_max_filesize from php.ini
-            
+
             // Validate upload
             // Standard validation happens in save()
-            
+
             $path = $this->varDirectory->getAbsolutePath($subDir);
-            
+
             // Handle filename sanitization
             $fileName = $uploader->getCorrectFileName($uploader->getFileExtension());
             $sanitizedName = $this->generateUniqueFileName($fileName);
-            
+
             // The save method moves the file
             $result = $uploader->save($path, $sanitizedName);
-            
+
             return $result['file'];
-            
+
         } catch (\Exception $e) {
             $this->logger->error('SquadexaAI FileManager: Upload error: ' . $e->getMessage());
             throw new LocalizedException(__('File upload failed: %1', $e->getMessage()));
@@ -209,19 +237,19 @@ class FileManager extends AbstractHelper
             'secondary_keywords' => 'Secondary Keywords',
             'include_pricing' => 'Include Pricing'
         ];
-        
+
         $errors = [];
-        
+
         // Check if required headers exist
         foreach ($requiredFields as $fieldKey => $fieldLabel) {
             $found = false;
             $actualHeaderIndex = null;
-            
+
             // Check all possible header variations
             foreach ($normalizedHeaders as $index => $normalizedHeader) {
                 $normalizedField = strtolower(str_replace(['_', '-', ' '], '', $fieldKey));
                 $normalizedHeaderClean = strtolower(str_replace(['_', '-', ' '], '', $headers[$index]));
-                
+
                 if ($normalizedHeaderClean === $normalizedField ||
                     $normalizedHeaderClean === strtolower(str_replace(['_', '-', ' '], '', $fieldLabel))) {
                     $found = true;
@@ -229,7 +257,7 @@ class FileManager extends AbstractHelper
                     break;
                 }
             }
-            
+
             if (!$found) {
                 $errors[] = __(
                     'Required column "%1" is missing. Please ensure your CSV includes this column.',
@@ -237,7 +265,7 @@ class FileManager extends AbstractHelper
                 );
             }
         }
-        
+
         if (!empty($errors)) {
             $errorMessage = __('CSV Validation Failed:') . ' ' . implode(' ', $errors);
             $this->logger->error('SquadexaAI FileManager: CSV validation failed - missing headers', [
@@ -246,19 +274,19 @@ class FileManager extends AbstractHelper
             ]);
             throw new LocalizedException($errorMessage);
         }
-        
+
         // Validate each data row
         $rowErrors = [];
-        
+
         foreach ($dataRows as $rowIndex => $row) {
             // +2 because row 1 is header and array is 0-indexed
-            $rowNumber = $rowIndex + 2; // phpcs:ignore
-            
+            $rowNumber = $rowIndex + 2;
+
             // Skip completely empty rows
             if (empty(array_filter($row))) {
                 continue;
             }
-            
+
             // Map row data to headers
             $productData = [];
             if (count($row) === count($headers)) {
@@ -269,20 +297,20 @@ class FileManager extends AbstractHelper
                     $productData[$header] = $row[$index] ?? '';
                 }
             }
-            
+
             // Normalize product data keys for comparison
             $normalizedProductData = [];
             foreach ($productData as $key => $value) {
                 $normalizedKey = strtolower(str_replace(['_', '-', ' '], '', $key));
                 $normalizedProductData[$normalizedKey] = trim($value ?? '');
             }
-            
+
             // Validate required fields in each row
             $productNameValue = '';
             $primaryKeywordsValue = '';
             $secondaryKeywordsValue = '';
             $includePricingValue = '';
-            
+
             // Find required field values (case-insensitive)
             foreach ($normalizedProductData as $key => $value) {
                 $cleanKey = strtolower(str_replace(['_', '-', ' '], '', $key));
@@ -305,22 +333,22 @@ class FileManager extends AbstractHelper
                     $includePricingValue = $value;
                 }
             }
-            
+
             // Validate product_name
             if (empty($productNameValue)) {
                 $rowErrors[] = __('Row %1: "Product Name" is required and cannot be empty.', $rowNumber);
             }
-            
+
             // Validate primary_keywords
             if (empty($primaryKeywordsValue)) {
                 $rowErrors[] = __('Row %1: "Primary Keywords" is required and cannot be empty.', $rowNumber);
             }
-            
+
             // Validate secondary_keywords
             if (empty($secondaryKeywordsValue)) {
                 $rowErrors[] = __('Row %1: "Secondary Keywords" is required and cannot be empty.', $rowNumber);
             }
-            
+
             // Validate include_pricing (should be true/false)
             if (empty($includePricingValue)) {
                 $rowErrors[] = __('Row %1: "Include Pricing" is required and must be "true" or "false".', $rowNumber);
@@ -328,7 +356,7 @@ class FileManager extends AbstractHelper
                 $rowErrors[] = __('Row %1: "Include Pricing" must be "true" or "false".', $rowNumber);
             }
         }
-        
+
         if (!empty($rowErrors)) {
             $errorMessage = __('CSV Data Validation Failed:') . ' ' . implode(' ', $rowErrors);
             $this->logger->error('SquadexaAI FileManager: CSV validation failed - invalid row data', [
@@ -337,7 +365,7 @@ class FileManager extends AbstractHelper
             ]);
             throw new LocalizedException($errorMessage);
         }
-        
+
         $this->logger->info('SquadexaAI FileManager: CSV validation passed', [
             'total_rows_validated' => count($dataRows)
         ]);
@@ -357,7 +385,7 @@ class FileManager extends AbstractHelper
             $directory = $type === 'input' ? self::INPUT_DIR : self::OUTPUT_DIR;
             $filePath = $directory . '/' . $fileName;
             $absolutePath = $this->varDirectory->getAbsolutePath($filePath);
-            
+
             $this->logger->info('SquadexaAI FileManager: Getting file content', [
                 'file_name' => $fileName,
                 'type' => $type,
@@ -365,7 +393,7 @@ class FileManager extends AbstractHelper
                 'relative_path' => $filePath,
                 'absolute_path' => $absolutePath
             ]);
-            
+
             if (!$this->varDirectory->isExist($filePath)) {
                 $this->logger->error('SquadexaAI FileManager: File does not exist', [
                     'file_name' => $fileName,
@@ -374,13 +402,13 @@ class FileManager extends AbstractHelper
                 ]);
                 throw new LocalizedException(__('File not found: %1', $fileName));
             }
-            
+
             $content = $this->varDirectory->readFile($filePath);
             $this->logger->info('SquadexaAI FileManager: File read successfully', [
                 'file_name' => $fileName,
                 'content_length' => strlen($content)
             ]);
-            
+
             return $content;
         } catch (\Exception $e) {
             $this->logger->error('SquadexaAI FileManager: Error reading file', [
@@ -414,15 +442,14 @@ class FileManager extends AbstractHelper
      */
     private function generateUniqueFileName(string $originalName): string
     {
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction
-        $pathInfo = pathinfo($originalName); // phpcs:ignore
-        $timestamp = date('Y-m-d_H-i-s');
-        $randomString = substr(hash('sha256', uniqid((string)random_int(0, PHP_INT_MAX), true)), 0, 8);
-        
+        $pathInfo = $this->ioFile->getPathInfo($originalName);
+        $timestamp = $this->dateTime->date('Y-m-d_H-i-s');
+        $randomString = $this->mathRandom->getRandomString(8);
+
         // Sanitize filename: remove invalid characters and replace spaces/special chars with underscores
         $sanitizedFilename = $this->sanitizeFileName($pathInfo['filename']);
         $sanitizedExtension = isset($pathInfo['extension']) ? strtolower($pathInfo['extension']) : 'csv';
-        
+
         return $sanitizedFilename . '_' . $timestamp . '_' . $randomString . '.' . $sanitizedExtension;
     }
 
@@ -436,31 +463,28 @@ class FileManager extends AbstractHelper
     {
         // Remove invalid characters: < > : " / \ | ? * and control characters
         $filename = preg_replace('/[<>:"\/\\\|?*\x00-\x1F]/', '', $filename);
-        
+
         // Replace spaces and other problematic characters with underscores
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction
         $filename = preg_replace('/[\s\(\)\[\]{}]+/', '_', $filename);
-        
+
         // Remove multiple consecutive underscores
         $filename = preg_replace('/_+/', '_', $filename);
-        
+
         // Remove leading/trailing underscores and dots
         $filename = trim($filename, '_.');
-        
+
         // If filename is empty after sanitization, use a default name
         if (empty($filename)) {
             $filename = 'uploaded_file';
         }
-        
+
         // Limit filename length to 200 characters to avoid filesystem issues
         if (strlen($filename) > 200) {
             $filename = substr($filename, 0, 200);
         }
-        
+
         return $filename;
     }
-
-
 
     /**
      * Save AI product data to database
@@ -478,25 +502,25 @@ class FileManager extends AbstractHelper
             'FileManager saveAiProductData: Starting to save ' . count($aiProductData) .
             ' products for CSV ID: ' . $csvIdLog . ', Type: ' . $generationType
         );
-        
+
         try {
             $savedCount = 0;
             $updatedCount = 0;
             $createdCount = 0;
             $isUpdate = false;
-            
+
             foreach ($aiProductData as $productData) {
                 $this->logger->info('FileManager saveAiProductData: Processing product', [
                     'product_data_keys' => array_keys($productData)
                 ]);
-                
+
                 // Get product_name - check both 'name' (from AI) and 'product_name' (from CSV)
                 $productName = $productData['name'] ?? $productData['product_name'] ?? '';
                 if (!$productName) {
                     $this->logger->warning('FileManager saveAiProductData: product_name is empty, skipping product');
                     continue;
                 }
-                
+
                 // Check if a product with the same name and generation type already exists
                 // This applies to both single and CSV generation types
                 // Note: We check by product_name and generation_type only, not by generatedcsv_id
@@ -508,19 +532,19 @@ class FileManager extends AbstractHelper
                     $existingCollection = $this->aiProductCollectionFactory->create();
                     $existingCollection->addFieldToFilter('product_name', $productName)
                         ->addFieldToFilter('generation_type', $generationType);
-                    
+
                     // Do NOT filter by generatedcsv_id when checking for duplicates
                     // This allows updating existing products even if they came from a different CSV
-                    
+
                     $existingCollection->setPageSize(1);
-                    
+
                     $this->logger->info('FileManager saveAiProductData: Checking for existing product', [
                         'product_name' => $productName,
                         'generation_type' => $generationType,
                         'generatedcsv_id' => $generatedCsvId,
                         'collection_size' => $existingCollection->getSize()
                     ]);
-                    
+
                     if ($existingCollection->getSize() > 0) {
                         $aiProduct = $existingCollection->getFirstItem();
                         $isUpdate = true;
@@ -542,28 +566,28 @@ class FileManager extends AbstractHelper
                         );
                     }
                 }
-                
+
                 // If no existing product found, create a new one
                 if (!$aiProduct) {
                     $aiProduct = $this->aiProductFactory->create();
                 }
-                
+
                 // Set required fields
                 // For single product generation, generatedCsvId can be null
                 // Explicitly set to null if not provided (important for database foreign key constraint)
                 $aiProduct->setGeneratedcsvId($generatedCsvId);
                 $aiProduct->setGenerationType($generationType);
                 $aiProduct->setProductName($productName);
-                
+
                 // Increment regeneration_count if updating existing product
                 if ($isUpdate) {
                     $currentCount = (int)($aiProduct->getData('regeneration_count') ?? 0);
                     $aiProduct->setData('regeneration_count', $currentCount + 1);
-                    
+
                     // Explicitly set updated_at to current timestamp when updating
                     // Magento's ORM doesn't automatically update this field even with on_update="true"
-                    $aiProduct->setUpdatedAt((new \DateTime())->format('Y-m-d H:i:s'));
-                    
+                    $aiProduct->setUpdatedAt($this->dateTime->gmtDate());
+
                     $this->logger->info(
                         'FileManager saveAiProductData: Incrementing regeneration count and updating timestamp',
                         [

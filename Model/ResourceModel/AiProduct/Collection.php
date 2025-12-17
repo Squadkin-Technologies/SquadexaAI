@@ -14,6 +14,9 @@ class Collection extends AbstractCollection
     /**
      * @inheritDoc
      */
+    /**
+     * @var string
+     */
     protected $_idFieldName = 'aiproduct_id';
 
     /**

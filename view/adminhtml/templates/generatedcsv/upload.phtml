@@ -1,47 +1,55 @@
 <?php
 /**
- * Copyright ©  All rights reserved.
+ * Copyright © All rights reserved.
  * See COPYING.txt for license details.
  */
 
-/** @var \Squadkin\SquadexaAI\Block\Adminhtml\GeneratedCsv\Upload $block */
+/**
+ * @var \Squadkin\SquadexaAI\Block\Adminhtml\GeneratedCsv\Upload $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
 ?>
 <div class="admin__page-section">
     <div class="admin__page-section-title">
-        <span class="title"><?= $block->escapeHtml(__('Upload File for AI Processing')) ?></span>
+        <span class="title"><?= $escaper->escapeHtml(__('Upload File for AI Processing')) ?></span>
     </div>
     <div class="admin__page-section-content">
         <div class="admin__page-section-item upload-section">
-            <form id="upload-form" 
-                  action="<?= $block->escapeUrl($block->getUploadUrl()) ?>" 
-                  method="post" 
+            <form id="upload-form"
+                  action="<?= $escaper->escapeUrl($block->getUploadUrl()) ?>"
+                  method="post"
                   enctype="multipart/form-data">
                 
-                <input name="form_key" type="hidden" value="<?= $block->escapeHtmlAttr($block->getFormKey()) ?>" />
+                <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>" />
                 
                 <div class="admin__field admin__field-file">
                     <label class="admin__field-label" for="input_file">
-                        <span><?= $block->escapeHtml(__('Select CSV File')) ?></span>
+                        <span><?= $escaper->escapeHtml(__('Select CSV File')) ?></span>
                     </label>
                     <div class="admin__field-control">
-                        <input type="file" 
-                               name="input_file" 
-                               id="input_file" 
-                               class="admin__control-file" 
+                        <input type="file"
+                               name="input_file"
+                               id="input_file"
+                               class="admin__control-file"
                                accept=".csv"
                                required="required" />
                         <div class="admin__field-note">
-                            <span><?= $block->escapeHtml(__('Accepted file types: CSV. Maximum file size: %1 MB.', $block->getMaxFileSize())) ?></span>
+                            <span>
+                                <?= $escaper->escapeHtml(__(
+                                    'Accepted file types: CSV. Maximum file size: %1 MB.',
+                                    $block->getMaxFileSize()
+                                )) ?>
+                            </span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="admin__field admin__field-submit">
                     <div class="admin__field-control">
-                        <button type="submit" 
-                                class="action-primary" 
+                        <button type="submit"
+                                class="action-primary"
                                 id="generate-button">
-                            <span><?= $block->escapeHtml(__('Generate AI Products')) ?></span>
+                            <span><?= $escaper->escapeHtml(__('Generate AI Products')) ?></span>
                         </button>
                     </div>
                 </div>
@@ -116,12 +124,15 @@ require(['jquery', 'mage/translate'], function($, $t) {
         fileInput.on('change', function() {
             var file = this.files[0];
             if (file) {
-                var maxSize = <?= $block->getMaxFileSize() ?> * 1024 * 1024; // Convert MB to bytes
+                var maxSize = <?= $escaper->escapeJs($block->getMaxFileSize()) ?> * 1024 * 1024; // Convert MB to bytes
                 var allowedTypes = ['csv'];
                 var fileExtension = file.name.split('.').pop().toLowerCase();
                 
                 if (file.size > maxSize) {
-                    alert($t('File size exceeds maximum limit of %1 MB.').replace('%1', <?= $block->getMaxFileSize() ?>));
+                    alert($t('File size exceeds maximum limit of %1 MB.').replace(
+                        '%1', 
+                        <?= $escaper->escapeJs($block->getMaxFileSize()) ?>
+                    ));
                     this.value = '';
                     return false;
                 }

@@ -26,7 +26,7 @@ define([
 
         _bind: function () {
             var self = this;
-            
+
             this.element.on('click', function (e) {
                 e.preventDefault();
                 self._openModal();
@@ -35,7 +35,7 @@ define([
 
         _openModal: function () {
             var self = this;
-            
+
             // Load product data via AJAX
             $.ajax({
                 url: this.options.modalUrl,
@@ -63,7 +63,7 @@ define([
 
         _renderModal: function (products, generationType) {
             var self = this;
-            
+
             // Compile template
             var tmpl = mageTemplate(formTemplate);
             var modalHtml = tmpl({
@@ -71,10 +71,10 @@ define([
                 generationType: generationType,
                 isSingle: generationType === 'single'
             });
-            
+
             // Create modal container
-            var $modalContainer = $('<div/>').html(modalHtml);
-            
+            var $modalContainer = $('<div></div>').html(modalHtml);
+
             // Initialize modal
             var modalOptions = {
                 type: 'slide',
@@ -98,7 +98,7 @@ define([
                     }
                 ]
             };
-            
+
             var modalInstance = modal(modalOptions, $modalContainer);
             $modalContainer.modal('openModal');
         },
@@ -106,23 +106,23 @@ define([
         _submitForm: function ($modalContainer, modalInstance) {
             var self = this;
             var $form = $modalContainer.find('#product-create-form');
-            
+
             // Validate form
             if (!$form.valid()) {
                 return false;
             }
-            
+
             // Collect form data
             var formData = {
                 csv_id: this.options.csvId,
                 product: {}
             };
-            
+
             // Serialize product data
             $form.find('.product-data-row').each(function () {
                 var $row = $(this);
                 var productId = $row.data('product-id');
-                
+
                 formData.product[productId] = {
                     sku: $row.find('[name$="[sku]"]').val(),
                     name: $row.find('[name$="[name]"]').val(),
@@ -141,7 +141,7 @@ define([
                     special_price: $row.find('[name$="[special_price]"]').val()
                 };
             });
-            
+
             // Submit via AJAX
             $.ajax({
                 url: this.options.createUrl,

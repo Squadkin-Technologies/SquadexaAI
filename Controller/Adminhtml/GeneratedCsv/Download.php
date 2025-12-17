@@ -15,6 +15,8 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Squadkin\SquadexaAI\Helper\FileManager;
 use Psr\Log\LoggerInterface;
+use Magento\Framework\Filesystem\Driver\File;
+use Magento\Framework\Filesystem\Io\File as IoFile;
 
 class Download extends Action
 {
@@ -34,23 +36,39 @@ class Download extends Action
     private $logger;
 
     /**
+     * @var File
+     */
+    private $fileDriver;
+
+    /**
+     * @var IoFile
+     */
+    private $ioFile;
+
+    /**
      * Download constructor.
      *
      * @param Context $context
      * @param FileFactory $fileFactory
      * @param FileManager $fileManager
      * @param LoggerInterface $logger
+     * @param File $fileDriver
+     * @param IoFile $ioFile
      */
     public function __construct(
         Context $context,
         FileFactory $fileFactory,
         FileManager $fileManager,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        File $fileDriver,
+        IoFile $ioFile
     ) {
         parent::__construct($context);
         $this->fileFactory = $fileFactory;
         $this->fileManager = $fileManager;
         $this->logger = $logger;
+        $this->fileDriver = $fileDriver;
+        $this->ioFile = $ioFile;
     }
 
     /**
@@ -81,8 +99,7 @@ class Download extends Action
             $absolutePath = $this->fileManager->getAbsoluteFilePath($fileName, $type);
             $this->logger->info('SquadexaAI Download: Looking for file', [
                 'absolute_path' => $absolutePath,
-                // phpcs:ignore Magento2.Functions.DiscouragedFunction
-                'file_exists' => file_exists($absolutePath) // phpcs:ignore
+                'file_exists' => $this->fileDriver->isExists($absolutePath)
             ]);
 
             // Get file content
@@ -135,9 +152,9 @@ class Download extends Action
      */
     private function getContentType(string $fileName): string
     {
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction
-        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION)); // phpcs:ignore
-        
+        $pathInfo = $this->ioFile->getPathInfo($fileName);
+        $extension = strtolower($pathInfo['extension'] ?? '');
+
         switch ($extension) {
             case 'csv':
                 return 'text/csv';

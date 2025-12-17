@@ -4,7 +4,10 @@
  * See COPYING.txt for license details.
  */
 
-/** @var \Magento\Backend\Block\Template $block */
+/**
+ * @var \Magento\Backend\Block\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
 
 $formKey = $block->getFormKey();
 $generateUrl = $block->getUrl('squadkin_squadexaai/productgeneration/generate');
@@ -14,38 +17,42 @@ $csvUploadUrl = $block->getUrl('squadkin_squadexaai/generatedcsv/upload');
 <!-- Single Product Generation Section -->
 <div class="admin__page-section">
     <div class="admin__page-section-title">
-        <span class="title">📝 <?= $block->escapeHtml(__('Single Product Generation')) ?></span>
+        <span class="title"><?= $escaper->escapeHtml(__('Single Product Generation')) ?></span>
     </div>
     <div class="admin__page-section-content">
         <div class="admin__page-section-item product-generation-form">
             <form id="single-product-form">
-                <input name="form_key" type="hidden" value="<?= $block->escapeHtmlAttr($block->getFormKey()) ?>" />
+                <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>" />
                 
                 <div class="form-row">
                     <div class="admin__field">
                         <label class="admin__field-label" for="product_name">
-                            <span><?= $block->escapeHtml(__('Product Name')) ?> <span class="required">*</span></span>
+                            <span><?= $escaper->escapeHtml(__('Product Name')) ?> <span class="required">*</span></span>
                         </label>
                         <div class="admin__field-control">
-                            <input type="text" 
-                                   name="product_name" 
-                                   id="product_name" 
-                                   class="admin__control-text" 
-                                   placeholder="<?= $block->escapeHtmlAttr(__('Enter product name')) ?>"
+                            <input type="text"
+                                   name="product_name"
+                                   id="product_name"
+                                   class="admin__control-text"
+                                   placeholder="<?= $escaper->escapeHtmlAttr(__('Enter product name')) ?>"
                                    required="required" />
                         </div>
                     </div>
 
                     <div class="admin__field">
                         <label class="admin__field-label" for="primary_keywords">
-                            <span><?= $block->escapeHtml(__('Primary Keywords')) ?> <span class="required">*</span></span>
+                            <span>
+                                <?= $escaper->escapeHtml(__('Primary Keywords')) ?> <span class="required">*</span>
+                            </span>
                         </label>
                         <div class="admin__field-control">
-                            <input type="text" 
-                                   name="primary_keywords" 
-                                   id="primary_keywords" 
-                                   class="admin__control-text" 
-                                   placeholder="<?= $block->escapeHtmlAttr(__('e.g., wireless, bluetooth, premium')) ?>"
+                            <input type="text"
+                                   name="primary_keywords"
+                                   id="primary_keywords"
+                                   class="admin__control-text"
+                                   placeholder="<?= $escaper->escapeHtmlAttr(
+                                       __('e.g., wireless, bluetooth, premium')
+                                   ) ?>"
                                    required="required" />
                         </div>
                     </div>
@@ -54,29 +61,29 @@ $csvUploadUrl = $block->getUrl('squadkin_squadexaai/generatedcsv/upload');
                 <div class="form-row">
                     <div class="admin__field">
                         <label class="admin__field-label" for="secondary_keywords">
-                            <span><?= $block->escapeHtml(__('Secondary Keywords (Optional)')) ?></span>
+                            <span><?= $escaper->escapeHtml(__('Secondary Keywords (Optional)')) ?></span>
                         </label>
                         <div class="admin__field-control">
-                            <input type="text" 
-                                   name="secondary_keywords" 
-                                   id="secondary_keywords" 
-                                   class="admin__control-text" 
-                                   placeholder="<?= $block->escapeHtmlAttr(__('e.g., comfortable, durable')) ?>" />
+                            <input type="text"
+                                   name="secondary_keywords"
+                                   id="secondary_keywords"
+                                   class="admin__control-text"
+                                   placeholder="<?= $escaper->escapeHtmlAttr(__('e.g., comfortable, durable')) ?>" />
                         </div>
                     </div>
 
                     <div class="admin__field">
                         <label class="admin__field-label">
-                            <span><?= $block->escapeHtml(__('Options')) ?></span>
+                            <span><?= $escaper->escapeHtml(__('Options')) ?></span>
                         </label>
                         <div class="admin__field-control">
-                            <input type="checkbox" 
-                                   name="include_pricing" 
-                                   id="include_pricing" 
-                                   value="1" 
+                            <input type="checkbox"
+                                   name="include_pricing"
+                                   id="include_pricing"
+                                   value="1"
                                    checked="checked" />
                             <label for="include_pricing">
-                                <?= $block->escapeHtml(__('Include Pricing')) ?>
+                                <?= $escaper->escapeHtml(__('Include Pricing')) ?>
                             </label>
                         </div>
                     </div>
@@ -85,7 +92,7 @@ $csvUploadUrl = $block->getUrl('squadkin_squadexaai/generatedcsv/upload');
                 <div class="form-row">
                     <div class="admin__field" style="width: 100%;">
                         <button type="submit" class="action-primary" id="generate-single-button">
-                            <span><?= $block->escapeHtml(__('Generate Product')) ?></span>
+                            <span><?= $escaper->escapeHtml(__('Generate Product')) ?></span>
                         </button>
                     </div>
                 </div>
@@ -98,25 +105,31 @@ $csvUploadUrl = $block->getUrl('squadkin_squadexaai/generatedcsv/upload');
 <!-- Multiple Products Generation (CSV Upload) Section -->
 <div class="admin__page-section">
     <div class="admin__page-section-title">
-        <span class="title">📋 <?= $block->escapeHtml(__('Multiple Products Generation (CSV Upload)')) ?></span>
+        <span class="title">
+            📋 <?= $escaper->escapeHtml(__('Multiple Products Generation (CSV Upload)')) ?>
+        </span>
     </div>
     <div class="admin__page-section-content">
         <div class="admin__page-section-item product-generation-form">
-            <form id="csv-upload-form" 
-                  action="<?= $block->escapeUrl($csvUploadUrl) ?>" 
-                  method="post" 
+            <form id="csv-upload-form"
+                  action="<?= $escaper->escapeUrl($csvUploadUrl) ?>"
+                  method="post"
                   enctype="multipart/form-data">
                 
-                <input name="form_key" type="hidden" value="<?= $block->escapeHtmlAttr($block->getFormKey()) ?>" />
+                <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>" />
                 
                 <div class="message message-notice">
                     <p>
-                        <?= $block->escapeHtml(__('Upload a CSV file containing product information to generate multiple products at once.')) ?>
-                        <a href="<?= $block->escapeUrl($block->getViewFileUrl('Squadkin_SquadexaAI::sample/sample-products.csv')) ?>" 
-                           download="sample-products.csv" 
+                        <?= $escaper->escapeHtml(__(
+                            'Upload a CSV file containing product information to generate multiple products at once.'
+                        )) ?>
+                        <a href="<?= $escaper->escapeUrl(
+                            $block->getViewFileUrl('Squadkin_SquadexaAI::sample/sample-products.csv')
+                        ) ?>"
+                           download="sample-products.csv"
                            class="action-secondary"
                            style="margin-left: 10px;">
-                            <span><?= $block->escapeHtml(__('📥 Download Sample CSV')) ?></span>
+                            <span><?= $escaper->escapeHtml(__('📥 Download Sample CSV')) ?></span>
                         </a>
                     </p>
                 </div>
@@ -124,24 +137,28 @@ $csvUploadUrl = $block->getUrl('squadkin_squadexaai/generatedcsv/upload');
                 <div class="form-row">
                     <div class="admin__field admin__field-file">
                         <label class="admin__field-label" for="csv_file">
-                            <span><?= $block->escapeHtml(__('Select CSV File')) ?> <span class="required">*</span></span>
+                            <span>
+                                <?= $escaper->escapeHtml(__('Select CSV File')) ?> <span class="required">*</span>
+                            </span>
                         </label>
                         <div class="admin__field-control">
-                            <input type="file" 
-                                   name="input_file" 
-                                   id="csv_file" 
-                                   class="admin__control-file" 
+                            <input type="file"
+                                   name="input_file"
+                                   id="csv_file"
+                                   class="admin__control-file"
                                    accept=".csv"
                                    required="required" />
                             <div class="admin__field-note">
-                                <span><?= $block->escapeHtml(__('Upload a CSV file with product information')) ?></span>
+                                <span>
+                                    <?= $escaper->escapeHtml(__('Upload a CSV file with product information')) ?>
+                                </span>
                             </div>
                         </div>
                     </div>
 
                     <div class="admin__field">
                         <button type="submit" class="action-primary" id="csv-upload-button">
-                            <span><?= $block->escapeHtml(__('Generate from CSV')) ?></span>
+                            <span><?= $escaper->escapeHtml(__('Generate from CSV')) ?></span>
                         </button>
                     </div>
                 </div>
@@ -157,9 +174,11 @@ $csvUploadUrl = $block->getUrl('squadkin_squadexaai/generatedcsv/upload');
             "formSelector": "#single-product-form",
             "submitButtonSelector": "#generate-single-button",
             "resultContainerSelector": "#single-product-result",
-            "generateUrl": "<?= $block->escapeJs($generateUrl) ?>",
-            "formKey": "<?= $block->escapeJs($formKey) ?>",
-            "generatedCsvUrl": "<?= $block->escapeJs($block->getUrl('squadkin_squadexaai/generatedcsv/index')) ?>"
+            "generateUrl": "<?= $escaper->escapeJs($generateUrl) ?>",
+            "formKey": "<?= $escaper->escapeJs($formKey) ?>",
+            "generatedCsvUrl": "<?= $escaper->escapeJs(
+                $block->getUrl('squadkin_squadexaai/generatedcsv/index')
+            ) ?>"
         },
         "Squadkin_SquadexaAI/js/product-generation/csv-upload-simple": {
             "formSelector": "#csv-upload-form",

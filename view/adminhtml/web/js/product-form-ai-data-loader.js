@@ -95,7 +95,7 @@ define([
                         dataSource.set('data.' + productId + '.product.general.ai_data', aiProductId);
                     }
                 } else {
-                    setTimeout(function() {
+                    setTimeout(function () {
                         self.storeAiProductId(aiProductId);
                     }, 500);
                 }
@@ -435,7 +435,7 @@ define([
             }
             
             // Function to verify if description was actually applied
-            var verifyDescriptionApplied = function() {
+            var verifyDescriptionApplied = function () {
                 if (descriptionApplied) {
                     return true;
                 }
@@ -473,7 +473,7 @@ define([
             var maxUpdateAttempts = 10; // Try updating up to 10 times even after finding Page Builder
             
             // Function to try updating Page Builder when found
-            var tryUpdatePageBuilder = function() {
+            var tryUpdatePageBuilder = function () {
                 if (descriptionApplied && verifyDescriptionApplied()) {
                     return; // Already applied and verified
                 }
@@ -511,7 +511,7 @@ define([
                             $pageBuilderTextarea.trigger('change').trigger('input').trigger('keyup').trigger('blur');
                             
                             // Also try setting it multiple times to ensure it sticks
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 $pageBuilderTextarea.val(descriptionValue);
                                 $pageBuilderTextarea.trigger('change').trigger('input');
                             }, 100);
@@ -568,7 +568,7 @@ define([
                             }
                         }
                         
-                        setTimeout(function() {
+                        setTimeout(function () {
                             if (verifyDescriptionApplied()) {
                                 descriptionApplied = true;
                             } else if (updateAttempts < maxUpdateAttempts) {
@@ -585,7 +585,7 @@ define([
             
             // Use MutationObserver to watch for Page Builder elements
             if (window.MutationObserver) {
-                var observer = new MutationObserver(function(mutations) {
+                var observer = new MutationObserver(function (mutations) {
                     if (!descriptionApplied) {
                         tryUpdatePageBuilder();
                     }

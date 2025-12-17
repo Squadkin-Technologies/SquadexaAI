@@ -16,6 +16,20 @@ use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 class AddUpdateFromAiButton
 {
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @param \Psr\Log\LoggerInterface $logger
+     */
+    public function __construct(
+        \Psr\Log\LoggerInterface $logger
+    ) {
+        $this->logger = $logger;
+    }
+
+    /**
      * Add button to product edit page
      *
      * @param Generic $subject
@@ -44,7 +58,7 @@ class AddUpdateFromAiButton
             }
         } catch (\Exception $e) {
             // If getProduct() doesn't exist or fails, skip adding the button
-            // phpcs:ignore MEQP2.Exceptions.EmptyCatch
+            $this->logger->debug('Could not add Squadexa AI button: ' . $e->getMessage());
         }
 
         return $result;

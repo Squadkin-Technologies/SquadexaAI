@@ -79,7 +79,7 @@ define([
          */
         getCurrentValue: function () {
             var valueFields = [
-                'value', 'value_select', 'value_multiselect', 
+                'value', 'value_select', 'value_multiselect',
                 'value_boolean', 'value_date', 'value_textarea'
             ];
             
@@ -120,7 +120,7 @@ define([
          */
         setCurrentValue: function (value) {
             var valueFields = [
-                'value', 'value_select', 'value_multiselect', 
+                'value', 'value_select', 'value_multiselect',
                 'value_boolean', 'value_date', 'value_textarea'
             ];
             

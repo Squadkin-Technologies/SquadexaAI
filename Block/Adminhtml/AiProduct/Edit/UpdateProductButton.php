@@ -15,6 +15,8 @@ use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 class UpdateProductButton extends GenericButton implements ButtonProviderInterface
 {
     /**
+     * Get button data
+     *
      * @return array
      */
     public function getButtonData(): array
@@ -42,7 +44,8 @@ class UpdateProductButton extends GenericButton implements ButtonProviderInterfa
                     'class' => 'primary',
                     'on_click' => sprintf(
                         "if (confirm('%s')) { window.location.href = '%s'; }",
-                        __('You will be redirected to the product edit page where you can review and apply the latest AI-generated data. Continue?'),
+                        __('You will be redirected to the product edit page where you can review and apply ' .
+                        'the latest AI-generated data. Continue?'),
                         $redirectUrl
                     ),
                     'sort_order' => 30,
@@ -66,7 +69,8 @@ class UpdateProductButton extends GenericButton implements ButtonProviderInterfa
                 return (int)$aiProduct->getMagentoProductId() ?: null;
             }
         } catch (\Exception $e) {
-            // Product not found, return null
+            $this->logger->debug('Magento Product ID not found: ' . $e->getMessage());
+            return null;
         }
         return null;
     }
@@ -84,7 +88,8 @@ class UpdateProductButton extends GenericButton implements ButtonProviderInterfa
                 return $this->aiProductRepository->get($aiproductId);
             }
         } catch (\Exception $e) {
-            // Product not found, return null
+            $this->logger->debug('AI Product not found: ' . $e->getMessage());
+            return null;
         }
         return null;
     }

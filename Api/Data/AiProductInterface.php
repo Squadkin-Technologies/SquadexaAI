@@ -432,9 +432,7 @@ interface AiProductInterface
      * Set custom attribute value
      *
      * @param string $attributeCode
-     *
      * @param mixed $value
-     *
      * @return \Squadkin\SquadexaAI\Api\Data\AiProductInterface
      */
     public function setCustomAttribute($attributeCode, $value);

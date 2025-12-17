@@ -1,0 +1,24 @@
+/**
+ * Custom SVG logo for Squadkin admin menu sidebar
+ * Targets both Squadkin::top_level (from Base) and Squadkin_SquadexaAI::root (standalone)
+ */
+
+li[data-ui-id="menu-squadkin-top-level"]>a::before,
+li[data-ui-id="menu-squadkin-squadexaai-root"]>a::before {
+    content: '' !important;
+    font-family: inherit !important;
+    font-size: 0 !important;
+    background-image: url('../images/squadkin-logo.svg') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    width: 2.3rem !important;
+    height: 2.3rem !important;
+    display: block !important;
+    margin: 0 auto 0.7rem auto !important;
+    text-align: center;
+}
+
+.item-squadexaiproductcreator-main-menu.parent.level-1 .submenu-group-title {
+    display: block !important;
+}

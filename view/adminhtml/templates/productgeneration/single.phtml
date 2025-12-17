@@ -11,7 +11,7 @@
         <div class="page-actions-inner">
             <div class="page-actions-buttons">
                 <button type="button" class="action-primary" id="generate-single-product">
-                    <span><?= $block->escapeHtml(__('Generate Product Description')) ?></span>
+                    <span><?= $escaper->escapeHtml(__('Generate Product Description')) ?></span>
                 </button>
             </div>
         </div>
@@ -20,66 +20,78 @@
 
 <div class="admin__page-section">
     <div class="admin__page-section-title">
-        <span class="title"><?= $block->escapeHtml(__('Single Product Generation')) ?></span>
+        <span class="title"><?= $escaper->escapeHtml(__('Single Product Generation')) ?></span>
     </div>
     <div class="admin__page-section-content">
         <div class="admin__page-section-item single-product-form">
             <form id="single-product-form" method="post">
-                <input name="form_key" type="hidden" value="<?= $block->escapeHtmlAttr($block->getFormKey()) ?>" />
+                <input name="form_key" type="hidden" value="<?= $escaper->escapeHtmlAttr($block->getFormKey()) ?>" />
                 
                 <div class="admin__field admin__field-product-name">
                     <label class="admin__field-label" for="product_name">
-                        <span><?= $block->escapeHtml(__('Product Name')) ?> <span class="required">*</span></span>
+                        <span><?= $escaper->escapeHtml(__('Product Name')) ?> <span class="required">*</span></span>
                     </label>
                     <div class="admin__field-control">
                         <input type="text" 
                                name="product_name" 
                                id="product_name" 
                                class="admin__control-text" 
-                               placeholder="<?= $block->escapeHtmlAttr(__('e.g., Wireless Bluetooth Headphones')) ?>"
+                               placeholder="<?= $escaper->escapeHtmlAttr(
+                                   __('e.g., Wireless Bluetooth Headphones')
+                               ) ?>"
                                required="required" />
                         <div class="admin__field-note">
-                            <span><?= $block->escapeHtml(__('Enter the name of the product you want to generate a description for.')) ?></span>
+                            <span><?= $escaper->escapeHtml(__(
+                                'Enter the name of the product you want to generate a description for.'
+                            )) ?></span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="admin__field admin__field-primary-keywords">
                     <label class="admin__field-label" for="primary_keywords">
-                        <span><?= $block->escapeHtml(__('Primary Keywords')) ?> <span class="required">*</span></span>
+                        <span><?= $escaper->escapeHtml(__('Primary Keywords')) ?> <span class="required">*</span></span>
                     </label>
                     <div class="admin__field-control">
                         <input type="text" 
                                name="primary_keywords" 
                                id="primary_keywords" 
                                class="admin__control-text" 
-                               placeholder="<?= $block->escapeHtmlAttr(__('e.g., wireless, bluetooth, noise-cancelling')) ?>"
+                               placeholder="<?= $escaper->escapeHtmlAttr(
+                                   __('e.g., wireless, bluetooth, noise-cancelling')
+                               ) ?>"
                                required="required" />
                         <div class="admin__field-note">
-                            <span><?= $block->escapeHtml(__('Separate keywords with commas. These are the main features of your product.')) ?></span>
+                            <span><?= $escaper->escapeHtml(__(
+                                'Separate keywords with commas. These are the main features of your product.'
+                            )) ?></span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="admin__field admin__field-secondary-keywords">
                     <label class="admin__field-label" for="secondary_keywords">
-                        <span><?= $block->escapeHtml(__('Secondary Keywords')) ?></span>
+                        <span><?= $escaper->escapeHtml(__('Secondary Keywords')) ?></span>
                     </label>
                     <div class="admin__field-control">
                         <input type="text" 
                                name="secondary_keywords" 
                                id="secondary_keywords" 
                                class="admin__control-text" 
-                               placeholder="<?= $block->escapeHtmlAttr(__('e.g., premium, comfortable, long-lasting')) ?>" />
+                               placeholder="<?= $escaper->escapeHtmlAttr(
+                                   __('e.g., premium, comfortable, long-lasting')
+                               ) ?>" />
                         <div class="admin__field-note">
-                            <span><?= $block->escapeHtml(__('Optional: Additional keywords for better SEO and description quality.')) ?></span>
+                            <span><?= $escaper->escapeHtml(__(
+                                'Optional: Additional keywords for better SEO and description quality.'
+                            )) ?></span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="admin__field admin__field-pricing">
                     <label class="admin__field-label" for="include_pricing">
-                        <span><?= $block->escapeHtml(__('Include Pricing Information')) ?></span>
+                        <span><?= $escaper->escapeHtml(__('Include Pricing Information')) ?></span>
                     </label>
                     <div class="admin__field-control">
                         <div class="admin__field-option">
@@ -89,11 +101,15 @@
                                    class="admin__control-checkbox" 
                                    value="1" />
                             <label for="include_pricing" class="admin__field-label">
-                                <span><?= $block->escapeHtml(__('Include pricing details in the description')) ?></span>
+                                <span><?= $escaper->escapeHtml(__(
+                                    'Include pricing details in the description'
+                                )) ?></span>
                             </label>
                         </div>
                         <div class="admin__field-note">
-                            <span><?= $block->escapeHtml(__('Check this box to include pricing information in the generated description.')) ?></span>
+                            <span><?= $escaper->escapeHtml(__(
+                                'Check this box to include pricing information in the generated description.'
+                            )) ?></span>
                         </div>
                     </div>
                 </div>
@@ -102,11 +118,15 @@
                     <div class="admin__field-control">
                         <div class="estimated-time-info">
                             <span class="time-icon">⏱️</span>
-                            <span class="time-label"><?= $block->escapeHtml(__('Estimated Generation Time:')) ?></span>
+                            <span class="time-label"><?= $escaper->escapeHtml(
+                                __('Estimated Generation Time:')
+                            ) ?></span>
                             <span class="time-value" id="estimated-time">13s</span>
                         </div>
                         <div class="admin__field-note">
-                            <span><?= $block->escapeHtml(__('Based on your current form data')) ?></span>
+                            <span><?= $escaper->escapeHtml(
+                                __('Depends on complexity and current API load')
+                            ) ?></span>
                         </div>
                     </div>
                 </div>
@@ -117,7 +137,7 @@
 
 <div class="admin__page-section" id="generation-results" style="display: none;">
     <div class="admin__page-section-title">
-        <span class="title"><?= $block->escapeHtml(__('Generated Product Description')) ?></span>
+        <span class="title"><?= $escaper->escapeHtml(__('Generated Product Description')) ?></span>
     </div>
     <div class="admin__page-section-content">
         <div class="admin__page-section-item generation-results">
@@ -128,7 +148,7 @@
 
 <div class="admin__page-section">
     <div class="admin__page-section-title">
-        <span class="title"><?= $block->escapeHtml(__('Generated Products History')) ?></span>
+        <span class="title"><?= $escaper->escapeHtml(__('Generated Products History')) ?></span>
     </div>
     <div class="admin__page-section-content">
         <div class="admin__page-section-item">
@@ -345,7 +365,9 @@ require(['jquery', 'mage/translate'], function($, $t) {
             
             // Make AJAX request
             $.ajax({
-                url: '<?= $block->escapeUrl($block->getUrl('squadkin_squadexaai/productgeneration/single/generate')) ?>',
+                url: '<?= $escaper->escapeUrl(
+                    $block->getUrl('squadkin_squadexaai/productgeneration/single/generate')
+                ) ?>',
                 type: 'POST',
                 data: formData,
                 dataType: 'json',
@@ -376,7 +398,8 @@ require(['jquery', 'mage/translate'], function($, $t) {
                     
                     // Show error message
                     $('<div class="message message-error">' + 
-                      '<div>' + $t('An error occurred while generating the product description.') + '</div>' + 
+                      '<div><strong>' + $t('An error occurred during generation. Please try again.') + 
+                      '</strong></div>' + 
                       '</div>').insertAfter('.page-main-actions');
                 },
                 complete: function() {

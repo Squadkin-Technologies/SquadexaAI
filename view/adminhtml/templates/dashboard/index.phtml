@@ -1,6 +1,7 @@
 <?php
 /**
  * @var $block \Squadkin\SquadexaAI\Block\Adminhtml\Dashboard
+ * @var $escaper \Magento\Framework\Escaper
  */
 $apiKey = $block->getApiKey();
 $data = $block->getDashboardData();
@@ -10,27 +11,35 @@ $data = $block->getDashboardData();
     <?php if (empty($apiKey)): ?>
         <div class="dashboard-no-key">
             <div class="no-key-icon">🔐</div>
-            <h2><?= __('No API Key Generated') ?></h2>
-            <p><?= __('Please configure your API key first to view the dashboard.') ?></p>
-            <a href="<?= $block->getUrl('adminhtml/system_config/edit/section/squadexaiproductcreator') ?>" class="action-primary">
-                <?= __('Go to Configuration') ?>
+            <h2><?= $escaper->escapeHtml(__('No API Key Generated')) ?></h2>
+            <p><?= $escaper->escapeHtml(__('Please configure your API key first to view the dashboard.')) ?></p>
+            <?php $configUrl = $block->getUrl('adminhtml/system_config/edit/section/squadexaiproductcreator'); ?>
+            <a href="<?= $escaper->escapeUrl($configUrl) ?>" class="action-primary">
+                <?= $escaper->escapeHtml(__('Go to Configuration')) ?>
             </a>
         </div>
     <?php else: ?>
         <!-- Welcome Header -->
         <div class="dashboard-header">
-            <h1><?= __('Welcome back') ?><?php if (!empty($data['usage_stats']['user_email'])): ?>, <span class="highlight"><?= $block->escapeHtml($data['usage_stats']['user_email']) ?></span><?php endif; ?></h1>
-            <p class="subtitle"><?= __('Your AI-powered content creation workspace') ?></p>
+            <h1>
+                <?= $escaper->escapeHtml(__('Welcome back')) ?>
+                <?php if (!empty($data['usage_stats']['user_email'])): ?>
+                    , <span class="highlight"><?= $escaper->escapeHtml($data['usage_stats']['user_email']) ?></span>
+                <?php endif; ?>
+            </h1>
+            <p class="subtitle"><?= $escaper->escapeHtml(__('Your AI-powered content creation workspace')) ?></p>
             <div class="header-meta">
-                <span class="date">📅 <?= date('F d, Y') ?></span>
+                <span class="date">📅 <?= $escaper->escapeHtml(date('F d, Y')) ?></span>
                 <?php if (!empty($data['usage_stats']['plan_info']['current_plan'])): ?>
-                <span class="plan-badge"><?= $block->escapeHtml(ucfirst($data['usage_stats']['plan_info']['current_plan'])) ?> Plan</span>
+                <span class="plan-badge">
+                    <?= $escaper->escapeHtml(ucfirst($data['usage_stats']['plan_info']['current_plan'])) ?> Plan
+                </span>
                 <?php endif; ?>
             </div>
         </div>
 
         <!-- Plan Status Banner -->
-        <?php if ($block->shouldShowSection($data, 'plan_status')): 
+        <?php if ($block->shouldShowSection($data, 'plan_status')):
             $planInfo = $data['usage_stats']['plan_info'] ?? [];
             $planLimits = $data['usage_stats']['plan_limits'] ?? [];
             $planName = ucfirst($planInfo['current_plan'] ?? 'free') . ' Plan';
@@ -43,23 +52,40 @@ $data = $block->getDashboardData();
             <div class="plan-info">
                 <div class="plan-icon">✨</div>
                 <div class="plan-details">
-                    <h3><?= $block->escapeHtml($planName) ?></h3>
-                    <p><?= $isTrial ? __('Free trial access') : __('Standard access with daily limits') ?></p>
-                    <span class="status-badge status-<?= strtolower($planStatus) ?>"><?= strtoupper($planStatus) ?></span>
+                    <h3><?= $escaper->escapeHtml($planName) ?></h3>
+                    <p>
+                        <?= $isTrial
+                            ? $escaper->escapeHtml(__('Free trial access'))
+                            : $escaper->escapeHtml(__('Standard access with daily limits'))
+                        ?>
+                    </p>
+                    <span class="status-badge status-<?= $escaper->escapeHtmlAttr(
+                        strtolower($planStatus)
+                    ) ?>">
+                        <?= $escaper->escapeHtml(strtoupper($planStatus)) ?>
+                    </span>
                 </div>
             </div>
             <div class="plan-limit">
                 <div class="plan-limit-monthly-container">
-                    <div class="limit-label"><?= __('Monthly Limit: ') ?></div>
-                    <div class="limit-value"><?= number_format($monthlyLimit) ?> <?= __('words') ?></div>
+                    <div class="limit-label"><?= $escaper->escapeHtml(__('Monthly Limit: ')) ?></div>
+                    <div class="limit-value">
+                        <?= $escaper->escapeHtml(number_format($monthlyLimit)) ?> <?= $escaper->escapeHtml(
+                            __('words')
+                        ) ?>
+                    </div>
                 </div>
                 <div class="plan-limit-daily-container">
-                    <div class="limit-label"><?= __('Daily Limit: ') ?></div>
-                    <div class="limit-value"><?= number_format($dailyLimit) ?> <?= __('words') ?></div>
+                    <div class="limit-label"><?= $escaper->escapeHtml(__('Daily Limit: ')) ?></div>
+                    <div class="limit-value">
+                        <?= $escaper->escapeHtml(number_format($dailyLimit)) ?> 
+                        <?= $escaper->escapeHtml(__('words')) ?>
+                    </div>
                 </div>
                 <div class="plan-limit-upgrade-container">
-                    <button class="upgrade-button" onclick="window.open('https://squadexa.ai//pricing', '_blank')">
-                        👑 <?= __('Upgrade Now') ?>
+                    <button class="upgrade-button" 
+                            onclick="window.open('https://squadexa.ai//pricing', '_blank')">
+                        👑 <?= $escaper->escapeHtml(__('Upgrade Now')) ?>
                     </button>
                     </div>
                 </div>
@@ -68,7 +94,7 @@ $data = $block->getDashboardData();
         <?php endif; ?>
 
         <!-- Usage Statistics Cards -->
-        <?php if ($block->shouldShowSection($data, 'usage_cards')): 
+        <?php if ($block->shouldShowSection($data, 'usage_cards')):
             $overallUsage = $data['usage_stats']['overall_usage'] ?? [];
             $wordsUsed = $overallUsage['words_used'] ?? 0;
             $wordsRemaining = $overallUsage['words_remaining'] ?? 0;
@@ -80,9 +106,9 @@ $data = $block->getDashboardData();
             <div class="usage-card">
                 <div class="card-icon card-icon-blue">📝</div>
                 <div class="card-content">
-                    <div class="card-label"><?= __('Words Used') ?></div>
-                    <div class="card-value"><?= number_format($wordsUsed) ?></div>
-                    <div class="card-subtitle"><?= __('this month') ?></div>
+                    <div class="card-label"><?= $escaper->escapeHtml(__('Words Used')) ?></div>
+                    <div class="card-value"><?= $escaper->escapeHtml(number_format($wordsUsed)) ?></div>
+                    <div class="card-subtitle"><?= $escaper->escapeHtml(__('this month')) ?></div>
                 </div>
                 <div class="card-trend">📈</div>
             </div>
@@ -92,9 +118,14 @@ $data = $block->getDashboardData();
             <div class="usage-card">
                 <div class="card-icon card-icon-green">⚡</div>
                 <div class="card-content">
-                    <div class="card-label"><?= __('Words Remaining') ?></div>
-                    <div class="card-value"><?= number_format($wordsRemaining) ?></div>
-                    <div class="card-subtitle"><?= __('of %1', number_format($wordsLimit)) ?></div>
+                    <div class="card-label"><?= $escaper->escapeHtml(__('Words Remaining')) ?></div>
+                    <div class="card-value"><?= $escaper->escapeHtml(number_format($wordsRemaining)) ?></div>
+                    <div class="card-subtitle">
+                        <?= $escaper->escapeHtml(__(
+                            'of %1',
+                            number_format($wordsLimit)
+                        )) ?>
+                    </div>
                 </div>
                 <div class="card-trend">🌟</div>
             </div>
@@ -104,9 +135,9 @@ $data = $block->getDashboardData();
             <div class="usage-card">
                 <div class="card-icon card-icon-purple">📊</div>
                 <div class="card-content">
-                    <div class="card-label"><?= __('Usage This Month') ?></div>
-                    <div class="card-value"><?= number_format($usagePercentage, 1) ?>%</div>
-                    <div class="card-subtitle"><?= __('capacity used') ?></div>
+                    <div class="card-label"><?= $escaper->escapeHtml(__('Usage This Month')) ?></div>
+                    <div class="card-value"><?= $escaper->escapeHtml(number_format($usagePercentage, 1)) ?>%</div>
+                    <div class="card-subtitle"><?= $escaper->escapeHtml(__('capacity used')) ?></div>
                 </div>
                 <div class="card-trend">⏰</div>
             </div>
@@ -115,7 +146,7 @@ $data = $block->getDashboardData();
         <?php endif; ?>
 
         <!-- Monthly Progress -->
-        <?php if ($block->shouldShowSection($data, 'monthly_progress')): 
+        <?php if ($block->shouldShowSection($data, 'monthly_progress')):
             $overallUsage = $data['usage_stats']['overall_usage'] ?? [];
             $wordsUsed = $overallUsage['words_used'] ?? 0;
             $wordsLimit = $overallUsage['monthly_word_limit'] ?? 30000;
@@ -123,23 +154,28 @@ $data = $block->getDashboardData();
         ?>
         <div class="monthly-progress-section">
             <div class="section-header">
-                <h3><?= __('Monthly Progress') ?></h3>
-                <p><?= __('Track your content generation journey') ?></p>
+                <h3><?= $escaper->escapeHtml(__('Monthly Progress')) ?></h3>
+                <p><?= $escaper->escapeHtml(__('Track your content generation journey')) ?></p>
             </div>
             <div class="progress-content">
                 <div class="progress-bar-wrapper">
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: <?= $percentage ?>%"></div>
+                        <div class="progress-fill" style="width: <?= $escaper->escapeHtmlAttr($percentage) ?>%"></div>
                     </div>
                     <div class="progress-labels">
-                        <span><?= number_format($wordsUsed) ?></span>
-                        <span class="progress-center"><?= number_format($wordsUsed) ?> <?= __('words used') ?></span>
-                        <span><?= number_format($wordsLimit) ?></span>
+                        <span><?= $escaper->escapeHtml(number_format($wordsUsed)) ?></span>
+                        <span class="progress-center">
+                            <?= $escaper->escapeHtml(number_format($wordsUsed)) ?>
+                            <?= $escaper->escapeHtml(__('words used')) ?>
+                        </span>
+                        <span><?= $escaper->escapeHtml(number_format($wordsLimit)) ?></span>
                     </div>
                 </div>
                 <div class="progress-percentage">
-                    <div class="percentage-value"><?= number_format($percentage, 1) ?>%</div>
-                    <div class="percentage-label"><?= __('completed') ?></div>
+                    <div class="percentage-value">
+                        <?= $escaper->escapeHtml(number_format($percentage, 1)) ?>%
+                    </div>
+                    <div class="percentage-label"><?= $escaper->escapeHtml(__('completed')) ?></div>
                 </div>
             </div>
         </div>
@@ -148,7 +184,7 @@ $data = $block->getDashboardData();
         <!-- Account Status and API Key -->
         <div class="account-api-grid">
             <!-- Account Status Card -->
-            <?php if ($block->shouldShowSection($data, 'account_status')): 
+            <?php if ($block->shouldShowSection($data, 'account_status')):
                 $userEmail = $data['usage_stats']['user_email'] ?? '';
                 $planInfo = $data['usage_stats']['plan_info'] ?? [];
                 $accountStatus = $planInfo['subscription_status'] ?? 'active';
@@ -158,28 +194,32 @@ $data = $block->getDashboardData();
             <div class="info-card">
                 <div class="card-header">
                     <span class="card-icon-header">✓</span>
-                    <h4><?= __('Account Status') ?></h4>
+                    <h4><?= $escaper->escapeHtml(__('Account Status')) ?></h4>
                 </div>
                 <div class="info-list">
                     <?php if (!empty($userEmail)): ?>
                     <div class="info-item">
                         <span class="info-icon">●</span>
-                        <span class="info-label"><?= __('Email') ?></span>
-                        <span class="info-value"><?= $block->escapeHtml($userEmail) ?></span>
+                        <span class="info-label"><?= $escaper->escapeHtml(__('Email')) ?></span>
+                        <span class="info-value"><?= $escaper->escapeHtml($userEmail) ?></span>
                     </div>
                     <?php endif; ?>
                     <?php if (isset($accountStatus)): ?>
                     <div class="info-item">
                         <span class="info-icon">●</span>
-                        <span class="info-label"><?= __('Status') ?></span>
-                        <span class="info-value status-active-text"><?= strtoupper($accountStatus) ?></span>
+                        <span class="info-label"><?= $escaper->escapeHtml(__('Status')) ?></span>
+                        <span class="info-value status-active-text">
+                            <?= $escaper->escapeHtml(strtoupper($accountStatus)) ?>
+                        </span>
                     </div>
                     <?php endif; ?>
                     <?php if (!empty($nextReset)): ?>
                     <div class="info-item">
                         <span class="info-icon">●</span>
-                        <span class="info-label"><?= __('Next Reset') ?></span>
-                        <span class="info-value"><?= $block->escapeHtml(date('M d, Y', strtotime($nextReset))) ?></span>
+                        <span class="info-label"><?= $escaper->escapeHtml(__('Next Reset')) ?></span>
+                        <span class="info-value">
+                            <?= $escaper->escapeHtml(date('M d, Y', strtotime($nextReset))) ?>
+                        </span>
                     </div>
                     <?php endif; ?>
                 </div>
@@ -190,23 +230,30 @@ $data = $block->getDashboardData();
             <div class="info-card">
                 <div class="card-header">
                     <span class="card-icon-header">🔗</span>
-                    <h4><?= __('API Key') ?></h4>
-                    <span class="status-badge-small status-active"><?= __('Active') ?></span>
+                    <h4><?= $escaper->escapeHtml(__('API Key')) ?></h4>
+                    <span class="status-badge-small status-active"><?= $escaper->escapeHtml(__('Active')) ?></span>
                 </div>
                 <div class="api-key-box">
-                    <div class="api-key-label"><?= __('Your API Key') ?></div>
+                    <div class="api-key-label"><?= $escaper->escapeHtml(__('Your API Key')) ?></div>
                     <div class="api-key-value">
-                        <code><?= $block->escapeHtml(substr($apiKey, 0, 20) . '...') ?></code>
-                        <button class="copy-button" onclick="copyApiKey()">📋 <?= __('Copy') ?></button>
+                        <code><?= $escaper->escapeHtml(substr($apiKey, 0, 20) . '...') ?></code>
+                        <button class="copy-button" onclick="copyApiKey()">
+                            📋 <?= $escaper->escapeHtml(__('Copy')) ?>
+                        </button>
                     </div>
-                    <div class="api-key-note"><?= __('Use this key to authenticate your API requests. Keep it secure and don\'t share it publicly.') ?></div>
+                    <div class="api-key-note">
+                        <?= $escaper->escapeHtml(__(
+                            'Use this key to authenticate your API requests. ' .
+                            'Keep it secure and don\'t share it publicly.'
+                        )) ?>
+                    </div>
                 </div>
             </div>
         </div>
 
 
         <!-- Recent Activity -->
-        <?php if ($block->shouldShowSection($data, 'recent_activity')): 
+        <?php if ($block->shouldShowSection($data, 'recent_activity')):
             $allActivities = $data['recent_activities'] ?? [];
             $totalItems = count($allActivities);
             $perPage = 10;
@@ -214,34 +261,51 @@ $data = $block->getDashboardData();
             $currentPage = 1;
             $offset = ($currentPage - 1) * $perPage;
             $paginatedActivities = array_slice($allActivities, $offset, $perPage);
+            $visiblePages = min(5, $totalPages);
         ?>
         <div class="recent-activity-section">
             <div class="section-header">
                 <div>
-                    <h3><?= __('Recent Activity') ?></h3>
-                    <p><?= __('Your latest AI tool usage and activity') ?></p>
+                    <h3><?= $escaper->escapeHtml(__('Recent Activity')) ?></h3>
+                    <p><?= $escaper->escapeHtml(__('Your latest AI tool usage and activity')) ?></p>
                 </div>
-                <span class="activity-count"><?= __('Total: %1 logs', $totalItems) ?></span>
+                <span class="activity-count">
+                    <?= $escaper->escapeHtml(__('Total: %1 logs', $totalItems)) ?>
+                </span>
             </div>
             <div class="activity-list" id="activity-list-container">
-                <?php foreach ($paginatedActivities as $activity): 
+                <?php foreach ($paginatedActivities as $activity):
                     $toolType = $activity['tool_type'] ?? 'product_generator';
                     $toolName = ucwords(str_replace('_', ' ', $toolType));
                     $totalWords = $activity['total_words'] ?? 0;
                     $timestamp = $activity['created_at'] ?? date('Y-m-d H:i:s');
                     $success = $activity['success'] ?? true;
-                    $processingTime = isset($activity['processing_time_ms']) ? round($activity['processing_time_ms'] / 1000, 2) . 's' : 'N/A';
+                    $processingTime = isset($activity['processing_time_ms'])
+                        ? round($activity['processing_time_ms'] / 1000, 2) . 's'
+                        : 'N/A';
                 ?>
                 <div class="activity-item">
                     <div class="activity-icon"><?= $success ? '🟢' : '🔴' ?></div>
                     <div class="activity-details">
-                        <div class="activity-title"><?= $block->escapeHtml($toolName) ?></div>
-                        <div class="activity-type"><?= __('Endpoint: %1', $block->escapeHtml($activity['endpoint'] ?? '/api/v1/' . $toolType)) ?></div>
+                        <div class="activity-title"><?= $escaper->escapeHtml($toolName) ?></div>
+                        <div class="activity-type">
+                            <?= $escaper->escapeHtml(__(
+                                'Endpoint: %1',
+                                $activity['endpoint'] ?? '/api/v1/' . $toolType
+                            )) ?>
+                        </div>
                     </div>
                     <div class="activity-meta">
-                        <div class="activity-words"><?= number_format($totalWords) ?> <?= __('words') ?></div>
-                        <div class="activity-time"><?= $block->escapeHtml(date('d/m/Y, H:i', strtotime($timestamp))) ?></div>
-                        <div class="activity-processing"><?= __('Processing: %1', $processingTime) ?></div>
+                        <div class="activity-words">
+                            <?= $escaper->escapeHtml(number_format($totalWords)) ?>
+                            <?= $escaper->escapeHtml(__('words')) ?>
+                        </div>
+                        <div class="activity-time">
+                            <?= $escaper->escapeHtml(date('d/m/Y, H:i', strtotime($timestamp))) ?>
+                        </div>
+                        <div class="activity-processing">
+                            <?= $escaper->escapeHtml(__('Processing: %1', $processingTime)) ?>
+                        </div>
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -250,28 +314,44 @@ $data = $block->getDashboardData();
             <?php if ($totalPages > 1): ?>
             <div class="activity-pagination" id="activity-pagination">
                 <div class="pagination-info">
-                    <?= __('Page %1 of %2', '<span id="current-page">1</span>', '<span id="total-pages">' . $totalPages . '</span>') ?>
-                    <span class="pagination-items">(<?= __('Showing %1-%2 of %3', 1, min($perPage, $totalItems), $totalItems) ?>)</span>
+                    <?= /* @noEscape */ __(
+                        'Page %1 of %2',
+                        '<span id="current-page">1</span>',
+                        '<span id="total-pages">' . $totalPages . '</span>'
+                    ) ?>
+                    <span class="pagination-items">
+                        (<?= $escaper->escapeHtml(__(
+                            'Showing %1-%2 of %3',
+                            1,
+                            min($perPage, $totalItems),
+                            $totalItems
+                        )) ?>)
+                    </span>
                 </div>
                 <div class="pagination-controls">
-                    <button class="pagination-btn" id="prev-page" onclick="loadActivityPage(<?= $currentPage - 1 ?>)" disabled>
-                        <?= __('Previous') ?>
+                    <button class="pagination-btn" id="prev-page" 
+                            onclick="loadActivityPage(<?= $currentPage - 1 ?>)" disabled>
+                        <?= $escaper->escapeHtml(__('Previous')) ?>
                     </button>
                     <div class="pagination-numbers" id="pagination-numbers">
-                        <?php for ($i = 1; $i <= min(5, $totalPages); $i++): ?>
-                            <button class="pagination-number <?= $i === 1 ? 'active' : '' ?>" onclick="loadActivityPage(<?= $i ?>)">
-                                <?= $i ?>
+                        <?php for ($i = 1; $i <= $visiblePages; $i++): ?>
+                            <button class="pagination-number <?= $i === 1 ? 'active' : '' ?>" 
+                                    onclick="loadActivityPage(<?= (int)$i ?>)">
+                                <?= $escaper->escapeHtml($i) ?>
                             </button>
                         <?php endfor; ?>
                         <?php if ($totalPages > 5): ?>
                             <span class="pagination-ellipsis">...</span>
-                            <button class="pagination-number" onclick="loadActivityPage(<?= $totalPages ?>)">
-                                <?= $totalPages ?>
+                            <button class="pagination-number" 
+                                    onclick="loadActivityPage(<?= $escaper->escapeHtmlAttr($totalPages) ?>)">
+                                <?= $escaper->escapeHtml($totalPages) ?>
                             </button>
                         <?php endif; ?>
                     </div>
-                    <button class="pagination-btn" id="next-page" onclick="loadActivityPage(<?= $currentPage + 1 ?>)" <?= $currentPage >= $totalPages ? 'disabled' : '' ?>>
-                        <?= __('Next') ?>
+                    <button class="pagination-btn" id="next-page" 
+                            onclick="loadActivityPage(<?= $currentPage + 1 ?>)"
+                            <?= $currentPage >= $totalPages ? 'disabled' : '' ?>>
+                        <?= $escaper->escapeHtml(__('Next')) ?>
                     </button>
                 </div>
             </div>
@@ -283,15 +363,16 @@ $data = $block->getDashboardData();
         <?php if (!$data['has_data']): ?>
         <div class="dashboard-no-data">
             <div class="no-data-icon">📊</div>
-            <h2><?= __('No Dashboard Data Available') ?></h2>
-            <p><?= __('Unable to fetch dashboard data from the API. Please check:') ?></p>
+            <h2><?= $escaper->escapeHtml(__('No Dashboard Data Available')) ?></h2>
+            <p><?= $escaper->escapeHtml(__('Unable to fetch dashboard data from the API. Please check:')) ?></p>
             <ul>
-                <li><?= __('Your API key is valid and active') ?></li>
-                <li><?= __('You have an active subscription') ?></li>
-                <li><?= __('The API service is accessible') ?></li>
+                <li><?= $escaper->escapeHtml(__('Your API key is valid and active')) ?></li>
+                <li><?= $escaper->escapeHtml(__('You have an active subscription')) ?></li>
+                <li><?= $escaper->escapeHtml(__('The API service is accessible')) ?></li>
             </ul>
-            <a href="<?= $block->getUrl('adminhtml/system_config/edit/section/squadexaiproductcreator') ?>" class="action-primary">
-                <?= __('Check Configuration') ?>
+            <?php $configUrl = $block->getUrl('adminhtml/system_config/edit/section/squadexaiproductcreator'); ?>
+            <a href="<?= $escaper->escapeUrl($configUrl) ?>" class="action-primary">
+                <?= $escaper->escapeHtml(__('Check Configuration')) ?>
             </a>
         </div>
         <?php endif; ?>
@@ -301,11 +382,11 @@ $data = $block->getDashboardData();
 <script>
 require(['jquery'], function($) {
     window.activityPagination = {
-        totalPages: <?= $totalPages ?? 1 ?>,
-        totalItems: <?= $totalItems ?? 0 ?>,
+        totalPages: <?= $escaper->escapeJs($totalPages ?? 1) ?>,
+        totalItems: <?= $escaper->escapeJs($totalItems ?? 0) ?>,
         perPage: 10,
         currentPage: 1,
-        activityUrl: '<?= $block->getUrl('squadkin_squadexaai/dashboard/activity') ?>'
+        activityUrl: '<?= $escaper->escapeUrl($block->getUrl('squadkin_squadexaai/dashboard/activity')) ?>'
     };
     
     window.loadActivityPage = function(page) {
@@ -316,7 +397,7 @@ require(['jquery'], function($) {
         // Show loading state
         const container = document.getElementById('activity-list-container');
         const pagination = document.getElementById('activity-pagination');
-        container.innerHTML = '<div class="activity-loading"><?= __('Loading...') ?></div>';
+        container.innerHTML = '<div class="activity-loading"><?= $escaper->escapeJs(__('Loading...')) ?></div>';
         
         // Disable pagination buttons
         const buttons = pagination.querySelectorAll('button');
@@ -337,12 +418,15 @@ require(['jquery'], function($) {
                             '<div class="activity-icon">' + (activity.success ? '🟢' : '🔴') + '</div>' +
                             '<div class="activity-details">' +
                             '<div class="activity-title">' + activity.tool_name + '</div>' +
-                            '<div class="activity-type"><?= __('Endpoint:') ?> ' + activity.endpoint + '</div>' +
+                            '<div class="activity-type"><?= $escaper->escapeJs(__('Endpoint:')) ?> ' + 
+                            activity.endpoint + '</div>' +
                             '</div>' +
                             '<div class="activity-meta">' +
-                            '<div class="activity-words">' + parseInt(activity.total_words).toLocaleString() + ' <?= __('words') ?></div>' +
+                            '<div class="activity-words">' + parseInt(activity.total_words).toLocaleString() + 
+                            ' <?= $escaper->escapeJs(__('words')) ?></div>' +
                             '<div class="activity-time">' + activity.timestamp + '</div>' +
-                            '<div class="activity-processing"><?= __('Processing:') ?> ' + activity.processing_time + '</div>' +
+                            '<div class="activity-processing"><?= $escaper->escapeJs(__('Processing:')) ?> ' + 
+                            activity.processing_time + '</div>' +
                             '</div>' +
                             '</div>';
                     });
@@ -354,15 +438,18 @@ require(['jquery'], function($) {
                     // Update current page
                     window.activityPagination.currentPage = page;
                 } else {
-                    container.innerHTML = '<div class="activity-error">' + (response.message || '<?= __('Error loading activities') ?>') + '</div>';
+                    container.innerHTML = '<div class="activity-error">' + (response.message || 
+                        '<?= $escaper->escapeJs(__('Error loading activities')) ?>') + '</div>';
                 }
             },
             error: function() {
-                container.innerHTML = '<div class="activity-error"><?= __('Error loading activities. Please try again.') ?></div>';
+                container.innerHTML = '<div class="activity-error"><?= $escaper->escapeJs(
+                    __('Error loading activities. Please try again.')
+                ) ?></div>';
             },
             complete: function() {
                 // Re-enable pagination buttons
-                buttons.forEach(btn => btn.disabled = false);
+                buttons.forEach(function(btn) { btn.disabled = false; });
             }
         });
     };
@@ -395,14 +482,17 @@ require(['jquery'], function($) {
             }
             
             for (let i = startPage; i <= endPage; i++) {
-                html += '<button class="pagination-number ' + (i === currentPage ? 'active' : '') + '" onclick="loadActivityPage(' + i + ')">' + i + '</button>';
+                html += '<button class="pagination-number ' + 
+                    (i === currentPage ? 'active' : '') + 
+                    '" onclick="loadActivityPage(' + i + ')">' + i + '</button>';
             }
             
             if (endPage < totalPages) {
                 if (endPage < totalPages - 1) {
                     html += '<span class="pagination-ellipsis">...</span>';
                 }
-                html += '<button class="pagination-number" onclick="loadActivityPage(' + totalPages + ')">' + totalPages + '</button>';
+                html += '<button class="pagination-number" onclick="loadActivityPage(' + 
+                    totalPages + ')">' + totalPages + '</button>';
             }
             
             numbersContainer.innerHTML = html;
@@ -413,18 +503,19 @@ require(['jquery'], function($) {
         const endItem = Math.min(pagination.current_page * pagination.per_page, pagination.total_items);
         const infoText = document.querySelector('.pagination-items');
         if (infoText) {
-            infoText.textContent = '(<?= __('Showing') ?> ' + startItem + '-' + endItem + ' <?= __('of') ?> ' + pagination.total_items + ')';
+            infoText.textContent = '(<?= $escaper->escapeJs(__('Showing')) ?> ' + startItem + '-' + 
+                endItem + ' <?= $escaper->escapeJs(__('of')) ?> ' + pagination.total_items + ')';
         }
     }
 });
 
 function copyApiKey() {
-    const apiKey = '<?= $block->escapeJs($apiKey) ?>';
+    const apiKey = '<?= $escaper->escapeJs($apiKey) ?>';
     navigator.clipboard.writeText(apiKey).then(function() {
         const button = event.target;
-        button.textContent = '✓ <?= __('Copied') ?>';
+        button.textContent = '✓ <?= $escaper->escapeJs(__('Copied')) ?>';
         setTimeout(function() {
-            button.textContent = '📋 <?= __('Copy') ?>';
+            button.textContent = '📋 <?= $escaper->escapeJs(__('Copy')) ?>';
         }, 2000);
     });
 }

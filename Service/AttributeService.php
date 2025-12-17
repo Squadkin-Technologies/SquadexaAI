@@ -14,6 +14,7 @@ use Magento\Eav\Api\Data\AttributeInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Eav\Model\Config;
 use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory;
+use Psr\Log\LoggerInterface;
 
 class AttributeService
 {
@@ -38,21 +39,29 @@ class AttributeService
     private $attributeCollectionFactory;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param ProductAttributeRepositoryInterface $attributeRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param Config $eavConfig
      * @param CollectionFactory $attributeCollectionFactory
+     * @param LoggerInterface $logger
      */
     public function __construct(
         ProductAttributeRepositoryInterface $attributeRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         Config $eavConfig,
-        CollectionFactory $attributeCollectionFactory
+        CollectionFactory $attributeCollectionFactory,
+        LoggerInterface $logger
     ) {
         $this->attributeRepository = $attributeRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->eavConfig = $eavConfig;
         $this->attributeCollectionFactory = $attributeCollectionFactory;
+        $this->logger = $logger;
     }
 
     /**
@@ -206,7 +215,7 @@ class AttributeService
                 }
             } catch (\Exception $e) {
                 // If we can't get options, return empty array
-                // phpcs:ignore MEQP2.Exceptions.EmptyCatch
+                $this->logger->warning('Error getting attribute options: ' . $e->getMessage());
             }
         }
         
@@ -342,8 +351,8 @@ class AttributeService
             }
             
         } catch (\Exception $e) {
-            // Return empty array on error
-            // phpcs:ignore MEQP2.Exceptions.EmptyCatch
+                // Return empty array on error
+                $this->logger->warning('Error getting attributes by type: ' . $e->getMessage());
         }
         
         return $attributes;

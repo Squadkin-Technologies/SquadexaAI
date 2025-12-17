@@ -13,6 +13,7 @@ use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\Filesystem;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Controller\Result\RedirectFactory;
+use Magento\Framework\Filesystem\Io\File as IoFile;
 
 class DownloadErrorReport extends Action
 {
@@ -29,27 +30,32 @@ class DownloadErrorReport extends Action
     /**
      * @var RedirectFactory
      */
-    /**
-     * @var RedirectFactory
-     */
     protected $resultRedirectFactory;
+
+    /**
+     * @var IoFile
+     */
+    private $ioFile;
 
     /**
      * @param Context $context
      * @param FileFactory $fileFactory
      * @param Filesystem $filesystem
      * @param RedirectFactory $resultRedirectFactory
+     * @param IoFile $ioFile
      */
     public function __construct(
         Context $context,
         FileFactory $fileFactory,
         Filesystem $filesystem,
-        RedirectFactory $resultRedirectFactory
+        RedirectFactory $resultRedirectFactory,
+        IoFile $ioFile
     ) {
         parent::__construct($context);
         $this->fileFactory = $fileFactory;
         $this->filesystem = $filesystem;
         $this->resultRedirectFactory = $resultRedirectFactory;
+        $this->ioFile = $ioFile;
     }
 
     /**
@@ -64,8 +70,10 @@ class DownloadErrorReport extends Action
             $this->messageManager->addErrorMessage(__('No error report file specified.'));
             return $this->resultRedirectFactory->create()->setPath('*/*/index');
         }
-        // phpcs:ignore Magento2.Functions.DiscouragedFunction
-        $fileName = basename($file); // phpcs:ignore
+
+        $pathInfo = $this->ioFile->getPathInfo($file);
+        $fileName = $pathInfo['basename'];
+
         $filePath = 'AIProductCreator/ErrorReports/' . $fileName;
         $varDirectory = $this->filesystem->getDirectoryRead(DirectoryList::VAR_DIR);
         if (!$varDirectory->isExist($filePath)) {

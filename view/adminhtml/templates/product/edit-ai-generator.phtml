@@ -3,6 +3,7 @@
  * Modal markup for Squadexa AI generator
  *
  * @var \Squadkin\SquadexaAI\Block\Adminhtml\Product\Edit\AiGenerator $block
+ * @var \Magento\Framework\Escaper $escaper
  */
 $config = $block->getJsonConfig();
 ?>
@@ -13,37 +14,54 @@ $config = $block->getJsonConfig();
     <div id="squadexa-ai-input-section">
         <div class="admin__field required">
             <label class="admin__field-label" for="squadexa_ai_product_name">
-                <span><?= $block->escapeHtml(__('Product Name')) ?></span>
+                <span><?= $escaper->escapeHtml(__('Product Name')) ?></span>
             </label>
             <div class="admin__field-control">
-                <input type="text" id="squadexa_ai_product_name" class="admin__control-text required-entry" value="<?= $block->escapeHtmlAttr($block->getProductName()) ?>" required="required" />
+                <input type="text"
+                       id="squadexa_ai_product_name"
+                       class="admin__control-text required-entry"
+                       value="<?= $escaper->escapeHtmlAttr($block->getProductName()) ?>"
+                       required="required" />
             </div>
         </div>
 
         <div class="admin__field required">
             <label class="admin__field-label" for="squadexa_ai_primary_keywords">
-                <span><?= $block->escapeHtml(__('Primary Keywords')) ?></span>
+                <span><?= $escaper->escapeHtml(__('Primary Keywords')) ?></span>
             </label>
             <div class="admin__field-control">
-                <input type="text" id="squadexa_ai_primary_keywords" class="admin__control-text required-entry" value="<?= $block->escapeHtmlAttr($block->getMetaKeywords()) ?>" required="required" />
-                <p class="note"><?= $block->escapeHtml(__('Comma separated keywords. Defaults to the product meta keywords.')) ?></p>
+                <input type="text"
+                       id="squadexa_ai_primary_keywords"
+                       class="admin__control-text required-entry"
+                       value="<?= $escaper->escapeHtmlAttr($block->getMetaKeywords()) ?>"
+                       required="required" />
+                <p class="note">
+                    <?= $escaper->escapeHtml(__('Comma separated keywords. Defaults to the product meta keywords.')) ?>
+                </p>
             </div>
         </div>
 
         <div class="admin__field">
             <label class="admin__field-label" for="squadexa_ai_secondary_keywords">
-                <span><?= $block->escapeHtml(__('Secondary Keywords')) ?></span>
+                <span><?= $escaper->escapeHtml(__('Secondary Keywords')) ?></span>
             </label>
             <div class="admin__field-control">
-                <input type="text" id="squadexa_ai_secondary_keywords" class="admin__control-text" value="<?= $block->escapeHtmlAttr($block->getMetaTitle()) ?>" />
-                <p class="note"><?= $block->escapeHtml(__('Optional. Comma separated secondary keywords. Defaults to the product meta title.')) ?></p>
+                <input type="text"
+                       id="squadexa_ai_secondary_keywords"
+                       class="admin__control-text"
+                       value="<?= $escaper->escapeHtmlAttr($block->getMetaTitle()) ?>" />
+                <p class="note">
+                    <?= $escaper->escapeHtml(__(
+                        'Optional. Comma separated secondary keywords. Defaults to the product meta title.'
+                    )) ?>
+                </p>
             </div>
         </div>
 
         <div class="admin__field admin__field-option">
             <input type="checkbox" class="admin__control-checkbox" id="squadexa_ai_include_pricing" />
             <label class="admin__field-label" for="squadexa_ai_include_pricing">
-                <span><?= $block->escapeHtml(__('Include pricing suggestions')) ?></span>
+                <span><?= $escaper->escapeHtml(__('Include pricing suggestions')) ?></span>
             </label>
         </div>
     </div>

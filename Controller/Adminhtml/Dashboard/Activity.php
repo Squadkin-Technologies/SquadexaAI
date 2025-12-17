@@ -11,6 +11,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Squadkin\SquadexaAI\Service\SquadexaApiService;
 use Psr\Log\LoggerInterface;
+use Magento\Framework\Stdlib\DateTime\DateTime;
 
 class Activity extends Action
 {
@@ -35,21 +36,29 @@ class Activity extends Action
     protected $logger;
 
     /**
+     * @var DateTime
+     */
+    protected $dateTime;
+
+    /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param SquadexaApiService $apiService
      * @param LoggerInterface $logger
+     * @param DateTime $dateTime
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
         SquadexaApiService $apiService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        DateTime $dateTime
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->apiService = $apiService;
         $this->logger = $logger;
+        $this->dateTime = $dateTime;
     }
 
     /**
@@ -60,45 +69,45 @@ class Activity extends Action
     public function execute()
     {
         $result = $this->resultJsonFactory->create();
-        
+
         try {
             $page = (int) $this->getRequest()->getParam('page', 1);
             $perPage = 10;
-            
+
             // Fetch all activities
             $usageHistory = $this->apiService->getUsageHistory();
             $allActivities = $usageHistory['history'] ?? [];
-            
+
             // Calculate pagination
             $totalItems = count($allActivities);
             $totalPages = ceil($totalItems / $perPage);
             $offset = ($page - 1) * $perPage;
-            
+
             // Get paginated activities
             $paginatedActivities = array_slice($allActivities, $offset, $perPage);
-            
+
             // Format activities for display
             $formattedActivities = [];
             foreach ($paginatedActivities as $activity) {
                 $toolType = $activity['tool_type'] ?? 'product_generator';
                 $toolName = ucwords(str_replace('_', ' ', $toolType));
                 $totalWords = $activity['total_words'] ?? 0;
-                $timestamp = $activity['created_at'] ?? date('Y-m-d H:i:s');
+                $timestamp = $activity['created_at'] ?? $this->dateTime->gmtDate();
                 $success = $activity['success'] ?? true;
-                $processingTime = isset($activity['processing_time_ms']) 
-                    ? round($activity['processing_time_ms'] / 1000, 2) . 's' 
+                $processingTime = isset($activity['processing_time_ms'])
+                    ? round($activity['processing_time_ms'] / 1000, 2) . 's'
                     : 'N/A';
-                
+
                 $formattedActivities[] = [
                     'tool_name' => $toolName,
                     'endpoint' => $activity['endpoint'] ?? '/api/v1/' . $toolType,
                     'total_words' => $totalWords,
-                    'timestamp' => date('d/m/Y, H:i', strtotime($timestamp)),
+                    'timestamp' => $this->dateTime->date('d/m/Y, H:i', $timestamp),
                     'success' => $success,
                     'processing_time' => $processingTime
                 ];
             }
-            
+
             $result->setData([
                 'success' => true,
                 'activities' => $formattedActivities,
@@ -111,7 +120,7 @@ class Activity extends Action
                     'has_next' => $page < $totalPages
                 ]
             ]);
-            
+
         } catch (\Exception $e) {
             $this->logger->error('Activity pagination error: ' . $e->getMessage());
             $result->setData([
@@ -119,8 +128,7 @@ class Activity extends Action
                 'message' => __('Error loading activities: %1', $e->getMessage())
             ]);
         }
-        
+
         return $result;
     }
 }
-

@@ -17,10 +17,11 @@ define([
 
     /**
      * Start polling for a specific generated CSV record
-     * 
+     *
      * @param {number} generatedCsvId
      */
-    function startPolling(generatedCsvId) {
+    function startPolling(generatedCsvId)
+    {
         // Stop any existing polling for this ID
         if (pollingIntervals[generatedCsvId]) {
             clearInterval(pollingIntervals[generatedCsvId]);
@@ -31,17 +32,18 @@ define([
         checkJobStatus(generatedCsvId);
 
         // Then poll every 10 seconds
-        pollingIntervals[generatedCsvId] = setInterval(function() {
+        pollingIntervals[generatedCsvId] = setInterval(function () {
             checkJobStatus(generatedCsvId);
         }, 10000); // 10 seconds
     }
 
     /**
      * Stop polling for a specific generated CSV record
-     * 
+     *
      * @param {number} generatedCsvId
      */
-    function stopPolling(generatedCsvId) {
+    function stopPolling(generatedCsvId)
+    {
         if (pollingIntervals[generatedCsvId]) {
             clearInterval(pollingIntervals[generatedCsvId]);
             delete pollingIntervals[generatedCsvId];
@@ -50,10 +52,11 @@ define([
 
     /**
      * Check job status via AJAX
-     * 
+     *
      * @param {number} generatedCsvId
      */
-    function checkJobStatus(generatedCsvId) {
+    function checkJobStatus(generatedCsvId)
+    {
         if (!pollUrl || !formKey) {
             return;
         }
@@ -67,7 +70,7 @@ define([
             },
             dataType: 'json',
             showLoader: false, // Don't show loader for background polling
-            success: function(response) {
+            success: function (response) {
                 if (response.success) {
                     // If status is completed, refresh grid and stop polling
                     if (response.status === 'completed') {
@@ -75,7 +78,7 @@ define([
                         
                         // Refresh grid when status becomes completed
                         // Use a small delay to ensure database is updated
-                        setTimeout(function() {
+                        setTimeout(function () {
                             if (!hasRefreshed[generatedCsvId]) {
                                 hasRefreshed[generatedCsvId] = true;
                                 refreshGrid();
@@ -84,7 +87,7 @@ define([
                     } else if (response.status === 'failed') {
                         stopPolling(generatedCsvId);
                         // Refresh grid to show failed status
-                        setTimeout(function() {
+                        setTimeout(function () {
                             refreshGrid();
                         }, 1000);
                     }
@@ -93,7 +96,7 @@ define([
                     // Stop polling on error only after multiple failures
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 // Don't stop polling on transient errors
                 // Log error but continue polling
             }
@@ -103,7 +106,8 @@ define([
     /**
      * Refresh the grid once
      */
-    function refreshGrid() {
+    function refreshGrid()
+    {
         try {
             var listingProvider = registry.get(
                 'squadkin_squadexaai_generatedcsv_listing.squadkin_squadexaai_generatedcsv_listing_data_source'
@@ -122,14 +126,14 @@ define([
                     });
                 } else {
                     // Fallback: reload page after delay
-                    setTimeout(function() {
+                    setTimeout(function () {
                         window.location.reload();
                     }, 1000);
                 }
             }
         } catch (e) {
             // Fallback to page reload
-            setTimeout(function() {
+            setTimeout(function () {
                 window.location.reload();
             }, 1000);
         }
@@ -138,8 +142,10 @@ define([
     /**
      * Initialize polling for all pending jobs
      */
-    function initializePolling() {
-        function checkGridForPendingJobs() {
+    function initializePolling()
+    {
+        function checkGridForPendingJobs()
+        {
             try {
                 // Try to get listing provider
                 var listingProvider = registry.get(
@@ -148,13 +154,13 @@ define([
                 
                 if (listingProvider) {
                     // Try different ways to access rows
-                    var rows = listingProvider.rows || 
+                    var rows = listingProvider.rows ||
                               (listingProvider.data && listingProvider.data.items) ||
                               (listingProvider.data && listingProvider.data) ||
                               [];
                     
                     if (Array.isArray(rows) && rows.length > 0) {
-                        rows.forEach(function(row) {
+                        rows.forEach(function (row) {
                             var csvId = row.generatedcsv_id || row['generatedcsv_id'];
                             var jobId = row.job_id || row['job_id'];
                             var responseFile = row.response_file_name || row['response_file_name'];
@@ -162,7 +168,7 @@ define([
                             
                             // Start polling if job_id exists but file is not ready
                             // Also poll if status is completed but file not yet downloaded (file might be processing)
-                            if (csvId && jobId && !responseFile && 
+                            if (csvId && jobId && !responseFile &&
                                 (status === 'pending' || status === 'processing' || status === 'in_progress' || status === '' || status === 'completed')) {
                                 // Only start polling if not already polling
                                 if (!pollingIntervals[csvId]) {
@@ -185,9 +191,9 @@ define([
         setTimeout(checkGridForPendingJobs, 5000);
         
         // Listen for grid reloads
-        registry.get('squadkin_squadexaai_generatedcsv_listing', function(component) {
+        registry.get('squadkin_squadexaai_generatedcsv_listing', function (component) {
             if (component && component.source) {
-                component.source.on('reloaded', function() {
+                component.source.on('reloaded', function () {
                     setTimeout(checkGridForPendingJobs, 500);
                 });
             }
@@ -202,14 +208,14 @@ define([
         }
 
         // Initialize when DOM is ready
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Wait a bit for Magento UI components to initialize
             setTimeout(initializePolling, 1000);
         });
 
         // Cleanup on page unload
-        $(window).on('beforeunload', function() {
-            Object.keys(pollingIntervals).forEach(function(csvId) {
+        $(window).on('beforeunload', function () {
+            Object.keys(pollingIntervals).forEach(function (csvId) {
                 stopPolling(csvId);
             });
         });

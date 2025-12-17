@@ -109,7 +109,9 @@ class ProductSaveAfter implements ObserverInterface
                             'data' => $postData['product']['general']
                         ];
                     }
-                    if (isset($postData['product']['product']['general']) && is_array($postData['product']['product']['general'])) {
+                    if (isset($postData['product']['product']['general']) &&
+                        is_array($postData['product']['product']['general'])
+                    ) {
                         $generalCandidates[] = [
                             'path' => 'product.product.general',
                             'data' => $postData['product']['product']['general']
@@ -162,6 +164,8 @@ class ProductSaveAfter implements ObserverInterface
             $existingMagentoProductId = $aiProduct->getMagentoProductId();
             if ($existingMagentoProductId && (int)$existingMagentoProductId !== $magentoProductId) {
                 // Update anyway - the new product takes precedence
+                $this->logger->info('ProductSaveAfter: AI product re-linked from ' .
+                    $existingMagentoProductId . ' to ' . $magentoProductId);
             }
 
             // Update AI product record

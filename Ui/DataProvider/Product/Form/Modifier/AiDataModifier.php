@@ -70,7 +70,7 @@ class AiDataModifier extends AbstractModifier
     public const AI_PRODUCT_ID_KEY = 'ai_product_id';
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function modifyData(array $data)
     {
@@ -95,7 +95,8 @@ class AiDataModifier extends AbstractModifier
                 $productId = $product->getId();
                 
                 // For new products, Magento uses the product object's internal ID or 'new'
-                // The Eav modifier expects data in format: [product_id => [static::DATA_SOURCE_DEFAULT => [attributes]]]
+                // The Eav modifier expects data in format:
+                // [product_id => [static::DATA_SOURCE_DEFAULT => [attributes]]]
                 $formDataKey = $productId ?: 'new';
                 
                 // Initialize data structure if needed
@@ -126,7 +127,7 @@ class AiDataModifier extends AbstractModifier
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function modifyMeta(array $meta)
     {

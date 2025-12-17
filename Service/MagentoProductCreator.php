@@ -91,9 +91,9 @@ class MagentoProductCreator
                 try {
                     $existingProduct = $this->productRepository->getById($aiProduct->getMagentoProductId());
                     return $this->updateExistingProduct($existingProduct, $aiProduct);
-                } catch (\Exception $e) {
-                    // Product doesn't exist, create new one
-                    // phpcs:ignore MEQP2.Exceptions.EmptyCatch
+                } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+                    // Product doesn't exist, create new one.
+                    $this->logger->debug('Product not found for update, creating new one: ' . $e->getMessage());
                 }
             }
 

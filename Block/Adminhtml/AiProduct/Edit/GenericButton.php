@@ -24,15 +24,23 @@ class GenericButton
     protected $aiProductRepository;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @param Context $context
      * @param AiProductRepositoryInterface $aiProductRepository
+     * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(
         Context $context,
-        AiProductRepositoryInterface $aiProductRepository
+        AiProductRepositoryInterface $aiProductRepository,
+        \Psr\Log\LoggerInterface $logger
     ) {
         $this->context = $context;
         $this->aiProductRepository = $aiProductRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -47,6 +55,7 @@ class GenericButton
                 $this->context->getRequest()->getParam('aiproduct_id')
             )->getAiproductId();
         } catch (NoSuchEntityException $e) {
+            $this->logger->debug('AI Product ID not found: ' . $e->getMessage());
             return null;
         }
     }
@@ -77,7 +86,7 @@ class GenericButton
                 return (bool)$aiProduct->getIsCreatedInMagento();
             }
         } catch (NoSuchEntityException $e) {
-            // Product not found, return false
+            $this->logger->debug('Error checking if AI product is created in Magento: ' . $e->getMessage());
         }
         return false;
     }

@@ -45,8 +45,7 @@ class GeneratedCsvRepository implements GeneratedCsvRepositoryInterface
      * @var GeneratedCsvInterfaceFactory
      */
     protected $generatedCsvFactory;
-
-
+    
     /**
      * @param ResourceGeneratedCsv $resource
      * @param GeneratedCsvInterfaceFactory $generatedCsvFactory

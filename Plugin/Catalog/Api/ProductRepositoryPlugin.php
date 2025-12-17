@@ -61,65 +61,95 @@ class ProductRepositoryPlugin
 
         // Only for new products (no ID or ID is 0)
         if (!$productId || $productId == 0) {
-            $existingAiProductId = $product->getData(self::AI_PRODUCT_ID_KEY);
+            $this->processAiProductId($product);
+        }
+        return [$product, $saveOptions];
+    }
 
-            // Check if AI product ID is already in product data
-            if (!$existingAiProductId) {
-                $aiProductId = null;
+    /**
+     * Process AI product ID for new products
+     *
+     * @param ProductInterface $product
+     * @return void
+     */
+    private function processAiProductId(ProductInterface $product)
+    {
+        $existingAiProductId = $product->getData(self::AI_PRODUCT_ID_KEY);
 
-                // Try to get from request URL parameter
-                $urlParam = $this->request->getParam('ai_data');
-                $aiProductId = $urlParam ?: null;
+        // Check if AI product ID is already in product data
+        if (!$existingAiProductId) {
+            $aiProductId = $this->getAiProductIdFromRequest();
 
-                // Check POST data (UI component forms use nested structure)
-                if (!$aiProductId && $this->request->isPost()) {
-                    $postData = $this->request->getPostValue();
-
-                    // Check direct POST keys
-                    $aiProductId = $postData['ai_data'] ?? $postData[self::AI_PRODUCT_ID_KEY] ?? null;
-
-                    // Check nested in 'product' array
-                    if (!$aiProductId && isset($postData['product'])) {
-                        $productData = $postData['product'];
-                        $aiProductId = $productData['ai_data'] ?? $productData[self::AI_PRODUCT_ID_KEY] ?? null;
-
-                        if (!$aiProductId && isset($productData['product'])) {
-                            $nestedProduct = $productData['product'];
-                            $aiProductId = $nestedProduct['ai_data'] ?? $nestedProduct[self::AI_PRODUCT_ID_KEY] ?? null;
-                        }
-
-                        // Check in all possible general sections
-                        if (!$aiProductId) {
-                            $generalCandidates = [];
-                            if (isset($productData['general']) && is_array($productData['general'])) {
-                                $generalCandidates[] = $productData['general'];
-                            }
-                            if (isset($productData['product']['general']) && is_array($productData['product']['general'])) {
-                                $generalCandidates[] = $productData['product']['general'];
-                            }
-
-                            foreach ($generalCandidates as $generalData) {
-                                $aiProductId = $generalData['ai_data'] ?? $generalData[self::AI_PRODUCT_ID_KEY] ?? null;
-                                if ($aiProductId) {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if ($aiProductId) {
-                    $aiProductId = (int)$aiProductId;
-                    if ($aiProductId > 0) {
-                        $product->setData(self::AI_PRODUCT_ID_KEY, $aiProductId);
-                    } else {
-                        $this->logger->warning('ProductRepositoryPlugin: Invalid AI product ID detected before save', [
-                            'ai_product_id' => $aiProductId
-                        ]);
-                    }
+            if ($aiProductId) {
+                if ($aiProductId > 0) {
+                    $product->setData(self::AI_PRODUCT_ID_KEY, $aiProductId);
+                } else {
+                    $this->logger->warning(
+                        'ProductRepositoryPlugin: Invalid AI product ID detected before save',
+                        ['ai_product_id' => $aiProductId]
+                    );
                 }
             }
         }
-        return [$product, $saveOptions];
+    }
+
+    /**
+     * Get AI Product ID from request
+     *
+     * @return int|null
+     */
+    private function getAiProductIdFromRequest()
+    {
+        $aiProductId = null;
+        
+        // Method 1: Check URL parameters
+        $urlParam = $this->request->getParam('ai_data');
+        if ($urlParam) {
+            return (int)$urlParam;
+        }
+
+        // Method 2: Check POST data
+        if ($this->request->isPost()) {
+            $postData = $this->request->getPostValue();
+            
+            // Check direct POST keys
+            $aiProductId = $postData['ai_data'] ?? $postData[self::AI_PRODUCT_ID_KEY] ?? null;
+            
+            if (!$aiProductId && isset($postData['product'])) {
+                $productData = $postData['product'];
+                $aiProductId = $productData['ai_data'] ?? $productData[self::AI_PRODUCT_ID_KEY] ?? null;
+                
+                if (!$aiProductId) {
+                    $aiProductId = $this->findAiIdInGeneral($productData);
+                }
+            }
+        }
+
+        return $aiProductId ? (int)$aiProductId : null;
+    }
+
+    /**
+     * Find AI ID in general sections
+     *
+     * @param array $productData
+     * @return mixed|null
+     */
+    private function findAiIdInGeneral(array $productData)
+    {
+        $generalCandidates = [];
+        if (isset($productData['general']) && is_array($productData['general'])) {
+            $generalCandidates[] = $productData['general'];
+        }
+        if (isset($productData['product']['general']) && is_array($productData['product']['general'])) {
+            $generalCandidates[] = $productData['product']['general'];
+        }
+        
+        foreach ($generalCandidates as $generalData) {
+            $aiProductId = $generalData['ai_data'] ?? $generalData[self::AI_PRODUCT_ID_KEY] ?? null;
+            if ($aiProductId) {
+                return $aiProductId;
+            }
+        }
+        return null;
     }
 }

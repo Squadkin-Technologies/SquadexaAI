@@ -21,6 +21,8 @@ use Squadkin\SquadexaAI\Api\GeneratedCsvRepositoryInterface;
 use Squadkin\SquadexaAI\Api\AiProductRepositoryInterface;
 use Squadkin\SquadexaAI\Model\Config\Source\ImportStatus;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Stdlib\DateTime\DateTime;
+use Magento\Framework\Filesystem\Driver\File;
 
 class MagentoImportService
 {
@@ -65,6 +67,16 @@ class MagentoImportService
     private $searchCriteriaBuilder;
 
     /**
+     * @var DateTime
+     */
+    private $dateTime;
+
+    /**
+     * @var File
+     */
+    private $fileDriver;
+
+    /**
      * MagentoImportService constructor.
      *
      * @param ImportFactory $importFactory
@@ -75,6 +87,8 @@ class MagentoImportService
      * @param GeneratedCsvRepositoryInterface $generatedCsvRepository
      * @param AiProductRepositoryInterface $aiProductRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param DateTime $dateTime
+     * @param File $fileDriver
      */
     public function __construct(
         ImportFactory $importFactory,
@@ -84,7 +98,9 @@ class MagentoImportService
         LoggerInterface $logger,
         GeneratedCsvRepositoryInterface $generatedCsvRepository,
         AiProductRepositoryInterface $aiProductRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        DateTime $dateTime,
+        File $fileDriver
     ) {
         $this->importFactory = $importFactory;
         $this->csvSourceFactory = $csvSourceFactory;
@@ -94,6 +110,8 @@ class MagentoImportService
         $this->generatedCsvRepository = $generatedCsvRepository;
         $this->aiProductRepository = $aiProductRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->dateTime = $dateTime;
+        $this->fileDriver = $fileDriver;
     }
 
     /**
@@ -104,8 +122,10 @@ class MagentoImportService
      * @return array
      * @throws LocalizedException
      */
-    public function importProductsFromGeneratedCsv(GeneratedCsvInterface $generatedCsv, array $importOptions = []): array
-    {
+    public function importProductsFromGeneratedCsv(
+        GeneratedCsvInterface $generatedCsv,
+        array $importOptions = []
+    ): array {
         // Update status to processing
         $generatedCsv->setImportStatus(ImportStatus::STATUS_PROCESSING);
         $this->generatedCsvRepository->save($generatedCsv);
@@ -154,7 +174,7 @@ class MagentoImportService
                 $generatedCsv->setImportStatus(ImportStatus::STATUS_COMPLETED);
                 $generatedCsv->setImportedProductsCount($importResult['imported_count']);
                 $generatedCsv->setTotalProductsCount($importResult['total_count']);
-                $generatedCsv->setImportedAt(date('Y-m-d H:i:s'));
+                $generatedCsv->setImportedAt($this->dateTime->date('Y-m-d H:i:s'));
                 $generatedCsv->setImportErrorMessage(null);
                 
                 // Update AI products as imported
@@ -217,8 +237,8 @@ class MagentoImportService
         if (!$varDirectory->isExist($importDir)) {
             $varDirectory->create($importDir);
         }
-        
-        $fileName = 'import_csv_' . $csvId . '_' . date('Y-m-d_H-i-s') . '.csv';
+
+        $fileName = 'import_csv_' . $csvId . '_' . $this->dateTime->date('Y-m-d_H-i-s') . '.csv';
         $filePath = $importDir . '/' . $fileName;
         
         // Define Magento product import headers
@@ -296,8 +316,9 @@ class MagentoImportService
                 $aiProduct->getMetaKeywords(),
                 $aiProduct->getMetaDescription(),
                 $aiProduct->getUrlKey(),
-                date('Y-m-d H:i:s'), // created_at
-                date('Y-m-d H:i:s'), // updated_at
+                $aiProduct->getUrlKey(),
+                $this->dateTime->date('Y-m-d H:i:s'), // created_at
+                $this->dateTime->date('Y-m-d H:i:s'), // updated_at
                 '', // new_from_date
                 ''  // new_to_date
             ];
@@ -436,10 +457,8 @@ class MagentoImportService
     private function cleanupImportFile(string $filePath): void
     {
         try {
-            // phpcs:ignore Magento2.Functions.DiscouragedFunction
-            if (file_exists($filePath)) { // phpcs:ignore
-                // phpcs:ignore Magento2.Functions.DiscouragedFunction
-                unlink($filePath); // phpcs:ignore
+            if ($this->fileDriver->isExists($filePath)) {
+                $this->fileDriver->deleteFile($filePath);
             }
         } catch (\Exception $e) {
             $this->logger->warning('Unable to cleanup import file: ' . $e->getMessage());

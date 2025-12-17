@@ -21,19 +21,6 @@ class ImportModal extends Template
     private $generatedCsv;
 
     /**
-     * ImportModal constructor.
-     *
-     * @param Context $context
-     * @param array $data
-     */
-    public function __construct(
-        Context $context,
-        array $data = []
-    ) {
-        parent::__construct($context, $data);
-    }
-
-    /**
      * Set generated CSV data
      *
      * @param GeneratedCsvInterface $generatedCsv

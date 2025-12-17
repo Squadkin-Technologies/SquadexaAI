@@ -42,6 +42,11 @@ class DataProvider extends AbstractDataProvider
     private $request;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -50,6 +55,7 @@ class DataProvider extends AbstractDataProvider
      * @param CustomAttributeProcessor $customAttributeProcessor
      * @param Json $jsonSerializer
      * @param RequestInterface $request
+     * @param \Psr\Log\LoggerInterface $logger
      * @param array $meta
      * @param array $data
      */
@@ -62,6 +68,7 @@ class DataProvider extends AbstractDataProvider
         CustomAttributeProcessor $customAttributeProcessor,
         Json $jsonSerializer,
         RequestInterface $request,
+        \Psr\Log\LoggerInterface $logger,
         array $meta = [],
         array $data = []
     ) {
@@ -70,6 +77,7 @@ class DataProvider extends AbstractDataProvider
         $this->customAttributeProcessor = $customAttributeProcessor;
         $this->jsonSerializer = $jsonSerializer;
         $this->request = $request;
+        $this->logger = $logger;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
@@ -88,27 +96,7 @@ class DataProvider extends AbstractDataProvider
         foreach ($items as $model) {
             $data = $model->getData();
             
-            // Process JSON fields - convert JSON strings to readable format for form display
-            $jsonFields = ['key_features', 'how_to_use', 'ingredients', 'keywords'];
-            foreach ($jsonFields as $field) {
-                if (isset($data[$field]) && !empty($data[$field])) {
-                    try {
-                        // Try to decode JSON, if successful convert array to readable format
-                        $decoded = $this->jsonSerializer->unserialize($data[$field]);
-                        if (is_array($decoded)) {
-                            // For keywords, use comma-separated; for others, use newline-separated
-                            if ($field === 'keywords') {
-                                $data[$field] = implode(', ', $decoded);
-                            } else {
-                                $data[$field] = implode("\n", $decoded);
-                            }
-                        }
-                    } catch (\Exception $e) {
-                        // If JSON decode fails, keep the original value (might be plain text)
-                        // This handles cases where data might not be JSON
-                    }
-                }
-            }
+            $this->processJsonFields($data);
             
             // Process custom attributes for form display
             $customAttributes = $model->getCustomAttributes();
@@ -131,6 +119,37 @@ class DataProvider extends AbstractDataProvider
     }
 
     /**
+     * Process JSON fields in data array
+     *
+     * @param array &$data
+     * @return void
+     */
+    private function processJsonFields(array &$data)
+    {
+        // Process JSON fields - convert JSON strings to readable format for form display
+        $jsonFields = ['key_features', 'how_to_use', 'ingredients', 'keywords'];
+        foreach ($jsonFields as $field) {
+            if (isset($data[$field]) && !empty($data[$field])) {
+                try {
+                    // Try to decode JSON, if successful convert array to readable format
+                    $decoded = $this->jsonSerializer->unserialize($data[$field]);
+                    if (is_array($decoded)) {
+                        // For keywords, use comma-separated; for others, use newline-separated
+                        if ($field === 'keywords') {
+                            $data[$field] = implode(', ', $decoded);
+                        } else {
+                            $data[$field] = implode("\n", $decoded);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    // If JSON decode fails, keep the original value (might be plain text)
+                    $this->logger->debug('Error decoding JSON for field ' . $field . ': ' . $e->getMessage());
+                }
+            }
+        }
+    }
+
+    /**
      * Get meta
      *
      * @return array
@@ -139,29 +158,39 @@ class DataProvider extends AbstractDataProvider
     {
         $meta = parent::getMeta();
         
-        // Check if current product is created in Magento
         $aiproductId = $this->request->getParam('aiproduct_id');
         
         if ($aiproductId) {
             $item = $this->collection->getItemById($aiproductId);
             if ($item && $item->getIsCreatedInMagento()) {
-                // Product is created in Magento - make all fields read-only
-                $fieldsets = ['general', 'seo', 'product_details', 'pricing'];
-                
-                foreach ($fieldsets as $fieldset) {
-                    if (isset($meta[$fieldset]['children'])) {
-                        foreach ($meta[$fieldset]['children'] as $fieldName => &$fieldConfig) {
-                            if (isset($fieldConfig['arguments']['data']['config'])) {
-                                $fieldConfig['arguments']['data']['config']['disabled'] = true;
-                                $fieldConfig['arguments']['data']['config']['readonly'] = true;
-                            }
-                        }
-                    }
-                }
+                $this->makeFieldsReadOnly($meta);
             }
         }
         
         return $meta;
+    }
+
+    /**
+     * Make form fields read-only
+     *
+     * @param array &$meta
+     * @return void
+     */
+    private function makeFieldsReadOnly(array &$meta)
+    {
+        // Product is created in Magento - make all fields read-only
+        $fieldsets = ['general', 'seo', 'product_details', 'pricing'];
+        
+        foreach ($fieldsets as $fieldset) {
+            if (isset($meta[$fieldset]['children'])) {
+                foreach ($meta[$fieldset]['children'] as $fieldName => &$fieldConfig) {
+                    if (isset($fieldConfig['arguments']['data']['config'])) {
+                        $fieldConfig['arguments']['data']['config']['disabled'] = true;
+                        $fieldConfig['arguments']['data']['config']['readonly'] = true;
+                    }
+                }
+            }
+        }
     }
 
     /**
