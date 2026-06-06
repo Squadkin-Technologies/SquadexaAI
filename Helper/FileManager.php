@@ -672,27 +672,27 @@ class FileManager extends AbstractHelper
                     $aiProduct->setKeywords($keywords);
                 }
                 
-                // Extract pricing information
+                // Extract pricing information (API returns strings; store as-is for decimal columns)
                 if (isset($productData['pricing']) && is_array($productData['pricing'])) {
                     $pricing = $productData['pricing'];
-                    
+
                     // USD pricing
                     if (isset($pricing['USD']) && is_array($pricing['USD'])) {
-                        if (isset($pricing['USD']['min_price'])) {
-                            $aiProduct->setPricingUsdMin((float)$pricing['USD']['min_price']);
+                        if (isset($pricing['USD']['min_price']) && $pricing['USD']['min_price'] !== '') {
+                            $aiProduct->setPricingUsdMin($pricing['USD']['min_price']);
                         }
-                        if (isset($pricing['USD']['max_price'])) {
-                            $aiProduct->setPricingUsdMax((float)$pricing['USD']['max_price']);
+                        if (isset($pricing['USD']['max_price']) && $pricing['USD']['max_price'] !== '') {
+                            $aiProduct->setPricingUsdMax($pricing['USD']['max_price']);
                         }
                     }
-                    
+
                     // CAD pricing
                     if (isset($pricing['CAD']) && is_array($pricing['CAD'])) {
-                        if (isset($pricing['CAD']['min_price'])) {
-                            $aiProduct->setPricingCadMin((float)$pricing['CAD']['min_price']);
+                        if (isset($pricing['CAD']['min_price']) && $pricing['CAD']['min_price'] !== '') {
+                            $aiProduct->setPricingCadMin($pricing['CAD']['min_price']);
                         }
-                        if (isset($pricing['CAD']['max_price'])) {
-                            $aiProduct->setPricingCadMax((float)$pricing['CAD']['max_price']);
+                        if (isset($pricing['CAD']['max_price']) && $pricing['CAD']['max_price'] !== '') {
+                            $aiProduct->setPricingCadMax($pricing['CAD']['max_price']);
                         }
                     }
                 }
@@ -713,6 +713,14 @@ class FileManager extends AbstractHelper
                         !in_array($key, $excludedKeys) &&
                         $value !== null && $value !== '') {
                         $additionalData[$key] = $value;
+                    }
+                }
+
+                // Ensure new nullable API fields are preserved in additional_information
+                $newApiFields = ['schema_org_markup', 'seo_score', 'keyword_suggestions', 'enhanced_meta'];
+                foreach ($newApiFields as $field) {
+                    if (isset($productData[$field]) && $productData[$field] !== null && $productData[$field] !== '') {
+                        $additionalData[$field] = $productData[$field];
                     }
                 }
                 

@@ -45,14 +45,14 @@ class SquadexaApiService
         // Product generation endpoints (Core functionality)
         'product_details' => '/api/v1/product-details',
         'batch_jobs' => '/api/v1/batch-jobs',
+        'batch_jobs_estimate' => '/api/v1/batch-jobs/estimate',
         'job_status' => '/api/v1/job-status',
         'job_download' => '/api/v1/job-download',
 
-        // Billing endpoints
-        'billing_plans' => '/api/v1/billing/plans',
-        'billing_subscription' => '/api/v1/billing/subscription',
-        'billing_history' => '/api/v1/billing/history',
-        'billing_config' => '/api/v1/billing/config'
+        // AI Tools
+        'ai_humanizer' => '/api/v1/ai-humanizer',
+        'ai_detector' => '/api/v1/ai-detector',
+        'plagiarism_checker' => '/api/v1/plagiarism-checker/check'
     ];
 
     /**
@@ -101,6 +101,11 @@ class SquadexaApiService
     private $ioFile;
 
     /**
+     * @var array Stores credit info from last API response
+     */
+    private $lastCreditInfo = [];
+
+    /**
      * @param ScopeConfigInterface $scopeConfig
      * @param Curl $curl
      * @param Json $jsonSerializer
@@ -141,6 +146,41 @@ class SquadexaApiService
     public function getApiBaseUrl(): string
     {
         return self::API_BASE_URL;
+    }
+
+    /**
+     * Get credit info from the last API response
+     *
+     * @return array
+     */
+    public function getLastCreditInfo(): array
+    {
+        return $this->lastCreditInfo;
+    }
+
+    /**
+     * Parse and store credit headers from Curl response
+     *
+     * @return void
+     */
+    private function storeCreditHeaders(): void
+    {
+        $this->lastCreditInfo = [];
+        $headers = $this->curl->getHeaders();
+        if (!is_array($headers)) {
+            return;
+        }
+        foreach ($headers as $header) {
+            if (stripos($header, 'X-Credits-Remaining:') === 0) {
+                $this->lastCreditInfo['credits_remaining'] = (int) trim(substr($header, 20));
+            }
+            if (stripos($header, 'X-Credits-Used:') === 0) {
+                $this->lastCreditInfo['credits_used'] = (int) trim(substr($header, 15));
+            }
+        }
+        if (!empty($this->lastCreditInfo)) {
+            $this->squadexaLogger->logCreditUsage('Credit headers received', $this->lastCreditInfo);
+        }
     }
 
     /**
@@ -565,6 +605,54 @@ class SquadexaApiService
     }
 
     /**
+     * Estimate batch job cost (requires API key)
+     *
+     * @param array $estimateData
+     * @return array
+     * @throws LocalizedException
+     */
+    public function estimateBatchJob(array $estimateData): array
+    {
+        return $this->makeApiRequestWithApiKey(self::API_ENDPOINTS['batch_jobs_estimate'], 'POST', $estimateData);
+    }
+
+    /**
+     * Humanize text (requires API key)
+     *
+     * @param string $text
+     * @return array
+     * @throws LocalizedException
+     */
+    public function humanizeText(string $text): array
+    {
+        return $this->makeApiRequestWithApiKey(self::API_ENDPOINTS['ai_humanizer'], 'POST', ['text' => $text]);
+    }
+
+    /**
+     * Detect AI-generated text (requires API key)
+     *
+     * @param string $text
+     * @return array
+     * @throws LocalizedException
+     */
+    public function detectAiText(string $text): array
+    {
+        return $this->makeApiRequestWithApiKey(self::API_ENDPOINTS['ai_detector'], 'POST', ['text' => $text]);
+    }
+
+    /**
+     * Check plagiarism (requires API key, free)
+     *
+     * @param string $text
+     * @return array
+     * @throws LocalizedException
+     */
+    public function checkPlagiarism(string $text): array
+    {
+        return $this->makeApiRequestWithApiKey(self::API_ENDPOINTS['plagiarism_checker'], 'POST', ['text' => $text]);
+    }
+
+    /**
      * Get billing subscription (requires API key)
      *
      * @return array
@@ -892,7 +980,10 @@ class SquadexaApiService
 
             $responseCode = $this->curl->getStatus();
             $responseBody = $this->curl->getBody();
-            
+
+            // Store credit headers from every response
+            $this->storeCreditHeaders();
+
             if ($responseCode == 301 || $responseCode == 302) {
                 $headers = $this->curl->getHeaders();
                 $location = null;
@@ -1147,7 +1238,9 @@ class SquadexaApiService
     }
 
     /**
-     * Extract subscription plan information
+     * Extract subscription / credit plan information
+     *
+     * New backend uses wallet credits instead of per-call limits.
      *
      * @param array $userProfile
      * @param array $usageStats
@@ -1157,24 +1250,47 @@ class SquadexaApiService
     {
         $plan = [
             'name' => 'FREE',
-            'calls_limit' => 5,
-            'calls_remaining' => 5,
+            'credits_remaining' => 0,
+            'credits_used' => 0,
             'period' => 'month'
         ];
 
-        // Extract from usage stats if available
-        if (isset($usageStats['plan'])) {
+        // Extract credit balance from nested API response structure
+        if (isset($usageStats['credits']['credit_balance'])) {
+            $plan['credits_remaining'] = (int) $usageStats['credits']['credit_balance'];
+        }
+
+        // Prefer new credit-based fields from usage stats (top level)
+        if (isset($usageStats['credits_remaining'])) {
+            $plan['credits_remaining'] = (int) $usageStats['credits_remaining'];
+        }
+        if (isset($usageStats['credits_used'])) {
+            $plan['credits_used'] = (int) $usageStats['credits_used'];
+        }
+
+        // Fallback to old calls_remaining / calls_limit for backward compatibility
+        if (!isset($usageStats['credits_remaining']) && isset($usageStats['calls_remaining'])) {
+            $plan['calls_remaining'] = (int) $usageStats['calls_remaining'];
+            $plan['calls_limit'] = (int) ($usageStats['calls_limit'] ?? 0);
+        }
+
+        // Extract from usage stats plan object if present
+        if (isset($usageStats['plan']) && is_array($usageStats['plan'])) {
             $plan = array_merge($plan, $usageStats['plan']);
         }
 
-        // Extract from user profile if available
-        if (isset($userProfile['subscription'])) {
+        // Extract from user profile subscription if present
+        if (isset($userProfile['subscription']) && is_array($userProfile['subscription'])) {
             $plan = array_merge($plan, $userProfile['subscription']);
         }
 
-        // Calculate remaining calls
-        if (isset($usageStats['calls_used']) && isset($plan['calls_limit'])) {
-            $plan['calls_remaining'] = max(0, $plan['calls_limit'] - $usageStats['calls_used']);
+        // Merge last credit headers if available (most accurate real-time data)
+        $lastCredit = $this->getLastCreditInfo();
+        if (isset($lastCredit['credits_remaining'])) {
+            $plan['credits_remaining'] = $lastCredit['credits_remaining'];
+        }
+        if (isset($lastCredit['credits_used'])) {
+            $plan['credits_used'] = $lastCredit['credits_used'];
         }
 
         return $plan;
@@ -1192,6 +1308,37 @@ class SquadexaApiService
         try {
             $response = $this->jsonSerializer->unserialize($responseBody);
             if (is_array($response)) {
+                // Handle 402 insufficient_credits with rich details
+                if ($statusCode === 402 && isset($response['error']) && $response['error'] === 'insufficient_credits') {
+                    $message = $response['message'] ?? __('Insufficient credits.');
+                    $creditsRemaining = $response['credits_remaining'] ?? 0;
+                    $creditsNeeded = $response['credits_needed'] ?? 0;
+                    $ctaLink = $response['cta_link'] ?? '';
+                    $ctaText = $response['cta_text'] ?? __('Top Up Credits');
+
+                    $richMessage = $message;
+                    if ($creditsNeeded > 0) {
+                        $richMessage .= ' ' . __(
+                            'You have %1 credits remaining but need %2.',
+                            $creditsRemaining,
+                            $creditsNeeded
+                        );
+                    }
+                    if ($ctaLink) {
+                        $richMessage .= ' [' . $ctaText . ': ' . $ctaLink . ']';
+                    }
+                    return $richMessage;
+                }
+
+                // Handle 401 EMAIL_NOT_VERIFIED
+                if ($statusCode === 401 && isset($response['error_code']) &&
+                    $response['error_code'] === 'EMAIL_NOT_VERIFIED') {
+                    return __(
+                        'Your email address is not verified. Please check your inbox '
+                        . 'and verify your email before logging in.'
+                    );
+                }
+
                 if (isset($response['message'])) {
                     return is_string($response['message']) ? $response['message'] : (string)$response['message'];
                 }
@@ -1203,6 +1350,9 @@ class SquadexaApiService
                 }
                 if (isset($response['errors']) && is_array($response['errors'])) {
                     return implode(', ', array_filter($response['errors'], 'is_string'));
+                }
+                if (isset($response['detail'])) {
+                    return is_string($response['detail']) ? $response['detail'] : (string)$response['detail'];
                 }
             }
         } catch (\Exception $e) {
@@ -1217,64 +1367,49 @@ class SquadexaApiService
         switch ($statusCode) {
             case 401:
                 return 'Unauthorized - Invalid API key';
+            case 402:
+                return 'Payment Required - Insufficient credits. Please top up your wallet.';
             case 403:
                 return 'Forbidden - API key does not have required permissions';
             case 404:
                 return 'Not Found - API endpoint not found';
-            case 429:
-                return 'Too Many Requests - Rate limit exceeded';
             case 500:
                 return 'Internal Server Error';
+            case 503:
+                return 'Service Unavailable - Please try again later';
             default:
                 return "HTTP Error {$statusCode}";
         }
     }
 
-    // ==========================================
-    // BILLING & SUBSCRIPTION METHODS
-    // ==========================================
-
     /**
-     * Get available subscription plans (no auth required)
+     * Validate API key format (must start with pk_)
      *
-     * @return array
-     * @throws LocalizedException
+     * @param string $apiKey
+     * @return bool
      */
-    public function getBillingPlans(): array
+    public function validateApiKeyFormat(string $apiKey): bool
     {
-        return $this->makeApiRequestWithoutAuth(self::API_ENDPOINTS['billing_plans'], 'GET');
+        return !empty($apiKey) && strpos($apiKey, 'pk_') === 0;
     }
 
     /**
-     * Get current subscription details
+     * Extract insufficient credits info from a 402 response
      *
+     * @param array $response
      * @return array
-     * @throws LocalizedException
      */
-    public function getCurrentSubscription(): array
+    public function getInsufficientCreditsInfo(array $response): array
     {
-        return $this->makeApiRequestWithApiKey(self::API_ENDPOINTS['billing_subscription'], 'GET');
-    }
-
-    /**
-     * Get billing history
-     *
-     * @return array
-     * @throws LocalizedException
-     */
-    public function getBillingHistory(): array
-    {
-        return $this->makeApiRequestWithApiKey(self::API_ENDPOINTS['billing_history'], 'GET');
-    }
-
-    /**
-     * Get billing configuration (no auth required)
-     *
-     * @return array
-     * @throws LocalizedException
-     */
-    public function getBillingConfig(): array
-    {
-        return $this->makeApiRequestWithoutAuth(self::API_ENDPOINTS['billing_config'], 'GET');
+        return [
+            'error' => $response['error'] ?? 'insufficient_credits',
+            'message' => $response['message'] ?? __('Insufficient credits.'),
+            'credits_remaining' => $response['credits_remaining'] ?? 0,
+            'credits_needed' => $response['credits_needed'] ?? 0,
+            'deficit' => $response['deficit'] ?? 0,
+            'cta_text' => $response['cta_text'] ?? __('Top Up Credits'),
+            'cta_link' => $response['cta_link'] ?? '/credits/wallet/topup',
+            'action_required' => $response['action_required'] ?? 'TOPUP_CREDITS'
+        ];
     }
 }

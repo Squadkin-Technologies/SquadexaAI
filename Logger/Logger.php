@@ -119,4 +119,16 @@ class Logger
     {
         $this->logger->warning('[SquadexaAI Warning] ' . $message, $context);
     }
+
+    /**
+     * Log credit usage
+     *
+     * @param string $message
+     * @param array $context
+     * @return void
+     */
+    public function logCreditUsage(string $message, array $context = []): void
+    {
+        $this->logger->info('[SquadexaAI Credits] ' . $message, $context);
+    }
 }

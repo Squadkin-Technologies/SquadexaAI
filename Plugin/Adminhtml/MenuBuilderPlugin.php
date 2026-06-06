@@ -58,11 +58,11 @@ class MenuBuilderPlugin
                             $menu->remove('Squadkin_SquadexaAI::root');
                         }
                     }
-                } catch (\OutOfBoundsException $e) {
+                } catch (\OutOfBoundsException $e) { // @codingStandardsIgnoreLine
                     // Items don't exist, nothing to move
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Exception $e) { // @codingStandardsIgnoreLine
             // Silently fail if menu items don't exist
             // This ensures the plugin doesn't break the menu if structure changes
         }

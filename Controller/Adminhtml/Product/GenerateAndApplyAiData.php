@@ -127,17 +127,18 @@ class GenerateAndApplyAiData extends Action
             }
 
             // Flatten pricing data if it exists (convert nested pricing to flat price field)
+            // API returns pricing values as strings; keep them as strings for safe mapping
             if (isset($apiResponse['pricing']) && is_array($apiResponse['pricing'])) {
                 $pricing = $apiResponse['pricing'];
                 // Use USD min_price as the main price if available
-                if (isset($pricing['USD']['min_price'])) {
-                    $apiResponse['price'] = (float)$pricing['USD']['min_price'];
-                } elseif (isset($pricing['USD']['max_price'])) {
-                    $apiResponse['price'] = (float)$pricing['USD']['max_price'];
-                } elseif (isset($pricing['CAD']['min_price'])) {
-                    $apiResponse['price'] = (float)$pricing['CAD']['min_price'];
-                } elseif (isset($pricing['CAD']['max_price'])) {
-                    $apiResponse['price'] = (float)$pricing['CAD']['max_price'];
+                if (isset($pricing['USD']['min_price']) && $pricing['USD']['min_price'] !== '') {
+                    $apiResponse['price'] = $pricing['USD']['min_price'];
+                } elseif (isset($pricing['USD']['max_price']) && $pricing['USD']['max_price'] !== '') {
+                    $apiResponse['price'] = $pricing['USD']['max_price'];
+                } elseif (isset($pricing['CAD']['min_price']) && $pricing['CAD']['min_price'] !== '') {
+                    $apiResponse['price'] = $pricing['CAD']['min_price'];
+                } elseif (isset($pricing['CAD']['max_price']) && $pricing['CAD']['max_price'] !== '') {
+                    $apiResponse['price'] = $pricing['CAD']['max_price'];
                 }
             }
 

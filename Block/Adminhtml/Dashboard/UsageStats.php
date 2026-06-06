@@ -91,6 +91,16 @@ class UsageStats extends Template
     }
 
     /**
+     * Alias for isAuthenticationConfigured (template compatibility)
+     *
+     * @return bool
+     */
+    public function isApiKeyConfigured(): bool
+    {
+        return $this->isAuthenticationConfigured();
+    }
+
+    /**
      * Get redirect URL for account creation
      *
      * @return string
@@ -108,7 +118,7 @@ class UsageStats extends Template
     public function getFormattedUsageData(): array
     {
         $accountInfo = $this->getAccountInfo();
-        
+
         if (empty($accountInfo) || !$accountInfo['api_key_valid']) {
             return [
                 'error' => true,
@@ -118,18 +128,41 @@ class UsageStats extends Template
 
         $usageStats = $accountInfo['usage_stats'] ?? [];
         $subscriptionPlan = $accountInfo['subscription_plan'] ?? [];
-        
+
+        // New credit-based model (wallet)
+        $creditsRemaining = $subscriptionPlan['credits_remaining'] ?? 0;
+        $creditsUsed = $subscriptionPlan['credits_used'] ?? 0;
+
+        // Backward compatibility: if no credits, fall back to old calls model
+        $hasCreditModel = isset($subscriptionPlan['credits_remaining']) || isset($subscriptionPlan['credits_used']);
+        if (!$hasCreditModel) {
+            $creditsRemaining = $subscriptionPlan['calls_remaining'] ?? 0;
+            $creditsUsed = ($subscriptionPlan['calls_limit'] ?? 0) - $creditsRemaining;
+        }
+
+        $creditsTotal = $creditsRemaining + $creditsUsed;
+
         return [
             'error' => false,
-            'calls_remaining' => $subscriptionPlan['calls_remaining'] ?? 0,
-            'calls_limit' => $subscriptionPlan['calls_limit'] ?? 5,
-            'calls_used' => ($subscriptionPlan['calls_limit'] ?? 5) - ($subscriptionPlan['calls_remaining'] ?? 0),
+            'credits_remaining' => $creditsRemaining,
+            'credits_used' => $creditsUsed,
+            'credits_total' => $creditsTotal,
             'plan_name' => $subscriptionPlan['name'] ?? 'FREE',
             'descriptions_today' => $usageStats['descriptions_today'] ?? 0,
             'ai_humanizer_today' => $usageStats['ai_humanizer_today'] ?? 0,
             'ai_detector_today' => $usageStats['ai_detector_today'] ?? 0,
             'ai_tools_this_week' => $usageStats['ai_tools_this_week'] ?? 0,
-            'total_today' => $usageStats['total_today'] ?? 0
+            'total_today' => $usageStats['total_today'] ?? 0,
+            // Legacy aliases for template compatibility during transition
+            'calls_remaining' => $creditsRemaining,
+            'calls_limit' => $creditsTotal,
+            'calls_used' => $creditsUsed,
+            'api_calls_remaining' => $creditsRemaining,
+            'api_calls_limit' => $creditsTotal,
+            'api_calls' => $creditsUsed,
+            'api_calls_percentage' => $creditsTotal > 0 ? ($creditsUsed / $creditsTotal) * 100 : 0,
+            'words_generated' => $usageStats['words_generated'] ?? 0,
+            'words_percentage' => 0
         ];
     }
 
@@ -141,12 +174,12 @@ class UsageStats extends Template
     public function getUsagePercentage(): float
     {
         $data = $this->getFormattedUsageData();
-        
-        if ($data['error'] || $data['calls_limit'] == 0) {
+
+        if ($data['error'] || $data['credits_total'] == 0) {
             return 0;
         }
-        
-        return ($data['calls_used'] / $data['calls_limit']) * 100;
+
+        return ($data['credits_used'] / $data['credits_total']) * 100;
     }
 
     /**

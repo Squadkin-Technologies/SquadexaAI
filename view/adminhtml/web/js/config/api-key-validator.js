@@ -72,25 +72,26 @@ define([
                 infoHtml += '<h4>📊 Account Information</h4>';
                 infoHtml += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 10px;">';
                 
-                // API Usage
-                var callsRemaining = subscriptionPlan.calls_remaining || 0;
-                var callsLimit = subscriptionPlan.calls_limit || 5;
-                var percentage = callsLimit > 0 ? ((callsLimit - callsRemaining) / callsLimit) * 100 : 0;
-                
+                // Credit Wallet
+                var creditsRemaining = subscriptionPlan.credits_remaining || subscriptionPlan.calls_remaining || 0;
+                var creditsUsed = subscriptionPlan.credits_used || 0;
+                var creditsTotal = creditsRemaining + creditsUsed;
+                var percentage = creditsTotal > 0 ? (creditsUsed / creditsTotal) * 100 : 0;
+
                 infoHtml += '<div style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #dee2e6;">';
-                infoHtml += '<h5>⚡ API Usage</h5>';
+                infoHtml += '<h5>⚡ Credit Wallet</h5>';
                 infoHtml += '<div style="background: #e9ecef; border-radius: 10px; height: 20px; overflow: hidden; margin: 10px 0;">';
                 infoHtml += '<div style="background: linear-gradient(90deg, #28a745, #20c997); height: 100%; width: ' + percentage + '%;"></div>';
                 infoHtml += '</div>';
-                infoHtml += '<p><strong>' + callsRemaining + '/' + callsLimit + '</strong> calls remaining</p>';
+                infoHtml += '<p><strong>' + creditsRemaining + '</strong> credits remaining</p>';
                 infoHtml += '</div>';
-                
+
                 // Current Plan
                 var planName = subscriptionPlan.name || 'FREE';
                 infoHtml += '<div style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #dee2e6;">';
                 infoHtml += '<h5>📊 Current Plan</h5>';
                 infoHtml += '<p><strong>' + planName + '</strong></p>';
-                infoHtml += '<p>' + callsLimit + ' calls/month</p>';
+                infoHtml += '<p>Wallet-based credits</p>';
                 infoHtml += '</div>';
                 
                 // Today's Activity

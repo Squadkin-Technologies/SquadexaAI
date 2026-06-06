@@ -1,5 +1,8 @@
 <?php
 /**
+ * Copyright © 2024 Squadkin. All rights reserved.
+ * See COPYING.txt for license details.
+ *
  * Squadexa AI Product generator block
  */
 declare(strict_types=1);

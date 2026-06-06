@@ -134,9 +134,23 @@ class FieldMapping extends AbstractHelper
         $mappings = $this->getFieldMappings($storeId);
         $magentoData = [];
 
+        // List of error/placeholder messages from API that should not be mapped
+        $skipMessages = [
+            'Not found in reliable online sources provided',
+            'Not found',
+            'N/A',
+            'Not applicable',
+            'Unable to generate',
+            'Error generating field',
+        ];
+
         foreach ($mappings as $aiField => $magentoAttribute) {
             if (isset($aiProductData[$aiField]) && !empty($aiProductData[$aiField])) {
-                $magentoData[$magentoAttribute] = $aiProductData[$aiField];
+                $value = $aiProductData[$aiField];
+                // Skip if the value is an error/placeholder message
+                if (!in_array($value, $skipMessages, true)) {
+                    $magentoData[$magentoAttribute] = $value;
+                }
             }
         }
 

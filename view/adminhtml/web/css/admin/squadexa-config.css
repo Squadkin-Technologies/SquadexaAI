@@ -1,14 +1,37 @@
 /**
  * Copyright © 2024 Squadkin. All rights reserved.
- * Squadexa AI Configuration - Full Width Dashboard Styles
+ * Squadexa AI Configuration - Modern Premium UI Design
  */
+
+/* ========================================
+   CSS Variables - Squadexa Brand Design System
+   ======================================== */
+
+:root {
+    --sq-primary: #4f46e5;
+    --sq-primary-dark: #3c35d0;
+    --sq-primary-light: #6366f1;
+    --sq-purple: #7c3aed;
+    --sq-purple-light: #a78bfa;
+    --sq-success: #10b981;
+    --sq-warning: #f59e0b;
+    --sq-danger: #ef4444;
+    --sq-dark: #1f2937;
+    --sq-light: #f3f4f6;
+    --sq-border: #e5e7eb;
+    --sq-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 13px rgba(0, 0, 0, 0.05);
+    --sq-shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.1), 0 8px 10px rgba(0, 0, 0, 0.06);
+}
+
+/* ========================================
+   Global Configuration Styles
+   ======================================== */
 
 /* Full width configuration section */
 .config-nav-block .item-squadexaiproductcreator {
     width: 100% !important;
 }
 
-/* Full width for Squadexa AI section when JavaScript class is added */
 .squadexa-fullwidth-section {
     width: 100% !important;
     max-width: none !important;
@@ -28,7 +51,7 @@
     max-width: none !important;
 }
 
-/* Full width for fields within Squadexa AI section */
+/* Full width for fields */
 #squadexaiproductcreator_general .admin__field,
 #squadexaiproductcreator_authentication .admin__field,
 #squadexaiproductcreator_account_status .admin__field {
@@ -37,7 +60,6 @@
     flex-wrap: wrap !important;
 }
 
-/* Label and control layout for full width */
 #squadexaiproductcreator_general .admin__field-label,
 #squadexaiproductcreator_authentication .admin__field-label,
 #squadexaiproductcreator_account_status .admin__field-label {
@@ -62,7 +84,6 @@
     margin-top: 10px !important;
 }
 
-/* Account status and token information full width */
 .squadexa-account-dashboard,
 .token-status-info,
 .account-status-info {
@@ -70,33 +91,716 @@
     max-width: none !important;
 }
 
-/* Button styling for full width */
-#squadexaiproductcreator_authentication_generate_token .admin__field-control {
-    width: 100% !important;
-}
-
-#row_squadexaiproductcreator_account_status_account_info td.label{
+#row_squadexaiproductcreator_account_status_account_info td.label {
     display: none;
 }
 
-#row_squadexaiproductcreator_account_status_account_info td.value{
+#row_squadexaiproductcreator_account_status_account_info td.value {
     width: 100% !important;
 }
 
+/* ========================================
+   Modern Button Styling
+   ======================================== */
 
-/* Responsive design for smaller screens */
+#generate_access_token_btn,
+.action-primary {
+    background: linear-gradient(135deg, var(--sq-primary) 0%, var(--sq-primary-light) 100%) !important;
+    border: none !important;
+    color: white !important;
+    padding: 12px 24px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: var(--sq-shadow) !important;
+}
+
+#generate_access_token_btn:hover,
+.action-primary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--sq-shadow-lg) !important;
+    background: linear-gradient(135deg, var(--sq-primary-dark) 0%, var(--sq-primary) 100%) !important;
+}
+
+/* ========================================
+   Step Indicator - Modern Design
+   ======================================== */
+
+.step-indicator {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    align-items: center;
+    position: relative;
+    padding: 15px 0;
+}
+
+.step-indicator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #ddd 0%, var(--sq-light) 50%, #ddd 100%);
+    z-index: 0;
+    transform: translateY(-50%);
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #999;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+    background: white;
+    padding-right: 10px;
+}
+
+.step.active {
+    color: var(--sq-dark);
+    font-weight: 700;
+}
+
+.step.done {
+    color: var(--sq-success);
+}
+
+.step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: #999;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.step.active .step-circle {
+    background: linear-gradient(135deg, var(--sq-primary) 0%, var(--sq-primary-light) 100%);
+    color: white;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    border-color: var(--sq-primary);
+}
+
+.step.done .step-circle {
+    background: linear-gradient(135deg, var(--sq-success) 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+    border-color: var(--sq-success);
+}
+
+/* ========================================
+   Success Card - Premium Design
+   ======================================== */
+
+.success-card {
+    background: linear-gradient(135deg, #f0f9ff 0%, #f3e8ff 100%);
+    border: 2px solid var(--sq-primary);
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    box-shadow: var(--sq-shadow);
+}
+
+.success-card > div:first-child {
+    color: var(--sq-success);
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 12px;
+}
+
+.api-key-display {
+    background: white;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    word-break: break-all;
+    font-size: 13px;
+    color: var(--sq-primary);
+    border: 1px solid var(--sq-border);
+    letter-spacing: 0.5px;
+}
+
+.copy-button {
+    background: linear-gradient(135deg, var(--sq-primary) 0%, var(--sq-primary-light) 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+    box-shadow: var(--sq-shadow);
+}
+
+.copy-button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--sq-shadow-lg);
+    background: linear-gradient(135deg, var(--sq-primary-dark) 0%, var(--sq-primary) 100%);
+}
+
+/* ========================================
+   Credit Info Card
+   ======================================== */
+
+.credit-info {
+    margin-top: 12px;
+    padding: 12px 15px;
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+    border: 1px solid #d1fae5;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #047857;
+    font-weight: 500;
+}
+
+/* ========================================
+   Error Cards - Modern Design
+   ======================================== */
+
+.error-card {
+    background: linear-gradient(135deg, #fef2f2 0%, #fef2f2 100%);
+    border: 2px solid var(--sq-danger);
+    padding: 18px;
+    border-radius: 12px;
+    margin-top: 20px;
+    box-shadow: 0 4px 6px rgba(239, 68, 68, 0.1);
+}
+
+.error-card > div:first-child {
+    color: var(--sq-danger);
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.email-verify-card {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 2px solid var(--sq-warning);
+    padding: 18px;
+    border-radius: 12px;
+    margin-top: 20px;
+    box-shadow: 0 4px 6px rgba(245, 158, 11, 0.1);
+    color: #92400e;
+}
+
+.email-verify-card strong {
+    color: #b45309;
+}
+
+.email-verify-card ol {
+    margin: 10px 0 0 25px;
+    padding: 0;
+}
+
+.email-verify-card li {
+    margin-bottom: 6px;
+    line-height: 1.5;
+}
+
+.topup-card {
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe4e6 100%);
+    border: 2px solid var(--sq-danger);
+    padding: 18px;
+    border-radius: 12px;
+    margin-top: 20px;
+    box-shadow: 0 4px 6px rgba(239, 68, 68, 0.1);
+    color: #7f1d1d;
+}
+
+/* ========================================
+   CTA Links
+   ======================================== */
+
+.cta-link {
+    color: var(--sq-primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.cta-link:hover {
+    color: var(--sq-primary-dark);
+    text-decoration: underline;
+}
+
+/* ========================================
+   Credit Wallet Display
+   ======================================== */
+
+.credit-wallet-card {
+    background: white;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    border-left: 4px solid var(--sq-success);
+    box-shadow: var(--sq-shadow);
+    transition: all 0.3s ease;
+}
+
+.credit-wallet-card:hover {
+    box-shadow: var(--sq-shadow-lg);
+    transform: translateY(-1px);
+}
+
+.credit-progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 10px 0;
+    border: 1px solid #d1d5db;
+}
+
+.credit-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sq-success) 0%, var(--sq-primary) 100%);
+    transition: width 0.4s ease;
+}
+
+/* ========================================
+   Plan Status Banner - Hero Section
+   ======================================== */
+
+.plan-status-banner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: var(--sq-shadow-lg);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.plan-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.plan-icon {
+    font-size: 32px;
+}
+
+.plan-details h3 {
+    color: white;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.plan-details p {
+    color: rgba(255, 255, 255, 0.9);
+    margin: 4px 0;
+    font-size: 13px;
+}
+
+.plan-limit {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.plan-limit-monthly-container,
+.plan-limit-daily-container {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 15px;
+    border-radius: 8px;
+    color: white;
+}
+
+.limit-label {
+    font-size: 11px;
+    opacity: 0.9;
+    margin-bottom: 2px;
+}
+
+.limit-value {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.upgrade-button {
+    background: linear-gradient(135deg, var(--sq-primary) 0%, var(--sq-primary-light) 100%);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    box-shadow: var(--sq-shadow);
+    white-space: nowrap;
+}
+
+.upgrade-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sq-shadow-lg);
+}
+
+.upgrade-button.warning {
+    background: linear-gradient(135deg, var(--sq-warning) 0%, #f97316 100%);
+}
+
+.upgrade-button.danger {
+    background: linear-gradient(135deg, var(--sq-danger) 0%, #dc2626 100%);
+}
+
+/* ========================================
+   Usage Cards Grid - Modern Design
+   ======================================== */
+
+.usage-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.usage-card {
+    background: white;
+    border: 1px solid var(--sq-border);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    gap: 14px;
+    transition: all 0.3s ease;
+    box-shadow: var(--sq-shadow);
+}
+
+.usage-card:hover {
+    border-color: var(--sq-primary);
+    box-shadow: var(--sq-shadow-lg);
+    transform: translateY(-4px);
+}
+
+.card-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.card-content {
+    flex: 1;
+}
+
+.card-label {
+    font-size: 11px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.card-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--sq-primary);
+    line-height: 1.2;
+}
+
+.card-subtitle {
+    font-size: 12px;
+    color: #ccc;
+    margin-top: 6px;
+}
+
+.card-trend {
+    font-size: 18px;
+}
+
+/* ========================================
+   Monthly Progress Section
+   ======================================== */
+
+.monthly-progress-section {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: var(--sq-shadow);
+}
+
+.section-header {
+    margin-bottom: 20px;
+}
+
+.section-header h3 {
+    color: var(--sq-dark);
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.section-header p {
+    color: #999;
+    margin: 4px 0 0 0;
+    font-size: 13px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #d1d5db;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sq-primary) 0%, var(--sq-purple) 100%);
+    transition: width 0.5s ease;
+}
+
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #666;
+    font-weight: 600;
+}
+
+.progress-center {
+    text-align: center;
+    color: var(--sq-primary);
+}
+
+.progress-percentage {
+    margin-top: 15px;
+    text-align: right;
+}
+
+.percentage-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--sq-primary);
+}
+
+.percentage-label {
+    font-size: 11px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ========================================
+   Info Cards
+   ======================================== */
+
+.info-card {
+    background: white;
+    border: 1px solid var(--sq-border);
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: var(--sq-shadow);
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    box-shadow: var(--sq-shadow-lg);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--sq-light);
+    padding-bottom: 12px;
+}
+
+.card-header h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--sq-dark);
+    flex: 1;
+}
+
+.card-icon-header {
+    font-size: 18px;
+}
+
+.status-badge-small {
+    background: linear-gradient(135deg, var(--sq-success) 0%, #059669 100%);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 13px;
+}
+
+.info-icon {
+    color: var(--sq-primary);
+    font-weight: 800;
+}
+
+.info-label {
+    color: #999;
+    min-width: 80px;
+    font-weight: 600;
+}
+
+.info-value {
+    color: var(--sq-dark);
+    font-weight: 600;
+}
+
+.status-active-text {
+    color: var(--sq-success);
+}
+
+/* ========================================
+   API Key Box
+   ======================================== */
+
+.api-key-box {
+    background: linear-gradient(135deg, #f0f9ff 0%, #f3e8ff 100%);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid var(--sq-border);
+}
+
+.api-key-label {
+    font-size: 11px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.api-key-value {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.api-key-value code {
+    background: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: 12px;
+    color: var(--sq-primary);
+    flex: 1;
+    border: 1px solid var(--sq-border);
+}
+
+.api-key-note {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+    margin-top: 10px;
+}
+
+/* ========================================
+   Trial Banner
+   ======================================== */
+
+.trial-banner {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid var(--sq-warning);
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 15px;
+    color: #92400e;
+    font-size: 13px;
+}
+
+.trial-banner p {
+    margin: 0;
+}
+
+.trial-banner a {
+    color: #b45309;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.trial-banner a:hover {
+    color: #92400e;
+    text-decoration: underline;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
 @media (max-width: 768px) {
     #squadexaiproductcreator_general .admin__field-label,
     #squadexaiproductcreator_authentication .admin__field-label,
     #squadexaiproductcreator_account_status .admin__field-label {
         width: 100% !important;
         flex: 0 0 100% !important;
+        margin-bottom: 8px;
     }
-    
+
     #squadexaiproductcreator_general .admin__field-control,
     #squadexaiproductcreator_authentication .admin__field-control,
     #squadexaiproductcreator_account_status .admin__field-control {
         width: 100% !important;
         flex: 0 0 100% !important;
+    }
+
+    .plan-status-banner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .usage-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .step-indicator {
+        gap: 10px;
+    }
+
+    .step {
+        flex-direction: column;
+        gap: 4px;
+        align-items: center;
     }
 }

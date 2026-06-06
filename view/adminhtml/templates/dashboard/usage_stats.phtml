@@ -1,4 +1,5 @@
 <?php
+// phpcs:ignoreFile Generic.WhiteSpace.ScopeIndent,Generic.Files.LineLength
 /**
  * @var \Squadkin\SquadexaAI\Block\Adminhtml\Dashboard\UsageStats $block
  * @var \Magento\Framework\Escaper $escaper
@@ -48,7 +49,7 @@ $progressColor = $block->getProgressBarColor();
                 </p>
                 <p>
                     <?= $escaper->escapeHtml(__('Don\'t have an account?')) ?>
-                    <a href="<?= $escaper->escapeUrl($block->getRedirectUrl()) ?>" target="_blank">
+                    <a href="<?= $escaper->escapeUrl('https://www.squadexa.ai/account#credits') ?>" target="_blank">
                         <?= $escaper->escapeHtml(__('Create account and get API key')) ?>
                     </a>
                 </p>
@@ -89,28 +90,24 @@ $progressColor = $block->getProgressBarColor();
                         <div class="progress-text">
                             <span class="calls-remaining">
                                 <?= $escaper->escapeHtml(__(
-                                    'Remaining: %1',
-                                    number_format($usageData['api_calls_remaining'])
-                                )) ?>
-                                <?= $escaper->escapeHtml(__(
-                                    'Limit: %1',
-                                    number_format($usageData['api_calls_limit'])
+                                    'Credits Remaining: %1',
+                                    number_format($usageData['credits_remaining'])
                                 )) ?>
                             </span>
-                            <span class="calls-label"><?= $escaper->escapeHtml(__('calls remaining')) ?></span>
+                            <span class="calls-label">
+                                <?= $escaper->escapeHtml(__(
+                                    'of %1 total',
+                                    number_format($usageData['credits_total'])
+                                )) ?>
+                            </span>
                         </div>
                     </div>
                     <div class="card-words-generated">
-                        <div class="card-label"><?= $escaper->escapeHtml(__('Words Generated')) ?></div>
+                        <div class="card-label"><?= $escaper->escapeHtml(__('Descriptions Generated')) ?></div>
                         <div class="card-value"><?= $escaper->escapeHtml(number_format(
-                            $usageData['words_generated']
+                            $usageData['descriptions_today'] ?? 0
                         )) ?></div>
-                        <div class="card-subtitle">
-                            <?= $escaper->escapeHtml(__(
-                                '%1% of daily limit',
-                                number_format($usageData['words_percentage'], 1)
-                            )) ?>
-                        </div>
+                        <div class="card-subtitle"><?= $escaper->escapeHtml(__('Today')) ?></div>
                     </div>
                     <div class="usage-stats-grid">
                         <div class="stat-item">
@@ -118,14 +115,17 @@ $progressColor = $block->getProgressBarColor();
                             <span class="stat-label"><?= $escaper->escapeHtml(__('Current Plan')) ?></span>
                         </div>
                     </div>
-                    <?php if ($usageData['calls_remaining'] > 0): ?>
+                    <?php if ($usageData['credits_remaining'] <= 5 && $usageData['credits_total'] > 0): ?>
                         <div class="trial-banner">
                             <p>
-                                🎉 <?= $escaper->escapeHtml(
-                                    __('You have %1 free calls remaining.', $usageData['calls_remaining'])
-                                ) ?>
-                                <a href="<?= $escaper->escapeUrl($block->getRedirectUrl()) ?>" target="_blank">
-                                    <?= $escaper->escapeHtml(__('Upgrade for unlimited access')) ?>
+                                ⚠️ <?= $escaper->escapeHtml(__(
+                                    'You have %1 credits remaining. Top up to continue using AI tools.',
+                                    $usageData['credits_remaining']
+                                )) ?>
+                                <a href="<?= $escaper->escapeUrl(
+                                    'https://www.squadexa.ai/account#credits'
+                                ) ?>" target="_blank">
+                                    <?= $escaper->escapeHtml(__('Top Up Credits')) ?>
                                 </a>.
                             </p>
                         </div>
@@ -140,11 +140,11 @@ $progressColor = $block->getProgressBarColor();
                             <div class="activity-icon">📝</div>
                             <div class="activity-content">
                                 <span class="activity-count"><?= $escaper->escapeHtml(
-                                    $usageData['calls_used']
+                                    $usageData['credits_used']
                                 ) ?></span>
                                 <span class="activity-label">
                                     <?= $escaper->escapeHtml(__(
-                                        'API Calls Today'
+                                        'Credits Used Today'
                                     )) ?>
                                 </span>
                             </div>
@@ -184,13 +184,13 @@ $progressColor = $block->getProgressBarColor();
                         </div>
                     </div>
                     <div class="card-total-api">
-                        <div class="card-label"><?= $escaper->escapeHtml(__('API Calls Used')) ?></div>
+                        <div class="card-label"><?= $escaper->escapeHtml(__('Credits Used')) ?></div>
                         <div class="card-value"><?= $escaper->escapeHtml(number_format(
-                            $usageData['api_calls']
+                            $usageData['credits_used']
                         )) ?></div>
                         <div class="card-subtitle">
                             <?= $escaper->escapeHtml(__(
-                                '%1% of limit',
+                                '%1% of wallet',
                                 number_format($usageData['api_calls_percentage'], 1)
                             )) ?>
                         </div>
@@ -221,18 +221,20 @@ $progressColor = $block->getProgressBarColor();
                             </div>
                         </div>
                     </div>
-                    <?php if ($usageData['calls_remaining'] > 0): ?>
+                    <?php if ($usageData['credits_remaining'] <= 5 && $usageData['credits_total'] > 0): ?>
                         <div class="trial-banner">
                             <p>
-                                🎉 <strong><?= $escaper->escapeHtml(__('Free Trial')) ?></strong>
+                                ⚠️ <strong><?= $escaper->escapeHtml(__('Low Credits')) ?></strong>
                                 <?= $escaper->escapeHtml(__(
-                                    'You have %1 descriptions remaining in your free trial.',
-                                    $usageData['calls_remaining']
+                                    'You have %1 credits remaining.',
+                                    $usageData['credits_remaining']
                                 )) ?>
-                                <a href="<?= $escaper->escapeUrl($block->getRedirectUrl()) ?>" target="_blank">
-                                    <?= $escaper->escapeHtml(__('Upgrade now')) ?>
+                                <a href="<?= $escaper->escapeUrl(
+                                    'https://www.squadexa.ai/account#credits'
+                                ) ?>" target="_blank">
+                                    <?= $escaper->escapeHtml(__('Top up now')) ?>
                                 </a>
-                                <?= $escaper->escapeHtml(__('to get unlimited access.')) ?>
+                                <?= $escaper->escapeHtml(__('to continue using AI tools.')) ?>
                             </p>
                         </div>
                     <?php endif; ?>

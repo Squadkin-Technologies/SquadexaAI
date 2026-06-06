@@ -19,12 +19,13 @@
         <group id="authentication" sortOrder="20" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
             <label>🔐 Authentication Settings</label>
             <comment><![CDATA[<strong>How to setup API Authentication:</strong><br/>
-            1. Enter your Squadexa AI account email and password below<br/>
-            2. Click "Generate API Key" button<br/>
-            3. Your permanent API Key will be generated automatically<br/>
-            4. Start using AI-powered product generation!<br/>
+            1. Create a free account at <a href="https://www.squadexa.ai/" target="_blank">Squadexa AI</a><br/>
+            2. Enter your email and password below<br/>
+            3. Click "Generate API Key" to create a permanent <code>pk_...</code> format API key<br/>
+            4. Your API key will be saved securely and used for all product generation requests<br/>
+            5. Monitor your credit balance in the dashboard<br/>
             <br/>
-            <strong>Note:</strong> If you don't have an account, visit <a href="https://squadexa.ai/" target="_blank">Squadexa AI Portal</a> to register first.]]></comment>
+            <strong>Note:</strong> The API key format is always <code>pk_</code> followed by a secure token. It never expires and is used for billing by credit wallet.]]></comment>
             
             <field id="username" type="text" sortOrder="10" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
                 <label>📧 Email</label>
@@ -61,7 +62,7 @@
             
             <field id="api_key" type="obscure" sortOrder="40" showInWebsite="0" showInStore="0" showInDefault="1" translate="label">
                 <label>🔐 API Key</label>
-                <comment>Your permanent API key - automatically generated when you click "Generate API Key" button above.</comment>
+                <comment>Your permanent API key in format <code>pk_...</code> - automatically generated when you click "Generate API Key" button above. Never expires and is billed using wallet credits.</comment>
                 <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 <depends>
                     <field id="is_enable">1</field>

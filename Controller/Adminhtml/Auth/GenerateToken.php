@@ -13,6 +13,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Squadkin\SquadexaAI\Service\SquadexaApiService;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
 
 class GenerateToken extends Action
 {
@@ -37,24 +38,32 @@ class GenerateToken extends Action
     protected $configWriter;
 
     /**
+     * @var EncryptorInterface
+     */
+    protected $encryptor;
+
+    /**
      * @param Context $context
      * @param JsonFactory $jsonFactory
      * @param SquadexaApiService $apiService
      * @param LoggerInterface $logger
      * @param WriterInterface $configWriter
+     * @param EncryptorInterface $encryptor
      */
     public function __construct(
         Context $context,
         JsonFactory $jsonFactory,
         SquadexaApiService $apiService,
         LoggerInterface $logger,
-        WriterInterface $configWriter
+        WriterInterface $configWriter,
+        EncryptorInterface $encryptor
     ) {
         parent::__construct($context);
         $this->jsonFactory = $jsonFactory;
         $this->apiService = $apiService;
         $this->logger = $logger;
         $this->configWriter = $configWriter;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -112,9 +121,10 @@ class GenerateToken extends Action
                     'api_key_length' => strlen($apiKeyData['api_key'])
                 ]);
 
-                // Save ONLY the API key (not the access token as it expires in 30 minutes)
+                // Save ONLY the API key encrypted (not the access token as it expires in 30 minutes)
                 $apiKeyCreated = date('Y-m-d H:i:s');
-                $this->configWriter->save('squadexaiproductcreator/authentication/api_key', $apiKeyData['api_key']);
+                $encryptedApiKey = $this->encryptor->encrypt($apiKeyData['api_key']);
+                $this->configWriter->save('squadexaiproductcreator/authentication/api_key', $encryptedApiKey);
                 $this->configWriter->save('squadexaiproductcreator/authentication/api_key_created', $apiKeyCreated);
                 
                 $this->logger->info('SquadexaAI: API key saved to database (access token NOT saved as it expires)', [
@@ -148,9 +158,20 @@ class GenerateToken extends Action
                 'error' => $e->getMessage()
             ]);
 
+            $message = $e->getMessage();
+
+            // Surface email-not-verified error with helpful guidance
+            if (stripos($message, 'EMAIL_NOT_VERIFIED') !== false ||
+                stripos($message, 'not verified') !== false) {
+                $message = __(
+                    'Your email address is not verified. Please check your inbox for a verification '
+                    . 'email from Squadexa AI and click the link to verify your account before logging in.'
+                );
+            }
+
             return $result->setData([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $message
             ]);
         } catch (\Exception $e) {
             $this->logger->error('SquadexaAI: Login failed - General Exception', [

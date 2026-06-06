@@ -169,25 +169,34 @@ class AccountStatus extends Field
     {
         $usageStats = $accountInfo['usage_stats'] ?? [];
         $subscriptionPlan = $accountInfo['subscription_plan'] ?? [];
-        
-        $callsRemaining = $subscriptionPlan['calls_remaining'] ?? 0;
-        $callsLimit = $subscriptionPlan['calls_limit'] ?? 5;
-        $callsUsed = $callsLimit - $callsRemaining;
-        $percentage = $callsLimit > 0 ? ($callsUsed / $callsLimit) * 100 : 0;
-        
+
+        // Credit-based wallet model
+        $creditsRemaining = $subscriptionPlan['credits_remaining'] ?? 0;
+        $creditsUsed = $subscriptionPlan['credits_used'] ?? 0;
+        $creditsTotal = $creditsRemaining + $creditsUsed;
+
+        // Backward compatibility fallback
+        if ($creditsTotal == 0 && isset($subscriptionPlan['calls_remaining'])) {
+            $creditsRemaining = $subscriptionPlan['calls_remaining'];
+            $creditsTotal = $subscriptionPlan['calls_limit'] ?? 0;
+            $creditsUsed = $creditsTotal - $creditsRemaining;
+        }
+
+        $percentage = $creditsTotal > 0 ? ($creditsUsed / $creditsTotal) * 100 : 0;
+
         $html = '<div class="usage-overview">';
         $html .= '<h3>📊 Usage & Overview</h3>';
         $html .= '<div class="usage-stats">';
-        
-        // API Usage Progress Bar
+
+        // Credit Wallet Progress Bar
         $html .= '<div class="api-usage">';
-        $html .= '<h4>⚡ API Usage</h4>';
+        $html .= '<h4>⚡ Credit Wallet</h4>';
         $html .= '<div class="progress-bar">';
         $html .= '<div class="progress-fill" style="width: ' . $percentage . '%"></div>';
         $html .= '</div>';
-        $html .= '<p><strong>' . $callsRemaining . '/' . $callsLimit . '</strong> calls remaining</p>';
+        $html .= '<p><strong>' . $creditsRemaining . '</strong> credits remaining</p>';
         $html .= '</div>';
-        
+
         // Today's Activity
         $html .= '<div class="todays-activity">';
         $html .= '<h4>📈 Today\'s Activity</h4>';
@@ -210,10 +219,10 @@ class AccountStatus extends Field
         $html .= '</div>';
         $html .= '</div>';
         $html .= '</div>';
-        
+
         $html .= '</div>';
         $html .= '</div>';
-        
+
         return $html;
     }
 
@@ -226,39 +235,45 @@ class AccountStatus extends Field
     private function renderAccountStatus(array $accountInfo): string
     {
         $userProfile = $accountInfo['user_profile'] ?? [];
-        
+        $subscriptionPlan = $accountInfo['subscription_plan'] ?? [];
+
+        $creditsRemaining = $subscriptionPlan['credits_remaining'] ?? 0;
+        $creditsUsed = $subscriptionPlan['credits_used'] ?? 0;
+
+        // Backward compatibility fallback
+        if (($creditsRemaining + $creditsUsed) == 0 && isset($subscriptionPlan['calls_remaining'])) {
+            $creditsRemaining = $subscriptionPlan['calls_remaining'];
+        }
+
         $html = '<div class="account-status">';
         $html .= '<h3>🔑 Account Status</h3>';
         $html .= '<div class="status-grid">';
-        
+
         // API Key Status
         $html .= '<div class="status-item">';
         $html .= '<span class="status-icon">🔑</span>';
         $html .= '<span class="status-label">API Key Status</span>';
         $html .= '<span class="status-value status-active">Active Ready</span>';
         $html .= '</div>';
-        
+
         // Current Plan
-        $subscriptionPlan = $accountInfo['subscription_plan'] ?? [];
         $planName = $subscriptionPlan['name'] ?? 'FREE';
         $html .= '<div class="status-item">';
         $html .= '<span class="status-icon">📊</span>';
         $html .= '<span class="status-label">Current Plan</span>';
-        $html .= '<span class="status-value">' . $planName . ' ';
-        $html .= ($subscriptionPlan['calls_limit'] ?? 5) . ' calls/month</span>';
+        $html .= '<span class="status-value">' . $planName . '</span>';
         $html .= '</div>';
-        
-        // Calls Remaining
-        $callsRemaining = $subscriptionPlan['calls_remaining'] ?? 0;
+
+        // Credits Remaining
         $html .= '<div class="status-item">';
         $html .= '<span class="status-icon">⚡</span>';
-        $html .= '<span class="status-label">Calls Remaining</span>';
-        $html .= '<span class="status-value">' . $callsRemaining . ' Free Trial</span>';
+        $html .= '<span class="status-label">Credits Remaining</span>';
+        $html .= '<span class="status-value">' . $creditsRemaining . ' credits</span>';
         $html .= '</div>';
-        
+
         $html .= '</div>';
         $html .= '</div>';
-        
+
         return $html;
     }
 
@@ -271,37 +286,54 @@ class AccountStatus extends Field
     private function renderSubscriptionPlan(array $accountInfo): string
     {
         $subscriptionPlan = $accountInfo['subscription_plan'] ?? [];
-        $callsRemaining = $subscriptionPlan['calls_remaining'] ?? 0;
-        $callsLimit = $subscriptionPlan['calls_limit'] ?? 5;
-        $percentage = $callsLimit > 0 ? (($callsLimit - $callsRemaining) / $callsLimit) * 100 : 0;
-        
+        $creditsRemaining = $subscriptionPlan['credits_remaining'] ?? 0;
+        $creditsUsed = $subscriptionPlan['credits_used'] ?? 0;
+        $creditsTotal = $creditsRemaining + $creditsUsed;
+
+        // Backward compatibility fallback
+        if ($creditsTotal == 0 && isset($subscriptionPlan['calls_remaining'])) {
+            $creditsRemaining = $subscriptionPlan['calls_remaining'];
+            $creditsTotal = $subscriptionPlan['calls_limit'] ?? 0;
+            $creditsUsed = $creditsTotal - $creditsRemaining;
+        }
+
+        $percentage = $creditsTotal > 0 ? (($creditsUsed) / $creditsTotal) * 100 : 0;
+
         $html = '<div class="subscription-plan">';
-        $html .= '<h3>📋 Usage Overview</h3>';
+        $html .= '<h3>📋 Credit Usage Overview</h3>';
         $html .= '<div class="plan-details">';
-        
-        // Descriptions Generated Progress
+
+        // Credit Usage Progress
         $html .= '<div class="descriptions-progress">';
-        $html .= '<h4>📝 Descriptions Generated</h4>';
+        $html .= '<h4>📝 Credits Used</h4>';
         $html .= '<div class="progress-bar">';
         $html .= '<div class="progress-fill" style="width: ' . $percentage . '%"></div>';
         $html .= '</div>';
-        $html .= '<p><strong>' . ($callsLimit - $callsRemaining) . '/' . $callsLimit;
-        $html .= '</strong> descriptions generated</p>';
+        $html .= '<p><strong>' . $creditsUsed . '/' . $creditsTotal;
+        $html .= '</strong> credits used</p>';
         $html .= '</div>';
-        
-        // Free Trial Banner
-        if ($callsRemaining > 0) {
+
+        // Low Credits Banner
+        $ctaLink = $subscriptionPlan['cta_link'] ?? '';
+        if ($creditsRemaining <= 5 && $creditsTotal > 0) {
             $html .= '<div class="trial-banner">';
-            $html .= '<p>🎉 <strong>Free Trial</strong> You have ' . $callsRemaining;
-            $html .= ' descriptions remaining in your free trial. ';
-            $html .= '<a href="#" target="_blank">Upgrade now</a> ';
-            $html .= 'to get unlimited access.</p>';
+            $html .= '<p>⚠️ <strong>Low Credits</strong> You have ' . $creditsRemaining;
+            $html .= ' credits remaining. ';
+            if ($ctaLink) {
+                // @codingStandardsIgnoreLine
+                $html .= '<a href="' . htmlspecialchars($ctaLink) . '" target="_blank">Top up now</a> ';
+            } else {
+                // @codingStandardsIgnoreLine
+                $html .= '<a href="' . htmlspecialchars($this->apiService->getRedirectUrl())
+                    . '" target="_blank">Top up now</a> ';
+            }
+            $html .= 'to continue using AI tools.</p>';
             $html .= '</div>';
         }
-        
+
         $html .= '</div>';
         $html .= '</div>';
-        
+
         return $html;
     }
 
